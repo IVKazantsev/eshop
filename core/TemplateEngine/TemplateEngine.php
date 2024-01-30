@@ -29,7 +29,7 @@ class TemplateEngine
 
 		if (!file_exists($absolutePath))
 		{
-			throw new RuntimeException('Template not found');
+			return $this->render('errorPage');
 		}
 
 		extract($variables);
