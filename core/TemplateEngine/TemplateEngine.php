@@ -18,7 +18,7 @@ class TemplateEngine
 		$this->templateDir = $templateDir;
 	}
 
-	public function render(string $file, array $variables = [], $isEcho = true): string
+	public function render(string $file, array $variables = []): string
 	{
 		if (!preg_match('/^[0-9A-Za-z\/_-]+$/', $file))
 		{
@@ -38,12 +38,6 @@ class TemplateEngine
 
 		require $absolutePath;
 
-		$content = ob_get_clean();
-		if ($isEcho)
-		{
-			echo $content;
-		}
-
-		return $content;
+		return ob_get_clean();
 	}
 }
