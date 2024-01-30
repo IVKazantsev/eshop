@@ -1,6 +1,6 @@
 <?php
 
-namespace N_ONE\src\Model;
+namespace N_ONE\App\Model;
 
 class Item
 {
