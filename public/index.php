@@ -1,2 +1,3 @@
 <?php
-//public index
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/boot.php';
