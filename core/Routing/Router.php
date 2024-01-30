@@ -5,7 +5,7 @@ namespace N_ONE\Core\Routing;
 class Router
 {
 	/**
-	 * @var array Router
+	 * @var array Router[]
 	 */
 	public static array $routes = [];
 
