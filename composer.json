@@ -1,0 +1,8 @@
+{
+	"autoload": {
+		"psr-4": {
+			"N_ONE\\App\\": "src/",
+			"N_ONE\\Core\\": "core/"
+		}
+	}
+}

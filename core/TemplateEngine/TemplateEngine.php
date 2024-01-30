@@ -37,6 +37,7 @@ class TemplateEngine
 		ob_start();
 
 		require $absolutePath;
+
 		return ob_get_clean();
 	}
 }
