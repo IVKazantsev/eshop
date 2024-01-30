@@ -1,6 +1,6 @@
 <?php
 
-namespace N_ONE\src\Controller;
+namespace N_ONE\App\Controller;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 abstract class BaseController
