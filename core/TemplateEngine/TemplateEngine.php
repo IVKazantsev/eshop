@@ -29,7 +29,7 @@ class TemplateEngine
 
 		if (!file_exists($absolutePath))
 		{
-			$this->render('errorPage');
+			return $this->render('errorPage');
 		}
 
 		extract($variables);
@@ -37,7 +37,6 @@ class TemplateEngine
 		ob_start();
 
 		require $absolutePath;
-
 		return ob_get_clean();
 	}
 }
