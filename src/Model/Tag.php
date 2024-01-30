@@ -4,11 +4,10 @@ namespace N_ONE\App\Model;
 
 class Tag
 {
-	private string $title;
-
-	public function __construct(string $title)
+	public function __construct(
+		private string $title
+	)
 	{
-		$this->title = $title;
 	}
 
 	public function getTitle(): string

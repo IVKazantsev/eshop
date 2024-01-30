@@ -4,17 +4,13 @@ namespace N_ONE\App\Model;
 
 class Order
 {
-	private User $user;
-	private Item $item;
-	private string $status;
-	private int $price;
-
-	public function __construct(User $user, Item $item, string $status, int $price)
+	public function __construct(
+		private User   $user,
+		private Item   $item,
+		private string $status,
+		private int    $price
+	)
 	{
-		$this->user = $user;
-		$this->item = $item;
-		$this->status = $status;
-		$this->price = $price;
 	}
 
 	public function getUser(): User

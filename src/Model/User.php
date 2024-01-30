@@ -4,28 +4,15 @@ namespace N_ONE\App\Model;
 
 class User
 {
-	private string $role;
-	private string $name;
-	private string $email;
-	private string $pass;
-	private string $number;
-	private string $address;
-
 	public function __construct(
-		string $role,
-		string $name,
-		string $email,
-		string $pass,
-		string $number,
-		string $address
+		private string $role,
+		private string $name,
+		private string $email,
+		private string $pass,
+		private string $number,
+		private string $address
 	)
 	{
-		$this->role = $role;
-		$this->name = $name;
-		$this->email = $email;
-		$this->pass = $pass;
-		$this->number = $number;
-		$this->address = $address;
 	}
 
 	public function getRole(): string

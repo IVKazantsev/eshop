@@ -4,34 +4,18 @@ namespace N_ONE\App\Model;
 
 class Item
 {
-	private string $title;
-	private bool $isActive;
-	private int $price;
-	private string $description;
-	private int $sortOrder;
-	/**
-	 * @var Tag[]
-	 */
-	private array $tags;
-
 	/**
 	 * @param Tag[] $tags
 	 */
 	public function __construct(
-		string $title,
-		bool   $isActive,
-		int    $price,
-		string $description,
-		array  $tags,
-		int    $sortOrder = 0
+		private string $title,
+		private bool   $isActive,
+		private int    $price,
+		private string $description,
+		private array  $tags,
+		private int    $sortOrder = 0
 	)
 	{
-		$this->title = $title;
-		$this->isActive = $isActive;
-		$this->price = $price;
-		$this->description = $description;
-		$this->tags = $tags;
-		$this->sortOrder = $sortOrder;
 	}
 
 	public function getTitle(): string
