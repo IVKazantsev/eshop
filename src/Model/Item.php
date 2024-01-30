@@ -8,6 +8,7 @@ class Item
 	 * @param Tag[] $tags
 	 */
 	public function __construct(
+		private int    $id,
 		private string $title,
 		private bool   $isActive,
 		private int    $price,
@@ -16,6 +17,16 @@ class Item
 		private int    $sortOrder = 0
 	)
 	{
+	}
+
+	public function getId(): int
+	{
+		return $this->id;
+	}
+
+	public function setId(int $id): void
+	{
+		$this->id = $id;
 	}
 
 	public function getTitle(): string
