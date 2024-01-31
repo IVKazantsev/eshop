@@ -1,10 +1,7 @@
 <?php
-/**
- * @var int $errorCode
- * @var string $errorMessage
- */
 
 ?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -14,6 +11,6 @@
 	<title>Document</title>
 </head>
 <body>
-<h1><?= $errorCode ?> <?= $errorMessage ?></h1>
+<h1>Catalogue will reside here</h1>
 </body>
 </html>

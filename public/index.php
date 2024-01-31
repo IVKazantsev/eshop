@@ -1,5 +1,7 @@
 <?php
 
+<<<<<<< public/index.php
+use N_ONE\App;
 use N_ONE\Core\DbConnection\DbConnection;
 use N_ONE\Core\Migration\Migration;
 
@@ -9,3 +11,7 @@ $dbConnection = new DbConnection();
 $migrator = new Migration($dbConnection);
 
 $migrator->migrate();
+
+$app = new App\Application();
+$app->run();
+

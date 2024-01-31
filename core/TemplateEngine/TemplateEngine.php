@@ -10,12 +10,25 @@ class TemplateEngine
 
 	public function __construct(string $templateDir)
 	{
+
 		if (!is_dir($templateDir))
 		{
 			throw new RuntimeException('Invalid template dir');
 		}
 
 		$this->templateDir = $templateDir;
+	}
+
+	public function renderError(int $errorCode, string $errorMessage): string
+	{
+		$errorViewFile = 'errorPage';
+
+		$variables = [
+			'errorCode' => $errorCode,
+			'errorMessage' => $errorMessage,
+		];
+
+		return $this->render($errorViewFile, $variables);
 	}
 
 	public function render(string $file, array $variables = []): string
@@ -29,7 +42,7 @@ class TemplateEngine
 
 		if (!file_exists($absolutePath))
 		{
-			return $this->render('errorPage');
+			exit(404);
 		}
 
 		extract($variables);
