@@ -41,15 +41,15 @@ values
 	(1, 1),
 	(1, 5),
 	(1, 7),
-	(1, 10),
+	(1, 9),
 	(2, 3),
 	(2, 5),
 	(2, 7),
-	(2, 10),
+	(2, 9),
 	(3, 1),
 	(3, 5),
 	(3, 7),
-	(3, 10);
+	(3, 9);
 
 insert into N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE)
 values
