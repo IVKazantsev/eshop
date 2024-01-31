@@ -1,6 +1,5 @@
 <?php
 
-<<<<<<< public/index.php
 use N_ONE\App;
 use N_ONE\Core\DbConnection\DbConnection;
 use N_ONE\Core\Migration\Migration;
