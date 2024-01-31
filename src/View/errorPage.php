@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var int $errorCode
+ * @var string $errorMessage
+ */
+
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,6 +14,6 @@
 	<title>Document</title>
 </head>
 <body>
-<h1>404 Not Found</h1>
+<h1><?= $errorCode ?> <?= $errorMessage ?></h1>
 </body>
 </html>

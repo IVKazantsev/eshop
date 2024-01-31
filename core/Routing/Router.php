@@ -4,9 +4,7 @@ namespace N_ONE\Core\Routing;
 
 class Router
 {
-	/**
-	 * @var array Router[]
-	 */
+
 	public static array $routes = [];
 
 	public static function get(string $uri, callable $action)
@@ -41,4 +39,5 @@ class Router
 
 		return null;
 	}
+
 }

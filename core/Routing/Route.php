@@ -4,6 +4,7 @@ namespace N_ONE\Core\Routing;
 
 class Route
 {
+
 	private array $variables = [];
 
 	public function __construct(
