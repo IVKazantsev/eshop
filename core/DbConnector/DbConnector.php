@@ -9,7 +9,7 @@ use RuntimeException;
 
 class DbConnector
 {
-	static private DbConnector $instance;
+	static private ?DbConnector $instance = null;
 
 	/**
 	 * @throws Exception

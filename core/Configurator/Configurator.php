@@ -7,7 +7,7 @@ use RuntimeException;
 class Configurator
 {
 
-	static private Configurator $instance;
+	static private ?Configurator $instance = null;
 
 	private function __construct()
 	{

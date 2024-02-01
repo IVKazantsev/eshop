@@ -6,8 +6,8 @@ use N_ONE\Core\Migrator\Migrator;
 
 require_once __DIR__ . '/../boot.php';
 
-$dbConnection = new DbConnector();
-$migrator = new Migrator($dbConnection);
+$dbConnection = DbConnector::getInstance();
+$migrator = Migrator::getInstance();
 
 $migrator->migrate();
 

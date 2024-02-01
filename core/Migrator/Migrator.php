@@ -3,14 +3,13 @@
 namespace N_ONE\Core\Migrator;
 
 use DateTime;
-use Exception;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 use RuntimeException;
 
 class Migrator
 {
-	static private Migrator $instance;
+	static private ?Migrator $instance = null;
 	private DbConnector $dbConnector;
 
 	private function __construct(DbConnector $dbConnector)
@@ -34,9 +33,6 @@ class Migrator
 		return static::$instance = new self($dbConnector);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public function migrate(): void
 	{
 
@@ -85,9 +81,6 @@ class Migrator
 		return mysqli_fetch_assoc($result)["TITLE"];
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	private function findNewMigrations($lastMigration): array
 	{
 		$pattern = '/(\d{4}_\d{2}_\d{2}_\d{2}_\d{2})/';
@@ -115,9 +108,6 @@ class Migrator
 		return $migrations;
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	private function executeMigration($migration): void
 	{
 

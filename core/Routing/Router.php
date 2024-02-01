@@ -5,7 +5,7 @@ namespace N_ONE\Core\Routing;
 class Router
 {
 
-	static private Router $instance;
+	static private ?Router $instance = null;
 
 	private function __construct()
 	{

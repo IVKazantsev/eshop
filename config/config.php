@@ -18,5 +18,5 @@ return [
 	'ASSETS_PATH' =>'/resources/assets/',
 	'POSTERS_PATH' => '/resources/moviePosters/',
 	'NUM_OF_ITEMS_PER_PAGE' => 6,
-	'MIGRATION_PATH' => "/core/Migration/migrations",
+	'MIGRATION_PATH' => "/core/Migrator/migrations",
 ];
