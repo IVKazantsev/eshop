@@ -31,18 +31,15 @@ class Application
 	{
 		// echo "app started" . PHP_EOL;
 		$route = Router::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
-		if ($route)
-		{
-			$action = $route->action;
-			$variables = $route->getVariables();
-
-			echo $action(...$variables);
-		}
-		else
+		if (!$route)
 		{
 			http_response_code(404);
 			echo (new TemplateEngine(__DIR__ . '../../src/View/'))->renderError(404, "Page not found");
 			exit;
 		}
+		$action = $route->action;
+		$variables = $route->getVariables();
+
+		echo $action(...$variables);
 	}
 }
