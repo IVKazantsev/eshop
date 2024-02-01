@@ -2,7 +2,7 @@
 
 namespace N_ONE\App\Model;
 
-class Item
+class Item extends Entity
 {
 	/**
 	 * @param Tag[] $tags

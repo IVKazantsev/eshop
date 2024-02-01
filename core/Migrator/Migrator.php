@@ -1,18 +1,22 @@
 <?php
 
-namespace N_ONE\Core\Migration;
+namespace N_ONE\Core\Migrator;
 
 use DateTime;
 use Exception;
-use N_ONE\Core\Configuration\Configuration;
-use N_ONE\Core\DbConnection\DbConnection;
+use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\DbConnector\DbConnector;
 
-class Migration
+class Migrator
 {
-	private DbConnection $dbConnection;
-	public function __construct(DbConnection $dbConnection)
+	private DbConnector $dbConnection;
+	private string $migrationPath;
+	private string $migrationTable;
+	public function __construct(DbConnector $dbConnection)
 	{
 		$this->dbConnection = $dbConnection;
+		$this->migrationPath = Configurator::option('MIGRATION_PATH');
+		$this->migrationTable = Configurator::option('MIGRATION_TABLE');
 	}
 
     public function migrate()
@@ -21,7 +25,7 @@ class Migration
         // 1. смотрим последнюю применённую миграцию, которая записана в таблице migration (если таблица пуста то делаем все миграции)
         $lastMigration = $this->getLastMigration();
 
-        // 2. проходимся по /core/Migration/migrations и ищем новые миграции
+        // 2. проходимся по /core/Migrator/migrations и ищем новые миграции
         $newMigrations = $this->findNewMigrations($lastMigration);
 
         // 3. выполняем новые миграции
@@ -34,10 +38,9 @@ class Migration
 
 	private function getLastMigration()
 	{
-		$migrationTable = "N_ONE_MIGRATIONS";
 		$connection = $this->dbConnection->getConnection();
 
-		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '{$migrationTable}'");
+		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '{$this->migrationTable}'");
 
 		if (mysqli_num_rows($tableExistsQuery) === 0)
 		{
@@ -46,7 +49,7 @@ class Migration
 
 		$result = mysqli_query($connection, "
         SELECT *
-        FROM {$migrationTable}
+        FROM {$this->migrationTable}
         ORDER BY ID DESC
         LIMIT 1
         ");
@@ -63,7 +66,7 @@ class Migration
 	{
 		$pattern = '/(\d{4}_\d{2}_\d{2}_\d{2}_\d{2})/';
 		$migrations = [];
-		$files = glob(ROOT . Configuration::option('MIGRATION_PATH') . '/*.sql');
+		$files = glob(ROOT . $this->migrationPath . '/*.sql');
 
 		preg_match($pattern, $lastMigration, $matches);
 		$currentTimestamp = ($matches) ? DateTime::createFromFormat('Y_m_d_H_i', $matches[0])->getTimestamp() : 0;
@@ -92,7 +95,7 @@ class Migration
 		$connection = $this->dbConnection->getConnection();
 
 		// Чтение содержимого SQL файла
-		$sql = file_get_contents(ROOT . Configuration::option('MIGRATION_PATH') . '/' . $migration);
+		$sql = file_get_contents(ROOT . $this->migrationPath . '/' . $migration);
 
 		if (!$sql)
 		{
@@ -123,7 +126,7 @@ class Migration
 	{
 		$connection = $this->dbConnection->getConnection();
 
-		$sql = "INSERT INTO N_ONE_MIGRATIONS (TITLE) VALUE ('{$migration}');";
+		$sql = "INSERT INTO {$this->migrationTable} (TITLE) VALUE ('{$migration}');";
 
 		$result = mysqli_query($connection, $sql);
 		if (!$result)

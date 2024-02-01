@@ -1,10 +1,10 @@
 <?php
 
-namespace N_ONE\Core\Configuration;
+namespace N_ONE\Core\Configurator;
 
 use Exception;
 
-class Configuration
+class Configurator
 {
 	public static function option(string $name, $defaultValue = null)
 	{
@@ -35,6 +35,6 @@ class Configuration
 			return $defaultValue;
 		}
 
-		throw new Exception("Configuration option {$name} not found");
+		throw new Exception("Configurator option {$name} not found");
 	}
 }

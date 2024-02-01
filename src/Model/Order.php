@@ -2,16 +2,25 @@
 
 namespace N_ONE\App\Model;
 
-class Order
+class Order extends Entity
 {
 	public function __construct(
 		private int    $id,
 		private User   $user,
 		private Item   $item,
+		private int    $statusId,
 		private string $status,
 		private int    $price
-	)
+	){}
+
+	public function getStatusId(): int
 	{
+		return $this->statusId;
+	}
+
+	public function setStatusId(int $statusId): void
+	{
+		$this->statusId = $statusId;
 	}
 
 	public function getId(): int

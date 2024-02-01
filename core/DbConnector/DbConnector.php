@@ -1,16 +1,16 @@
 <?php
 
-namespace N_ONE\Core\DbConnection;
+namespace N_ONE\Core\DbConnector;
 
-use N_ONE\Core\Configuration\Configuration;
+use N_ONE\Core\Configurator\Configurator;
 
-class DbConnection
+class DbConnector
 {
 	private static \mysqli|false $connection;
 
 	public function __construct()
 	{
-		$dbOptions = Configuration::option("DB_OPTIONS");
+		$dbOptions = Configurator::option("DB_OPTIONS");
 		$this->createConnection($dbOptions);
 	}
 	private function createConnection( $dbOptions)

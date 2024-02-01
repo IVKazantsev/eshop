@@ -4,5 +4,8 @@
 			"N_ONE\\App\\": "src/",
 			"N_ONE\\Core\\": "core/"
 		}
+	},
+	"require": {
+		"ext-mysqli": "*"
 	}
 }
