@@ -11,6 +11,6 @@ $migrator = Migrator::getInstance();
 
 $migrator->migrate();
 
-$app = new App\Application();
+$app = App\Application::getInstance();
 $app->run();
 

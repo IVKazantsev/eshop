@@ -7,7 +7,27 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class Application
 {
-	public function run()
+	static private ?Application $instance = null;
+
+	private function __construct()
+	{
+	}
+
+	private function __clone()
+	{
+	}
+
+	public static function getInstance(): Application
+	{
+		if (static::$instance)
+		{
+			return static::$instance;
+		}
+
+		return static::$instance = new self();
+	}
+
+	public function run(): void
 	{
 		// echo "app started" . PHP_EOL;
 		$route = Router::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
