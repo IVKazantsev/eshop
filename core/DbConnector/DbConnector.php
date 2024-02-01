@@ -1,19 +1,45 @@
 <?php
 
-namespace N_ONE\Core\DbConnection;
+namespace N_ONE\Core\DbConnector;
 
-use N_ONE\Core\Configuration\Configuration;
+use Exception;
+use mysqli;
+use N_ONE\Core\Configurator\Configurator;
+use RuntimeException;
 
-class DbConnection
+class DbConnector
 {
-	private static \mysqli|false $connection;
+	static private DbConnector $instance;
 
-	public function __construct()
+	/**
+	 * @throws Exception
+	 */
+	private function __construct()
 	{
-		$dbOptions = Configuration::option("DB_OPTIONS");
+		$dbOptions = Configurator::option("DB_OPTIONS");
 		$this->createConnection($dbOptions);
 	}
-	private function createConnection( $dbOptions)
+
+	private function __clone()
+	{
+	}
+
+	public static function getInstance(): DbConnector
+	{
+		if (static::$instance)
+		{
+			return static::$instance;
+		}
+
+		return static::$instance = new self();
+	}
+
+	private static mysqli|false $connection;
+
+	/**
+	 * @throws Exception
+	 */
+	private function createConnection($dbOptions): void
 	{
 		$dbHost = $dbOptions["DB_HOST"];
 		$dbUser = $dbOptions["DB_USER"];
@@ -26,17 +52,17 @@ class DbConnection
 		if (!$connected)
 		{
 			$error = mysqli_connect_errno() . ': ' . mysqli_connect_error();
-			throw new \Exception($error);
+			throw new RuntimeException($error);
 		}
 
 		$encodingResult = mysqli_set_charset(static::$connection, 'utf8');
 		if (!$encodingResult)
 		{
-			throw new \Exception(mysqli_error(static::$connection));
+			throw new RuntimeException(mysqli_error(static::$connection));
 		}
 	}
 
-	public function getConnection()
+	public function getConnection(): bool|mysqli
 	{
 		return self::$connection;
 	}

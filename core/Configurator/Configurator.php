@@ -1,11 +1,32 @@
 <?php
 
-namespace N_ONE\Core\Configuration;
+namespace N_ONE\Core\Configurator;
 
-use Exception;
+use RuntimeException;
 
-class Configuration
+class Configurator
 {
+
+	static private Configurator $instance;
+
+	private function __construct()
+	{
+	}
+
+	private function __clone()
+	{
+	}
+
+	public static function getInstance(): Configurator
+	{
+		if (static::$instance)
+		{
+			return static::$instance;
+		}
+
+		return static::$instance = new self();
+	}
+
 	public static function option(string $name, $defaultValue = null)
 	{
 		static $config = null;
@@ -35,6 +56,6 @@ class Configuration
 			return $defaultValue;
 		}
 
-		throw new Exception("Configuration option {$name} not found");
+		throw new RuntimeException("Configuration option {$name} not found");
 	}
 }

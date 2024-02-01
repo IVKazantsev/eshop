@@ -1,13 +1,13 @@
 <?php
 
 use N_ONE\App;
-use N_ONE\Core\DbConnection\DbConnection;
-use N_ONE\Core\Migration\Migration;
+use N_ONE\Core\DbConnector\DbConnector;
+use N_ONE\Core\Migrator\Migrator;
 
 require_once __DIR__ . '/../boot.php';
 
-$dbConnection = new DbConnection();
-$migrator = new Migration($dbConnection);
+$dbConnection = new DbConnector();
+$migrator = new Migrator($dbConnection);
 
 $migrator->migrate();
 

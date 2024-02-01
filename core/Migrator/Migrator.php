@@ -1,41 +1,63 @@
 <?php
 
-namespace N_ONE\Core\Migration;
+namespace N_ONE\Core\Migrator;
 
 use DateTime;
 use Exception;
-use N_ONE\Core\Configuration\Configuration;
-use N_ONE\Core\DbConnection\DbConnection;
+use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
-class Migration
+class Migrator
 {
-	private DbConnection $dbConnection;
-	public function __construct(DbConnection $dbConnection)
+	static private Migrator $instance;
+	private DbConnector $dbConnector;
+
+	private function __construct(DbConnector $dbConnector)
 	{
-		$this->dbConnection = $dbConnection;
+		$this->dbConnector = $dbConnector;
 	}
 
-    public function migrate()
-    {
+	private function __clone()
+	{
+	}
 
-        // 1. смотрим последнюю применённую миграцию, которая записана в таблице migration (если таблица пуста то делаем все миграции)
-        $lastMigration = $this->getLastMigration();
+	public static function getInstance(): Migrator
+	{
+		if (static::$instance)
+		{
+			return static::$instance;
+		}
 
-        // 2. проходимся по /core/Migration/migrations и ищем новые миграции
-        $newMigrations = $this->findNewMigrations($lastMigration);
+		$dbConnector = DbConnector::getInstance();
 
-        // 3. выполняем новые миграции
-        foreach ($newMigrations as $migration)
+		return static::$instance = new self($dbConnector);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function migrate(): void
+	{
+
+		// 1. смотрим последнюю применённую миграцию, которая записана в таблице migration (если таблица пуста то делаем все миграции)
+		$lastMigration = $this->getLastMigration();
+
+		// 2. проходимся по /core/Migration/migrations и ищем новые миграции
+		$newMigrations = $this->findNewMigrations($lastMigration);
+
+		// 3. выполняем новые миграции
+		foreach ($newMigrations as $migration)
 		{
 			$this->executeMigration($migration);
 			$this->updateLastMigration($migration);
-        }
-    }
+		}
+	}
 
 	private function getLastMigration()
 	{
 		$migrationTable = "N_ONE_MIGRATIONS";
-		$connection = $this->dbConnection->getConnection();
+		$connection = $this->dbConnector->getConnection();
 
 		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '{$migrationTable}'");
 
@@ -44,26 +66,33 @@ class Migration
 			return null; // Возвращаем null, если таблица отсутствует
 		}
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
         SELECT *
         FROM {$migrationTable}
         ORDER BY ID DESC
         LIMIT 1
-        ");
+        "
+		);
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		// Если результат пустой, также возвращаем null
 		return mysqli_fetch_assoc($result)["TITLE"];
 	}
-	private function findNewMigrations($lastMigration)
+
+	/**
+	 * @throws Exception
+	 */
+	private function findNewMigrations($lastMigration): array
 	{
 		$pattern = '/(\d{4}_\d{2}_\d{2}_\d{2}_\d{2})/';
 		$migrations = [];
-		$files = glob(ROOT . Configuration::option('MIGRATION_PATH') . '/*.sql');
+		$files = glob(ROOT . Configurator::option('MIGRATION_PATH') . '/*.sql');
 
 		preg_match($pattern, $lastMigration, $matches);
 		$currentTimestamp = ($matches) ? DateTime::createFromFormat('Y_m_d_H_i', $matches[0])->getTimestamp() : 0;
@@ -76,7 +105,7 @@ class Migration
 			{
 				$timestamp = DateTime::createFromFormat('Y_m_d_H_i', $matches[0])->getTimestamp();
 
-				if($timestamp > $currentTimestamp)
+				if ($timestamp > $currentTimestamp)
 				{
 					$migrations[] = $filename;
 				}
@@ -85,18 +114,22 @@ class Migration
 
 		return $migrations;
 	}
-	private function executeMigration($migration)
+
+	/**
+	 * @throws Exception
+	 */
+	private function executeMigration($migration): void
 	{
 
 		// Получение соединения с базой данных
-		$connection = $this->dbConnection->getConnection();
+		$connection = $this->dbConnector->getConnection();
 
 		// Чтение содержимого SQL файла
-		$sql = file_get_contents(ROOT . Configuration::option('MIGRATION_PATH') . '/' . $migration);
+		$sql = file_get_contents(ROOT . Configurator::option('MIGRATION_PATH') . '/' . $migration);
 
 		if (!$sql)
 		{
-			throw new Exception("Failed to read migration file: $migration");
+			throw new RuntimeException("Failed to read migration file: $migration");
 		}
 
 		$queries = explode(';', $sql);
@@ -113,22 +146,22 @@ class Migration
 
 				if (!$result)
 				{
-					throw new Exception(mysqli_error($connection));
+					throw new RuntimeException(mysqli_error($connection));
 				}
 			}
 		}
 	}
 
-	private function updateLastMigration($migration)
+	private function updateLastMigration($migration): void
 	{
-		$connection = $this->dbConnection->getConnection();
+		$connection = $this->dbConnector->getConnection();
 
 		$sql = "INSERT INTO N_ONE_MIGRATIONS (TITLE) VALUE ('{$migration}');";
 
 		$result = mysqli_query($connection, $sql);
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 	}
 
