@@ -56,6 +56,6 @@ class Configurator
 			return $defaultValue;
 		}
 
-		throw new RuntimeException("Configuration option {$name} not found");
+		throw new RuntimeException("Configuration option $name not found");
 	}
 }

@@ -6,7 +6,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 abstract class BaseController
 {
-	public function renderView(string $templateName, array $params)
+	public function renderView(string $templateName, array $params): string
 	{
 
 

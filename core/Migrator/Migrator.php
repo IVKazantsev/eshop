@@ -55,7 +55,7 @@ class Migrator
 		$migrationTable = "N_ONE_MIGRATIONS";
 		$connection = $this->dbConnector->getConnection();
 
-		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '{$migrationTable}'");
+		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '$migrationTable'");
 
 		if (mysqli_num_rows($tableExistsQuery) === 0)
 		{
@@ -146,7 +146,7 @@ class Migrator
 	{
 		$connection = $this->dbConnector->getConnection();
 
-		$sql = "INSERT INTO N_ONE_MIGRATIONS (TITLE) VALUE ('{$migration}');";
+		$sql = "INSERT INTO N_ONE_MIGRATIONS (TITLE) VALUE ('$migration');";
 
 		$result = mysqli_query($connection, $sql);
 		if (!$result)
