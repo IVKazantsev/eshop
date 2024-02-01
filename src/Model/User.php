@@ -2,10 +2,11 @@
 
 namespace N_ONE\App\Model;
 
-class User
+class User extends Entity
 {
 	public function __construct(
 		private int    $id,
+		private int    $roleId,
 		private string $role,
 		private string $name,
 		private string $email,
@@ -14,6 +15,16 @@ class User
 		private string $address
 	)
 	{
+	}
+
+	public function getRoleId(): int
+	{
+		return $this->roleId;
+	}
+
+	public function setRoleId(int $roleId): void
+	{
+		$this->roleId = $roleId;
 	}
 
 	public function getId(): int
