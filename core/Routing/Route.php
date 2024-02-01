@@ -2,6 +2,8 @@
 
 namespace N_ONE\Core\Routing;
 
+use Closure;
+
 class Route
 {
 
@@ -10,7 +12,7 @@ class Route
 	public function __construct(
 		public string   $method,
 		public string   $uri,
-		public \Closure $action
+		public Closure $action
 	)
 	{
 	}
