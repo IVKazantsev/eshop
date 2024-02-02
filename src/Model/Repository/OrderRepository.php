@@ -136,6 +136,29 @@ class OrderRepository extends Repository
 
 	public function update(Order|Entity $entity): bool
 	{
+		$connection = $this->dbConnection->getConnection();
+		$orderId = $entity->getId();
+		$userId = $entity->getUser()->getId();
+		$itemId = $entity->getItem()->getId();
+		$statusId = $entity->getStatusId();
+		$price = $entity->getPrice();
+
+		$result = mysqli_query($connection, "
+		UPDATE N_ONE_ORDERS 
+		SET 
+			USER_ID = {$userId},
+			ITEM_ID = {$itemId},
+			STATUS_ID = {$statusId},
+			PRICE = {$price}
+		where ID = {$orderId};
+		");
+
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_error($connection));
+		}
+
 		return true;
 	}
 }
