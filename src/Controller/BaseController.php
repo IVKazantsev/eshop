@@ -10,6 +10,6 @@ abstract class BaseController
 	{
 
 
-		return (new TemplateEngine(__DIR__ . '../../../src/View/'))->render($templateName, $params);
+		return (new TemplateEngine(ROOT . '/src/View/'))->render($templateName, $params);
 	}
 }

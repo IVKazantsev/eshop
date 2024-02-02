@@ -8,26 +8,14 @@ class Item extends Entity
 	 * @param Tag[] $tags
 	 */
 	public function __construct(
-		private int    $id,
+		protected int    $id,
 		private string $title,
 		private bool   $isActive,
 		private int    $price,
 		private string $description,
 		private array  $tags,
 		private int    $sortOrder = 0
-	)
-	{
-	}
-
-	public function getId(): int
-	{
-		return $this->id;
-	}
-
-	public function setId(int $id): void
-	{
-		$this->id = $id;
-	}
+	){}
 
 	public function getTitle(): string
 	{

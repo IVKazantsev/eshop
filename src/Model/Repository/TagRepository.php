@@ -46,7 +46,6 @@ class TagRepository extends Repository
 
 		return $tags;
 	}
-
 	public function getById(int $id): Tag
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -77,7 +76,36 @@ class TagRepository extends Repository
 
 		return $tag;
 	}
+	/**
+	 * @param int[] $itemsIds
+	 */
+	public function getByItemsIds(array $itemsIds): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$itemsIdsString = implode(',', $itemsIds);
+		$tags = [];
 
+		$result = mysqli_query($connection, "
+		SELECT it.ITEM_ID, t.ID, t.TITLE
+		FROM N_ONE_TAGS t 
+		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
+		WHERE it.ITEM_ID IN ({$itemsIdsString});
+	");
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_connect_error($connection));
+		}
+
+		while($row = mysqli_fetch_assoc($result))
+		{
+			$tags[$row['ITEM_ID']][] = new Tag(
+				$row['ID'],
+				$row['TITLE'],
+			);
+		}
+		return $tags;
+	}
 	public function add(Tag|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -98,7 +126,6 @@ class TagRepository extends Repository
 
 		return true;
 	}
-
 	public function update(Tag|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();

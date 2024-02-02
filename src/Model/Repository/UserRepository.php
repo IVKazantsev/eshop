@@ -53,7 +53,6 @@ class UserRepository extends Repository
 
 		return $users;
 	}
-
 	public function getById(int $id): User
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -91,7 +90,44 @@ class UserRepository extends Repository
 
 		return $user;
 	}
+	public function getByIds(array $ids): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$users = [];
 
+		$result = mysqli_query($connection, "
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE, u.ROLE_ID
+		FROM N_ONE_USERS u
+		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+		WHERE u.ID IN (" . implode(',', $ids) . ");
+		");
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_connect_error($connection));
+		}
+
+		while($row = mysqli_fetch_assoc($result))
+		{
+			$users[] = new User(
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['TITLE'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
+			);
+		}
+
+		if (empty($users))
+		{
+			throw new Exception("Items not found");
+		}
+
+		return $users;
+	}
 	public function add(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -122,7 +158,6 @@ class UserRepository extends Repository
 
 		return true;
 	}
-
 	public function update(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();

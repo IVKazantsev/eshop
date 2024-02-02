@@ -5,13 +5,35 @@ namespace N_ONE\App\Model;
 class Order extends Entity
 {
 	public function __construct(
-		private int    $id,
-		private User   $user,
-		private Item   $item,
+		protected int  $id,
+		private int    $userId,
+		private int    $itemId,
 		private int    $statusId,
 		private string $status,
-		private int    $price
+		private int    $price,
+		private ?User  $user = null,
+		private ?Item  $item = null,
 	){}
+
+	public function getUserId(): int
+	{
+		return $this->userId;
+	}
+
+	public function setUserId(int $userId): void
+	{
+		$this->userId = $userId;
+	}
+
+	public function getItemId(): int
+	{
+		return $this->itemId;
+	}
+
+	public function setItemId(int $itemId): void
+	{
+		$this->itemId = $itemId;
+	}
 
 	public function getStatusId(): int
 	{
@@ -21,16 +43,6 @@ class Order extends Entity
 	public function setStatusId(int $statusId): void
 	{
 		$this->statusId = $statusId;
-	}
-
-	public function getId(): int
-	{
-		return $this->id;
-	}
-
-	public function setId(int $id): void
-	{
-		$this->id = $id;
 	}
 
 	public function getUser(): User

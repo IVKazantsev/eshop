@@ -12,10 +12,12 @@ use N_ONE\Core\DbConnector\DbConnector;
 class ItemRepository extends Repository
 {
 	private DbConnector $dbConnection;
+	private TagRepository $tagRepository;
 
-	public function __construct(DbConnector $dbConnection)
+	public function __construct(DbConnector $dbConnection, TagRepository $tagRepository)
 	{
 		$this->dbConnection = $dbConnection;
+		$this->tagRepository = $tagRepository;
 	}
 
 	public function getList(array $filter = null): array
@@ -53,9 +55,9 @@ class ItemRepository extends Repository
 			throw new Exception("Items not found");
 		}
 
-		$itemsIds = implode(',', array_map(function($item) {return $item->getId();}, $items));
+		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
 
-		$tags = $this->getTagsByItemsIds($itemsIds);
+		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 
 		foreach ($items as &$item)
 		{
@@ -64,34 +66,6 @@ class ItemRepository extends Repository
 
 		return $items;
 	}
-
-	private function getTagsByItemsIds(string $itemsIds): array
-	{
-		$connection = $this->dbConnection->getConnection();
-		$tags = [];
-
-		$result = mysqli_query($connection, "
-		SELECT it.ITEM_ID, t.ID, t.TITLE
-		FROM N_ONE_TAGS t 
-		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-		WHERE it.ITEM_ID IN ({$itemsIds});
-	");
-
-		if (!$result)
-		{
-			throw new Exception(mysqli_connect_error($connection));
-		}
-
-		while($row = mysqli_fetch_assoc($result))
-		{
-			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-			);
-		}
-		return $tags;
-	}
-
 	public function getById(int $id): Item
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -124,12 +98,55 @@ class ItemRepository extends Repository
 			throw new Exception("Item with id {$id} not found");
 		}
 
-		$tags = $this->getTagsByItemsIds($item->getId());
+		$tags = $this->tagRepository->getByItemsIds([$item->getId()]);
 		$item->setTags($tags[$item->getId()] ?? []);
 
 		return $item;
 	}
+	public function getByIds(array $ids): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$items = [];
 
+		$result = mysqli_query($connection, "
+		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+		FROM N_ONE_ITEMS i
+		WHERE i.ID IN (" . implode(',', $ids) . ");
+	");
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_connect_error($connection));
+		}
+
+		while($row = mysqli_fetch_assoc($result))
+		{
+			$items[] = new Item(
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				[],
+			);
+		}
+
+		if (empty($items))
+		{
+			throw new Exception("Items not found");
+		}
+
+		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
+
+		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+
+		foreach ($items as &$item)
+		{
+			$item->setTags($tags[$item->getId()] ?? []);
+		}
+
+		return $items;
+	}
 	public function add(Item|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -175,7 +192,6 @@ class ItemRepository extends Repository
 
 		return true;
 	}
-
 	public function update(Item|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();

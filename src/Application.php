@@ -34,7 +34,7 @@ class Application
 		if (!$route)
 		{
 			http_response_code(404);
-			echo (new TemplateEngine(__DIR__ . '../../src/View/'))->renderError(404, "Page not found");
+			echo (new TemplateEngine(ROOT . '/src/View/'))->renderError(404, "Page not found");
 			exit;
 		}
 		$action = $route->action;
