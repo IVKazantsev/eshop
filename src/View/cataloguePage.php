@@ -1,16 +1,37 @@
 <?php
 
+/**
+ * @var array $cars ;
+ */
+
+use N_ONE\Core\TemplateEngine\TemplateEngine;
+
+$TE = new TemplateEngine(ROOT . '/src/View/components/');
+
 ?>
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Document</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/styles/style.css">
+	<title>eshop</title>
 </head>
 <body>
-<h1>Catalogue will reside here</h1>
+<div class="container">
+	<div class="sidebar">sidebar</div>
+	<header><p>Фиг знает что сюда пихать</p></header>
+
+	<main>
+		<div class="catalogue">
+			<?php foreach ($cars as $car): ?>
+				<?= $TE->render('carCard', ['car' => $car]) ?>
+			<?php endforeach; ?>
+
+		</div>
+	</main>
+	<footer>Created by N_ONE team 2024</footer>
+</div>
 </body>
 </html>

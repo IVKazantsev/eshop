@@ -39,7 +39,6 @@ class TemplateEngine
 		}
 
 		$absolutePath = $this->templateDir . $file . ".php";
-
 		if (!file_exists($absolutePath))
 		{
 			exit(404);

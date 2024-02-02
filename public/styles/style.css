@@ -1,0 +1,109 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+header {
+	/*background-color: green;*/
+	grid-column: 2/-1;
+}
+
+.sidebar {
+	/*background-color: blue;*/
+	grid-column: 1;
+	grid-row: 1/-1;
+}
+
+main {
+
+	background-color: #f1faff;
+	padding: 40px;
+	grid-column: 2;
+	grid-row: 2/4;
+
+}
+
+footer {
+	grid-column: 1/-1;
+	background-color: pink;
+	text-align: center;
+}
+
+.catalogue {
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	/*justify-content: space-between;*/
+	gap: 30px;
+}
+
+.car-card {
+	width: 300px;
+	height: 500px;
+	background-color: white;
+	margin-bottom: 20px;
+	display: flex;
+	flex-direction: column;
+}
+
+.container {
+	height: 100vh;
+	width: 100vw;
+	display: grid;
+	grid-template-rows: 80px 1fr 20px;
+	grid-template-columns: 300px 1fr;
+}
+
+.car-image {
+	height: 200px;
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.car-name {
+	font-size: 20px;
+	color: #2d2d2d;
+	margin-bottom: 8px;
+}
+
+.car-year {
+	color: #707070;
+	margin-bottom: 10px;
+}
+
+.car-details {
+	list-style-type: none;
+}
+
+.car-spec {
+	display: flex;
+	gap: 12px;
+}
+
+.car-spec img {
+	/*width: 18px;*/
+	/*height: 18px;*/
+}
+
+.car-spec p {
+	font-size: 18px;
+	line-height: 24px;
+	color: #252525;
+}
+
+.price {
+	font-size: 32px;
+	margin-top: auto;
+	padding-bottom: 14px;
+}
+
+.detail-item {
+	margin-bottom: 12px;
+}
+
+.description {
+	padding: 0 10px 0 10px;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
