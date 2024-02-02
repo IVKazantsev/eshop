@@ -11,15 +11,18 @@ class Migrator
 {
 	static private ?Migrator $instance = null;
 	private DbConnector $dbConnector;
+	private string $migrationTable;
+	private string $migrationPath;
 
 	private function __construct(DbConnector $dbConnector)
 	{
 		$this->dbConnector = $dbConnector;
+		$this->migrationTable = Configurator::option('MIGRATION_TABLE');
+		$this->migrationPath = Configurator::option('MIGRATION_PATH');
 	}
 
 	private function __clone()
-	{
-	}
+	{}
 
 	public static function getInstance(): Migrator
 	{
@@ -52,10 +55,9 @@ class Migrator
 
 	private function getLastMigration()
 	{
-		$migrationTable = "N_ONE_MIGRATIONS";
 		$connection = $this->dbConnector->getConnection();
 
-		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '$migrationTable'");
+		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '{$this->migrationTable}'");
 
 		if (mysqli_num_rows($tableExistsQuery) === 0)
 		{
@@ -66,7 +68,7 @@ class Migrator
 			$connection,
 			"
         SELECT *
-        FROM {$migrationTable}
+        FROM {$this->migrationTable}
         ORDER BY ID DESC
         LIMIT 1
         "
@@ -85,7 +87,7 @@ class Migrator
 	{
 		$pattern = '/(\d{4}_\d{2}_\d{2}_\d{2}_\d{2})/';
 		$migrations = [];
-		$files = glob(ROOT . Configurator::option('MIGRATION_PATH') . '/*.sql');
+		$files = glob(ROOT . $this->migrationPath . '/*.sql');
 
 		preg_match($pattern, $lastMigration, $matches);
 		$currentTimestamp = ($matches) ? DateTime::createFromFormat('Y_m_d_H_i', $matches[0])->getTimestamp() : 0;
@@ -115,7 +117,7 @@ class Migrator
 		$connection = $this->dbConnector->getConnection();
 
 		// Чтение содержимого SQL файла
-		$sql = file_get_contents(ROOT . Configurator::option('MIGRATION_PATH') . '/' . $migration);
+		$sql = file_get_contents(ROOT . $this->migrationPath . '/' . $migration);
 
 		if (!$sql)
 		{
@@ -146,7 +148,7 @@ class Migrator
 	{
 		$connection = $this->dbConnector->getConnection();
 
-		$sql = "INSERT INTO N_ONE_MIGRATIONS (TITLE) VALUE ('$migration');";
+		$sql = "INSERT INTO {$this->migrationTable} (TITLE) VALUE ('$migration');";
 
 		$result = mysqli_query($connection, $sql);
 		if (!$result)
