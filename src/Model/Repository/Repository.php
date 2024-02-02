@@ -9,7 +9,7 @@ abstract class Repository
 	/**
 	 * @return Entity[]
 	 */
-	abstract public function getList(array $filter): array;
+	abstract public function getList(array $filter = null): array;
 	abstract public function getById(int $id): Entity;
 	abstract public function add(Entity $entity): bool;
 	abstract public function update(Entity $entity): bool;

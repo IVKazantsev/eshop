@@ -16,7 +16,7 @@ class TagRepository extends Repository
 		$this->dbConnection = $dbConnection;
 	}
 
-	public function getList(array $filter): array
+	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tags = [];
