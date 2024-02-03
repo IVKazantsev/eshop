@@ -89,6 +89,15 @@ class Migrator
 		$migrations = [];
 		$files = glob(ROOT . $this->migrationPath . '/*.sql');
 
+		if ($lastMigration === null)
+		{
+			foreach ($files as $file)
+			{
+				$migrations[] = basename($file);
+			}
+			return $migrations;
+		}
+
 		preg_match($pattern, $lastMigration, $matches);
 		$currentTimestamp = ($matches) ? DateTime::createFromFormat('Y_m_d_H_i', $matches[0])->getTimestamp() : 0;
 

@@ -58,9 +58,9 @@ class UserRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 
 		$result = mysqli_query($connection, "
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE, u.ROLE_ID
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
 		FROM N_ONE_USERS u
-		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID;
+		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.ID = {$id};
 		");
 

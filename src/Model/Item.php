@@ -2,10 +2,13 @@
 
 namespace N_ONE\App\Model;
 
+use Exception;
+
 class Item extends Entity
 {
 	/**
 	 * @param Tag[] $tags
+	 * @param Image[] $images
 	 */
 	public function __construct(
 		protected int    $id,
@@ -14,8 +17,48 @@ class Item extends Entity
 		private int    $price,
 		private string $description,
 		private array  $tags,
+		private array  $images,
 		private int    $sortOrder = 0
 	){}
+
+	public function getPreviewImage(): Image
+	{
+		foreach ($this->images as $image)
+		{
+			if ($image->getType() == 2 && $image->isMain())
+			{
+				return $image;
+			}
+		}
+		throw new Exception("Preview image for Item with id {$this->getId()} not found");
+	}
+
+	public function getFullSizeImages(): array
+	{
+		$images = [];
+		foreach ($this->images as $image)
+		{
+			if ($image->getType() == 1)
+			{
+				$images[] = $image;
+			}
+		}
+		if (empty($images))
+		{
+			throw new Exception("FullSize image for Item with id {$this->getId()} not found");
+		}
+		return $images;
+	}
+
+	public function getImages(): array
+	{
+		return $this->images;
+	}
+
+	public function setImages(array $images): void
+	{
+		$this->images = $images;
+	}
 
 	public function getTitle(): string
 	{

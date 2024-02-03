@@ -13,11 +13,13 @@ class ItemRepository extends Repository
 {
 	private DbConnector $dbConnection;
 	private TagRepository $tagRepository;
+	private ImageRepository $imageRepository;
 
-	public function __construct(DbConnector $dbConnection, TagRepository $tagRepository)
+	public function __construct(DbConnector $dbConnection, TagRepository $tagRepository, ImageRepository $imageRepository)
 	{
 		$this->dbConnection = $dbConnection;
 		$this->tagRepository = $tagRepository;
+		$this->imageRepository = $imageRepository;
 	}
 
 	public function getList(array $filter = null): array
@@ -47,6 +49,7 @@ class ItemRepository extends Repository
 				$row['PRICE'],
 				$row['DESCRIPTION'],
 				[],
+				[]
 			);
 		}
 
@@ -58,10 +61,12 @@ class ItemRepository extends Repository
 		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+		$images = $this->imageRepository->getList($itemsIds);
 
 		foreach ($items as &$item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
+			$item->setImages($images[$item->getId()] ?? []);
 		}
 
 		return $items;
@@ -89,7 +94,8 @@ class ItemRepository extends Repository
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
-				[],
+				$this->tagRepository->getByItemsIds([$row['ID'],])[$row['ID']],
+				$this->imageRepository->getList([$row['ID']]) [$row['ID']]
 			);
 		}
 
@@ -97,9 +103,6 @@ class ItemRepository extends Repository
 		{
 			throw new Exception("Item with id {$id} not found");
 		}
-
-		$tags = $this->tagRepository->getByItemsIds([$item->getId()]);
-		$item->setTags($tags[$item->getId()] ?? []);
 
 		return $item;
 	}
@@ -128,6 +131,7 @@ class ItemRepository extends Repository
 				$row['PRICE'],
 				$row['DESCRIPTION'],
 				[],
+				[]
 			);
 		}
 
@@ -139,10 +143,12 @@ class ItemRepository extends Repository
 		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+		$images = $this->imageRepository->getList($itemsIds);
 
 		foreach ($items as &$item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
+			$item->setImages($images[$item->getId()] ?? []);
 		}
 
 		return $items;
