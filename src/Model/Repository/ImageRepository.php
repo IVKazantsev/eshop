@@ -54,7 +54,7 @@ class ImageRepository extends Repository
 		return $images;
 	}
 
-	public function getById(int $id): Entity
+	public function getById(int $id): Image
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -90,13 +90,62 @@ class ImageRepository extends Repository
 		return $image;
 	}
 
-	public function add(Entity $entity): bool
+	public function add(Image|Entity $entity): bool
 	{
-		// TODO: Implement add() method.
+		$connection = $this->dbConnection->getConnection();
+		$imageId = $entity->getId();
+		$itemId = $entity->getItemId();
+		$height = $entity->getHeight();
+		$width = $entity->getWidth();
+		$isMain = $entity->isMain();
+		$type = $entity->getType();
+
+		$result = mysqli_query($connection, "
+		INSERT INTO N_ONE_IMAGES (ID, ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE) 
+		VALUES (
+			{$imageId},
+			{$itemId},
+			{$height},
+			{$width},
+			{$isMain},
+			{$type}
+		);");
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_error($connection));
+		}
+
+		return true;
 	}
 
-	public function update(Entity $entity): bool
+	public function update(Image|Entity $entity): bool
 	{
-		// TODO: Implement update() method.
+		$connection = $this->dbConnection->getConnection();
+		$imageId = $entity->getId();
+		$itemId = $entity->getItemId();
+		$height = $entity->getHeight();
+		$width = $entity->getWidth();
+		$isMain = $entity->isMain();
+		$type = $entity->getType();
+
+		$result = mysqli_query($connection, "
+		UPDATE N_ONE_IMAGES 
+		SET 
+			ITEM_ID = {$itemId},
+			HEIGHT = {$height},
+			WIDTH = {$width},
+			IS_MAIN = {$isMain},
+			TYPE = {$type}
+		where ID = {$imageId};
+		");
+
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_error($connection));
+		}
+
+		return true;
 	}
 }
