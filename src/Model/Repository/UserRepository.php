@@ -2,10 +2,10 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\User;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
 class UserRepository extends Repository
 {
@@ -29,7 +29,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -48,7 +48,7 @@ class UserRepository extends Repository
 
 		if (empty($users))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		return $users;
@@ -66,7 +66,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -85,7 +85,7 @@ class UserRepository extends Repository
 
 		if (empty($user))
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new RuntimeException("Item with id {$id} not found");
 		}
 
 		return $user;
@@ -104,7 +104,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -123,7 +123,7 @@ class UserRepository extends Repository
 
 		if (empty($users))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		return $users;
@@ -153,7 +153,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
@@ -181,7 +181,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;

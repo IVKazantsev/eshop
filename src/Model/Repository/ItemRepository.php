@@ -2,12 +2,10 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
-use N_ONE\App\Model\Tag;
-use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
 class ItemRepository extends Repository
 {
@@ -37,7 +35,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -55,7 +53,7 @@ class ItemRepository extends Repository
 
 		if (empty($items))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
@@ -83,7 +81,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -101,7 +99,7 @@ class ItemRepository extends Repository
 
 		if (empty($item))
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new RuntimeException("Item with id {$id} not found");
 		}
 
 		return $item;
@@ -119,7 +117,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -137,7 +135,7 @@ class ItemRepository extends Repository
 
 		if (empty($items))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
@@ -177,7 +175,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		$itemTags = "";
@@ -193,7 +191,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
@@ -220,7 +218,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		$result = mysqli_query($connection, "
@@ -228,7 +226,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		$itemTags = "";
@@ -244,7 +242,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;

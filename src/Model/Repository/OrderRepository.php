@@ -2,10 +2,10 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
 class OrderRepository extends Repository
 {
@@ -35,7 +35,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -52,7 +52,7 @@ class OrderRepository extends Repository
 
 		if (empty($orders))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		$itemsIds = array_map(function($order) {return $order->getItemId();}, $orders);
@@ -82,7 +82,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -101,7 +101,7 @@ class OrderRepository extends Repository
 
 		if (empty($order))
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new RuntimeException("Item with id {$id} not found");
 		}
 
 		return $order;
@@ -128,7 +128,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
@@ -156,7 +156,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;

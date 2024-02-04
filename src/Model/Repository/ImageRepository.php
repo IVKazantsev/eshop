@@ -2,10 +2,10 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
 use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
 class ImageRepository extends Repository
 {
@@ -30,7 +30,7 @@ class ImageRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -48,7 +48,7 @@ class ImageRepository extends Repository
 
 		if (empty($images))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		return $images;
@@ -66,7 +66,7 @@ class ImageRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -84,7 +84,7 @@ class ImageRepository extends Repository
 
 		if (empty($image))
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new RuntimeException("Item with id {$id} not found");
 		}
 
 		return $image;
@@ -113,7 +113,7 @@ class ImageRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
@@ -143,7 +143,7 @@ class ImageRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
