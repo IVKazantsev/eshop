@@ -1,19 +1,38 @@
 <?php
+
 /**
- * @var array $car
+ * @var Item $car
  */
+
+use N_ONE\App\Model\Item;
+use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
+
+$iconsPath = Configurator::option('ICONS_PATH');
+$imagesPath = Configurator::option('IMAGES_PATH');
+$priceString = $car->getPrice();
+$priceString = number_format($priceString, 0, '', ' ');
+$TE = new TemplateEngine(ROOT . '/src/View/components/');
 
 ?>
 
-<!doctype html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Document</title>
-</head>
-<body>
-<?php var_dump($car); ?>
-</body>
-</html>
+<div class="car-info">
+	<div class="car-image-gallery">
+		<div class="car-main-image-container">
+			<img class="car-main-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath(
+			) ?>" alt="image of a car">
+		</div>
+	</div>
+	<div class="car-specs">
+		<h1 class="car-title-details"><?= $car->getTitle() ?></h1>
+		<h3 class="year-title-details"> 2024</h3>
+		<?= $TE->render('tags', ['tags' => $car->getTags()]) ?>
+		<p class="price"><?= $priceString ?> ₽</p>
+		<button class="buy-button">КУПИТЬ</button>
+	</div>
+	<div class="car-description">
+		<h2>Описание машины</h2>
+		<p class="car-description-text"> <?= $car->getDescription() ?>
+		</p>
+	</div>
+</div>

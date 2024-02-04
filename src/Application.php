@@ -2,6 +2,7 @@
 
 namespace N_ONE\App;
 
+use N_ONE\App\Model\Repository\ItemRepository;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
@@ -11,10 +12,6 @@ class Application
 	static private ?Application $instance = null;
 
 	private function __construct()
-	{
-	}
-
-	private function __clone()
 	{
 	}
 
@@ -30,7 +27,6 @@ class Application
 
 	public function run(): void
 	{
-		// echo "app started" . PHP_EOL;
 		$route = Router::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 		if (!$route)
 		{
@@ -40,7 +36,10 @@ class Application
 		}
 		$action = $route->action;
 		$variables = $route->getVariables();
-
 		echo $action(...$variables);
+	}
+
+	private function __clone()
+	{
 	}
 }

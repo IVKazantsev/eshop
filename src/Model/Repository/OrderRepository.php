@@ -12,7 +12,12 @@ class OrderRepository extends Repository
 	private DbConnector $dbConnection;
 	private UserRepository $userRepository;
 	private ItemRepository $itemRepository;
-	public function __construct(DbConnector $dbConnection, UserRepository $userRepository, ItemRepository $itemRepository)
+
+	public function __construct(
+		DbConnector    $dbConnection,
+		UserRepository $userRepository,
+		ItemRepository $itemRepository
+	)
 	{
 		$this->dbConnection = $dbConnection;
 		$this->userRepository = $userRepository;
@@ -27,7 +32,9 @@ class OrderRepository extends Repository
 		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
 		$orders = [];
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
@@ -38,15 +45,10 @@ class OrderRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$orders[] = new Order(
-				$row['ID'],
-				$row['USER_ID'],
-				$row['ITEM_ID'],
-				$row['STATUS_ID'],
-				$row['TITLE'],
-				$row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
 		}
 
@@ -75,7 +77,9 @@ class OrderRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
@@ -118,7 +122,9 @@ class OrderRepository extends Repository
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		INSERT INTO N_ONE_ORDERS (ID, USER_ID, ITEM_ID, STATUS_ID, PRICE) 
 		VALUES (
 			$orderId,
@@ -126,7 +132,8 @@ class OrderRepository extends Repository
 			$itemId,
 			$statusId,
 			{$price}
-		);");
+		);"
+		);
 
 		if (!$result)
 		{
@@ -145,7 +152,9 @@ class OrderRepository extends Repository
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		UPDATE N_ONE_ORDERS 
 		SET 
 			USER_ID = $userId,
