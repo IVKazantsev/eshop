@@ -29,7 +29,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new Exception(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -66,7 +66,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new Exception(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -104,7 +104,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new Exception(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))

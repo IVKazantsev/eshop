@@ -30,12 +30,12 @@ class OrderRepository extends Repository
 		$result = mysqli_query($connection, "
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
-		JOIN bitcar.N_ONE_STATUSES s on s.ID = o.STATUS_ID;
+		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
 	");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new Exception(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -77,12 +77,12 @@ class OrderRepository extends Repository
 		$result = mysqli_query($connection, "
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
-		JOIN bitcar.N_ONE_STATUSES s on s.ID = o.STATUS_ID;
+		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
 	");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new Exception(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
