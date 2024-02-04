@@ -84,6 +84,7 @@ class ItemRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
+		$item = null;
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$item = new Item(
@@ -97,7 +98,7 @@ class ItemRepository extends Repository
 			);
 		}
 
-		if (empty($item))
+		if ($item === null)
 		{
 			throw new RuntimeException("Item with id $id not found");
 		}

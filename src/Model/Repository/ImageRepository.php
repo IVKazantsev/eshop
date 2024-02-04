@@ -69,6 +69,7 @@ class ImageRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
+		$image = null;
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$image = new Image(
@@ -82,7 +83,7 @@ class ImageRepository extends Repository
 			);
 		}
 
-		if (empty($image))
+		if ($image === null)
 		{
 			throw new RuntimeException("Item with id $id not found");
 		}

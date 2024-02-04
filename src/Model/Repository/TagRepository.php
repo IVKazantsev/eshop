@@ -61,6 +61,7 @@ class TagRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
+		$tag = null;
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
@@ -69,7 +70,7 @@ class TagRepository extends Repository
 			);
 		}
 
-		if (empty($tag))
+		if ($tag === null)
 		{
 			throw new RuntimeException("Item with id $id not found");
 		}

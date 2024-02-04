@@ -69,6 +69,7 @@ class UserRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
+		$user = null;
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
@@ -83,7 +84,7 @@ class UserRepository extends Repository
 			);
 		}
 
-		if (empty($user))
+		if ($user === null)
 		{
 			throw new RuntimeException("Item with id $id not found");
 		}

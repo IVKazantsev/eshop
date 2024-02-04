@@ -85,6 +85,7 @@ class OrderRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
+		$order = null;
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
@@ -99,7 +100,7 @@ class OrderRepository extends Repository
 			);
 		}
 
-		if (empty($order))
+		if ($order === null)
 		{
 			throw new RuntimeException("Item with id $id not found");
 		}
