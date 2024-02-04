@@ -11,6 +11,7 @@ $migrator = Migrator::getInstance();
 
 $migrator->migrate();
 
+
 // $tagRepository = new App\Model\Repository\TagRepository($dbConnection);
 // $imageRepository = new App\Model\Repository\ImageRepository($dbConnection);
 // $itemRepository = new App\Model\Repository\ItemRepository($dbConnection, $tagRepository, $imageRepository);
@@ -23,7 +24,5 @@ $migrator->migrate();
 // var_dump($userRepository->getList());
 // var_dump($orderRepository->getList());
 
-
 // $app = App\Application::getInstance();
 // $app->run();
-

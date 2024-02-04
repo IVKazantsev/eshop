@@ -15,78 +15,36 @@ class ItemRepository extends Repository
 	private TagRepository $tagRepository;
 	private ImageRepository $imageRepository;
 
-	public function __construct(DbConnector $dbConnection, TagRepository $tagRepository, ImageRepository $imageRepository)
+	public function __construct(
+		DbConnector     $dbConnection,
+		TagRepository   $tagRepository,
+		ImageRepository $imageRepository
+	)
 	{
 		$this->dbConnection = $dbConnection;
 		$this->tagRepository = $tagRepository;
 		$this->imageRepository = $imageRepository;
 	}
 
-	public function getList(array $filter = null): array
-	{
-		$connection = $this->dbConnection->getConnection();
-		// $currentLimit = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		// $offset = calculateCurrentOffset($currentPageNumber);
-		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
-		$items = [];
-
-		$result = mysqli_query($connection, "
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
-		FROM N_ONE_ITEMS i;
-	");
-
-		if (!$result)
-		{
-			throw new Exception(mysqli_connect_error($connection));
-		}
-
-		while($row = mysqli_fetch_assoc($result))
-		{
-			$items[] = new Item(
-				$row['ID'],
-				$row['TITLE'],
-				$row['IS_ACTIVE'],
-				$row['PRICE'],
-				$row['DESCRIPTION'],
-				[],
-				[]
-			);
-		}
-
-		if (empty($items))
-		{
-			throw new Exception("Items not found");
-		}
-
-		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
-
-		$tags = $this->tagRepository->getByItemsIds($itemsIds);
-		$images = $this->imageRepository->getList($itemsIds);
-
-		foreach ($items as &$item)
-		{
-			$item->setTags($tags[$item->getId()] ?? []);
-			$item->setImages($images[$item->getId()] ?? []);
-		}
-
-		return $items;
-	}
 	public function getById(int $id): Item
 	{
 		$connection = $this->dbConnection->getConnection();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
 		FROM N_ONE_ITEMS i
 		WHERE i.ID = {$id};
-		");
+		"
+		);
 
 		if (!$result)
 		{
 			throw new Exception(mysqli_connect_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$item = new Item(
 				$row['ID'],
@@ -106,32 +64,32 @@ class ItemRepository extends Repository
 
 		return $item;
 	}
-	public function getByIds(array $ids): array
+
+	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
+		// $currentLimit = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
+		// $offset = calculateCurrentOffset($currentPageNumber);
+		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
 		$items = [];
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
-		FROM N_ONE_ITEMS i
-		WHERE i.ID IN (" . implode(',', $ids) . ");
-	");
+		FROM N_ONE_ITEMS i;
+	"
+		);
 
 		if (!$result)
 		{
 			throw new Exception(mysqli_connect_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'],
-				$row['TITLE'],
-				$row['IS_ACTIVE'],
-				$row['PRICE'],
-				$row['DESCRIPTION'],
-				[],
-				[]
+				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
 			);
 		}
 
@@ -140,7 +98,9 @@ class ItemRepository extends Repository
 			throw new Exception("Items not found");
 		}
 
-		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
+		$itemsIds = array_map(function($item) {
+			return $item->getId();
+		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
@@ -153,6 +113,54 @@ class ItemRepository extends Repository
 
 		return $items;
 	}
+
+	public function getByIds(array $ids): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$items = [];
+
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+		FROM N_ONE_ITEMS i
+		WHERE i.ID IN (" . implode(',', $ids) . ");
+	"
+		);
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_connect_error($connection));
+		}
+
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$items[] = new Item(
+				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
+			);
+		}
+
+		if (empty($items))
+		{
+			throw new Exception("Items not found");
+		}
+
+		$itemsIds = array_map(function($item) {
+			return $item->getId();
+		}, $items);
+
+		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+		$images = $this->imageRepository->getList($itemsIds);
+
+		foreach ($items as &$item)
+		{
+			$item->setTags($tags[$item->getId()] ?? []);
+			$item->setImages($images[$item->getId()] ?? []);
+		}
+
+		return $items;
+	}
+
 	public function add(Item|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -164,7 +172,9 @@ class ItemRepository extends Repository
 		$sortOrder = $entity->getSortOrder();
 		$tags = $entity->getTags();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		INSERT INTO N_ONE_ITEMS (ID, TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
 		VALUES (
 			{$itemId},
@@ -173,7 +183,8 @@ class ItemRepository extends Repository
 			{$price},
 			'{$description}',
 			{$sortOrder}
-		);");
+		);"
+		);
 
 		if (!$result)
 		{
@@ -188,8 +199,11 @@ class ItemRepository extends Repository
 		}
 		$itemTags = substr($itemTags, 0, -1);
 
-		$result = mysqli_query($connection, "
-		INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";");
+		$result = mysqli_query(
+			$connection,
+			"
+		INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";"
+		);
 
 		if (!$result)
 		{
@@ -198,6 +212,7 @@ class ItemRepository extends Repository
 
 		return true;
 	}
+
 	public function update(Item|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -209,22 +224,28 @@ class ItemRepository extends Repository
 		$sortOrder = $entity->getSortOrder();
 		$tags = $entity->getTags();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		UPDATE N_ONE_ITEMS 
 		SET TITLE = '{$title}', 
 			IS_ACTIVE = {$isActive}, 
 			PRICE = {$price}, 
 			DESCRIPTION = '{$description}', 
 			SORT_ORDER = {$sortOrder}
-		WHERE ID = {$itemId}");
+		WHERE ID = {$itemId}"
+		);
 
 		if (!$result)
 		{
 			throw new Exception(mysqli_error($connection));
 		}
 
-		$result = mysqli_query($connection, "
-		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}");
+		$result = mysqli_query(
+			$connection,
+			"
+		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}"
+		);
 
 		if (!$result)
 		{
