@@ -61,7 +61,7 @@ class ItemRepository extends Repository
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as &$item)
+		foreach ($items as $item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
@@ -144,7 +144,7 @@ class ItemRepository extends Repository
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as &$item)
+		foreach ($items as $item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
