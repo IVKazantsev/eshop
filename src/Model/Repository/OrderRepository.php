@@ -101,7 +101,7 @@ class OrderRepository extends Repository
 
 		if (empty($order))
 		{
-			throw new RuntimeException("Item with id {$id} not found");
+			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $order;
@@ -119,10 +119,10 @@ class OrderRepository extends Repository
 		$result = mysqli_query($connection, "
 		INSERT INTO N_ONE_ORDERS (ID, USER_ID, ITEM_ID, STATUS_ID, PRICE) 
 		VALUES (
-			{$orderId},
-			{$userId},
-			{$itemId},
-			{$statusId},
+			$orderId,
+			$userId,
+			$itemId,
+			$statusId,
 			{$price}
 		);");
 
@@ -146,11 +146,11 @@ class OrderRepository extends Repository
 		$result = mysqli_query($connection, "
 		UPDATE N_ONE_ORDERS 
 		SET 
-			USER_ID = {$userId},
-			ITEM_ID = {$itemId},
-			STATUS_ID = {$statusId},
+			USER_ID = $userId,
+			ITEM_ID = $itemId,
+			STATUS_ID = $statusId,
 			PRICE = {$price}
-		where ID = {$orderId};
+		where ID = $orderId;
 		");
 
 

@@ -53,7 +53,7 @@ class TagRepository extends Repository
 		$result = mysqli_query($connection, "
 		SELECT t.ID, t.TITLE
 		FROM N_ONE_TAGS t
-		WHERE t.ID = {$id};
+		WHERE t.ID = $id;
 		");
 
 		if (!$result)
@@ -71,7 +71,7 @@ class TagRepository extends Repository
 
 		if (empty($tag))
 		{
-			throw new RuntimeException("Item with id {$id} not found");
+			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $tag;
@@ -89,7 +89,7 @@ class TagRepository extends Repository
 		SELECT it.ITEM_ID, t.ID, t.TITLE
 		FROM N_ONE_TAGS t 
 		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-		WHERE it.ITEM_ID IN ({$itemsIdsString});
+		WHERE it.ITEM_ID IN ($itemsIdsString);
 	");
 
 		if (!$result)
@@ -115,8 +115,8 @@ class TagRepository extends Repository
 		$result = mysqli_query($connection, "
 		INSERT INTO N_ONE_TAGS (ID, TITLE)
 		VALUES (
-			{$tagId},
-			'{$title}'
+			$tagId,
+			'$title'
 		);");
 
 		if (!$result)
@@ -134,8 +134,8 @@ class TagRepository extends Repository
 
 		$result = mysqli_query($connection, "
 		UPDATE N_ONE_ITEMS 
-		SET TITLE = '{$title}'
-		WHERE ID = {$tagId}");
+		SET TITLE = '$title'
+		WHERE ID = $tagId");
 
 		if (!$result)
 		{

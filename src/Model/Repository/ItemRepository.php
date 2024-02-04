@@ -76,7 +76,7 @@ class ItemRepository extends Repository
 		$result = mysqli_query($connection, "
 		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
 		FROM N_ONE_ITEMS i
-		WHERE i.ID = {$id};
+		WHERE i.ID = $id;
 		");
 
 		if (!$result)
@@ -99,7 +99,7 @@ class ItemRepository extends Repository
 
 		if (empty($item))
 		{
-			throw new RuntimeException("Item with id {$id} not found");
+			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $item;
@@ -165,11 +165,11 @@ class ItemRepository extends Repository
 		$result = mysqli_query($connection, "
 		INSERT INTO N_ONE_ITEMS (ID, TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
 		VALUES (
-			{$itemId},
-			'{$title}',
-			{$isActive},
-			{$price},
-			'{$description}',
+			$itemId,
+			'$title',
+			$isActive,
+			$price,
+			'$description',
 			{$sortOrder}
 		);");
 
@@ -209,12 +209,12 @@ class ItemRepository extends Repository
 
 		$result = mysqli_query($connection, "
 		UPDATE N_ONE_ITEMS 
-		SET TITLE = '{$title}', 
-			IS_ACTIVE = {$isActive}, 
-			PRICE = {$price}, 
-			DESCRIPTION = '{$description}', 
+		SET TITLE = '$title', 
+			IS_ACTIVE = $isActive, 
+			PRICE = $price, 
+			DESCRIPTION = '$description', 
 			SORT_ORDER = {$sortOrder}
-		WHERE ID = {$itemId}");
+		WHERE ID = $itemId");
 
 		if (!$result)
 		{
@@ -222,7 +222,7 @@ class ItemRepository extends Repository
 		}
 
 		$result = mysqli_query($connection, "
-		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}");
+		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = $itemId");
 
 		if (!$result)
 		{

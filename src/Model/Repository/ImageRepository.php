@@ -61,7 +61,7 @@ class ImageRepository extends Repository
 		$result = mysqli_query($connection, "
 		SELECT id, item_id, height, width, is_main, type, path
 		FROM N_ONE_IMAGES 
-		WHERE id = {$id};
+		WHERE id = $id;
 		");
 
 		if (!$result)
@@ -84,7 +84,7 @@ class ImageRepository extends Repository
 
 		if (empty($image))
 		{
-			throw new RuntimeException("Item with id {$id} not found");
+			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $image;
@@ -103,11 +103,11 @@ class ImageRepository extends Repository
 		$result = mysqli_query($connection, "
 		INSERT INTO N_ONE_IMAGES (ID, ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE) 
 		VALUES (
-			{$imageId},
-			{$itemId},
-			{$height},
-			{$width},
-			{$isMain},
+			$imageId,
+			$itemId,
+			$height,
+			$width,
+			$isMain,
 			{$type}
 		);");
 
@@ -132,12 +132,12 @@ class ImageRepository extends Repository
 		$result = mysqli_query($connection, "
 		UPDATE N_ONE_IMAGES 
 		SET 
-			ITEM_ID = {$itemId},
-			HEIGHT = {$height},
-			WIDTH = {$width},
-			IS_MAIN = {$isMain},
+			ITEM_ID = $itemId,
+			HEIGHT = $height,
+			WIDTH = $width,
+			IS_MAIN = $isMain,
 			TYPE = {$type}
-		where ID = {$imageId};
+		where ID = $imageId;
 		");
 
 
