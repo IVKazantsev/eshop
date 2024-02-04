@@ -22,4 +22,5 @@ return [
 	'MIGRATION_TABLE' => "N_ONE_MIGRATIONS",
 	'ICONS_PATH' => 'images/icons/',
 	'IMAGES_PATH' => 'images/products/',
+	'VIEWS_PATH' => ROOT . '/src/View/',
 ];
