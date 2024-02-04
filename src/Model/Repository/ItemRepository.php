@@ -183,7 +183,7 @@ class ItemRepository extends Repository
 
 		foreach ($tags as $tag)
 		{
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
+			$itemTags .= '(' . $itemId . ', ' . $tag->getId() . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
 
@@ -234,7 +234,7 @@ class ItemRepository extends Repository
 
 		foreach ($tags as $tag)
 		{
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
+			$itemTags .= '(' . $itemId . ', ' . $tag->getId() . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
 
