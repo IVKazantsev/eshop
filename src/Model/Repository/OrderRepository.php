@@ -55,13 +55,14 @@ class OrderRepository extends Repository
 			throw new RuntimeException("Items not found");
 		}
 
-		$itemsIds = array_map(function($order) {return $order->getItemId();}, $orders);
-		$usersIds = array_map(function($user) {return $user->getUserId();}, $orders);
+		$itemsIds = array_map(static function($order) {return $order->getItemId();}, $orders);
+		$usersIds = array_map(static function($user) {return $user->getUserId();}, $orders);
 
 		$items = $this->itemRepository->getByIds($itemsIds);
 		$users = $this->userRepository->getByIds($usersIds);
 
-		for ($i = 0; $i < count($orders); $i++)
+		$ordersCount = count($orders);
+		for ($i = 0; $i < $ordersCount; $i++)
 		{
 			$orders[$i]->setItem($items[$i]);
 			$orders[$i]->setUser($users[$i]);

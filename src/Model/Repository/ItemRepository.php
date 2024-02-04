@@ -56,7 +56,7 @@ class ItemRepository extends Repository
 			throw new RuntimeException("Items not found");
 		}
 
-		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
+		$itemsIds = array_map(static function($item) {return $item->getId();}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
@@ -139,7 +139,7 @@ class ItemRepository extends Repository
 			throw new RuntimeException("Items not found");
 		}
 
-		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
+		$itemsIds = array_map(static function($item) {return $item->getId();}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
