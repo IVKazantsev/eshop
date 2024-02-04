@@ -2,7 +2,7 @@
 
 use N_ONE\Core\Routing\Router;
 
-Router::get('/', function() {
+Router::get('/', static function() {
 	return (new N_ONE\App\Controller\CatalogueController())->renderView('cataloguePage', [
 		'cars' => [
 			[
@@ -32,6 +32,6 @@ Router::get('/', function() {
 		],
 	]);
 });
-Router::get('/car/:id', function() {
+Router::get('/car/:id', static function() {
 	return (new N_ONE\App\Controller\DetailsController())->renderView('detailsPage', ['car' => ['id' => 2]]);
 });
