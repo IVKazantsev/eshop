@@ -2,10 +2,10 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
 class TagRepository extends Repository
 {
@@ -28,7 +28,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -41,7 +41,7 @@ class TagRepository extends Repository
 
 		if (empty($tags))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		return $tags;
@@ -53,14 +53,15 @@ class TagRepository extends Repository
 		$result = mysqli_query($connection, "
 		SELECT t.ID, t.TITLE
 		FROM N_ONE_TAGS t
-		WHERE t.ID = {$id};
+		WHERE t.ID = $id;
 		");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
+		$tag = null;
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
@@ -69,9 +70,9 @@ class TagRepository extends Repository
 			);
 		}
 
-		if (empty($tag))
+		if ($tag === null)
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $tag;
@@ -89,12 +90,12 @@ class TagRepository extends Repository
 		SELECT it.ITEM_ID, t.ID, t.TITLE
 		FROM N_ONE_TAGS t 
 		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-		WHERE it.ITEM_ID IN ({$itemsIdsString});
+		WHERE it.ITEM_ID IN ($itemsIdsString);
 	");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -115,13 +116,13 @@ class TagRepository extends Repository
 		$result = mysqli_query($connection, "
 		INSERT INTO N_ONE_TAGS (ID, TITLE)
 		VALUES (
-			{$tagId},
-			'{$title}'
+			$tagId,
+			'$title'
 		);");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
@@ -134,12 +135,12 @@ class TagRepository extends Repository
 
 		$result = mysqli_query($connection, "
 		UPDATE N_ONE_ITEMS 
-		SET TITLE = '{$title}'
-		WHERE ID = {$tagId}");
+		SET TITLE = '$title'
+		WHERE ID = $tagId");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;

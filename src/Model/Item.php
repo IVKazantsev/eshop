@@ -2,7 +2,7 @@
 
 namespace N_ONE\App\Model;
 
-use Exception;
+use RuntimeException;
 
 class Item extends Entity
 {
@@ -25,12 +25,12 @@ class Item extends Entity
 	{
 		foreach ($this->images as $image)
 		{
-			if ($image->getType() == 2 && $image->isMain())
+			if ($image->getType() === 2 && $image->isMain())
 			{
 				return $image;
 			}
 		}
-		throw new Exception("Preview image for Item with id {$this->getId()} not found");
+		throw new RuntimeException("Preview image for Item with id {$this->getId()} not found");
 	}
 
 	public function getFullSizeImages(): array
@@ -38,14 +38,14 @@ class Item extends Entity
 		$images = [];
 		foreach ($this->images as $image)
 		{
-			if ($image->getType() == 1)
+			if ($image->getType() === 1)
 			{
 				$images[] = $image;
 			}
 		}
 		if (empty($images))
 		{
-			throw new Exception("FullSize image for Item with id {$this->getId()} not found");
+			throw new RuntimeException("FullSize image for Item with id {$this->getId()} not found");
 		}
 		return $images;
 	}

@@ -20,6 +20,9 @@ return [
 	'NUM_OF_ITEMS_PER_PAGE' => 6,
 	'MIGRATION_PATH' => "/migrations",
 	'MIGRATION_TABLE' => "N_ONE_MIGRATIONS",
+
 	'ICONS_PATH' => '/images/icons/',
 	'IMAGES_PATH' => '/images/products/',
+	'VIEWS_PATH' => ROOT . '/src/View/',
+
 ];

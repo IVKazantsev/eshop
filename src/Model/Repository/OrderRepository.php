@@ -2,10 +2,10 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
 class OrderRepository extends Repository
 {
@@ -38,12 +38,11 @@ class OrderRepository extends Repository
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
-	"
-		);
+	");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -55,20 +54,17 @@ class OrderRepository extends Repository
 
 		if (empty($orders))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
-		$itemsIds = array_map(function($order) {
-			return $order->getItemId();
-		}, $orders);
-		$usersIds = array_map(function($user) {
-			return $user->getUserId();
-		}, $orders);
+		$itemsIds = array_map(static function($order) {return $order->getItemId();}, $orders);
+		$usersIds = array_map(static function($user) {return $user->getUserId();}, $orders);
 
 		$items = $this->itemRepository->getByIds($itemsIds);
 		$users = $this->userRepository->getByIds($usersIds);
 
-		for ($i = 0; $i < count($orders); $i++)
+		$ordersCount = count($orders);
+		for ($i = 0; $i < $ordersCount; $i++)
 		{
 			$orders[$i]->setItem($items[$i]);
 			$orders[$i]->setUser($users[$i]);
@@ -87,15 +83,15 @@ class OrderRepository extends Repository
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
-	"
-		);
+	");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while ($row = mysqli_fetch_assoc($result))
+		$order = null;
+		while($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
 				$row['ID'],
@@ -109,9 +105,9 @@ class OrderRepository extends Repository
 			);
 		}
 
-		if (empty($order))
+		if ($order === null)
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $order;
@@ -131,17 +127,17 @@ class OrderRepository extends Repository
 			"
 		INSERT INTO N_ONE_ORDERS (ID, USER_ID, ITEM_ID, STATUS_ID, PRICE) 
 		VALUES (
-			{$orderId},
-			{$userId},
-			{$itemId},
-			{$statusId},
+			$orderId,
+			$userId,
+			$itemId,
+			$statusId,
 			{$price}
 		);"
 		);
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
@@ -161,17 +157,17 @@ class OrderRepository extends Repository
 			"
 		UPDATE N_ONE_ORDERS 
 		SET 
-			USER_ID = {$userId},
-			ITEM_ID = {$itemId},
-			STATUS_ID = {$statusId},
+			USER_ID = $userId,
+			ITEM_ID = $itemId,
+			STATUS_ID = $statusId,
 			PRICE = {$price}
-		where ID = {$orderId};
-		"
-		);
+		where ID = $orderId;
+		");
+
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;

@@ -4,9 +4,10 @@
  * @var array $cars ;
  */
 
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
-$TE = new TemplateEngine(ROOT . '/src/View/components/');
+$TE = new TemplateEngine(Configurator::option("VIEWS_PATH"));
 
 ?>
 

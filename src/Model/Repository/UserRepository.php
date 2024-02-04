@@ -2,10 +2,10 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\User;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\DbConnector\DbConnector;
+use RuntimeException;
 
 class UserRepository extends Repository
 {
@@ -29,7 +29,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -48,7 +48,7 @@ class UserRepository extends Repository
 
 		if (empty($users))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		return $users;
@@ -61,14 +61,15 @@ class UserRepository extends Repository
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-		WHERE u.ID = {$id};
+		WHERE u.ID = $id;
 		");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
+		$user = null;
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
@@ -83,9 +84,9 @@ class UserRepository extends Repository
 			);
 		}
 
-		if (empty($user))
+		if ($user === null)
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $user;
@@ -104,7 +105,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while($row = mysqli_fetch_assoc($result))
@@ -123,7 +124,7 @@ class UserRepository extends Repository
 
 		if (empty($users))
 		{
-			throw new Exception("Items not found");
+			throw new RuntimeException("Items not found");
 		}
 
 		return $users;
@@ -142,18 +143,18 @@ class UserRepository extends Repository
 		$result = mysqli_query($connection, "
 		INSERT INTO N_ONE_USERS (ID, ROLE_ID, NAME, EMAIL, PASSWORD, PHONE_NUMBER, ADDRESS) 
 		VALUES (
-			{$tagId},
-			'{$roleId}',
-			{$name},
-			{$email},
-			'{$password}',
-			{$phoneNumber},
+			$tagId,
+			'$roleId',
+			$name,
+			$email,
+			'$password',
+			$phoneNumber,
 			{$address}
 		);");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
@@ -171,17 +172,17 @@ class UserRepository extends Repository
 
 		$result = mysqli_query($connection, "
 		UPDATE N_ONE_USERS 
-		SET ROLE_ID = {$roleId},
-			NAME = '{$name}', 
-			EMAIL = '{$email}', 
-			PASSWORD = '{$password}', 
-			PHONE_NUMBER = '{$phoneNumber}', 
+		SET ROLE_ID = $roleId,
+			NAME = '$name', 
+			EMAIL = '$email', 
+			PASSWORD = '$password', 
+			PHONE_NUMBER = '$phoneNumber', 
 			ADDRESS = {$address}
-		WHERE ID = {$tagId}");
+		WHERE ID = $tagId");
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		return true;
