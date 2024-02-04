@@ -7,8 +7,7 @@
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
-$TE = new TemplateEngine(Configurator::option("VIEWS_PATH"));
-
+$TE = new TemplateEngine(Configurator::option("COMPONENTS_PATH"));
 ?>
 
 <div class="catalogue">

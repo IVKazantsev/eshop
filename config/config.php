@@ -24,5 +24,6 @@ return [
 	'ICONS_PATH' => '/images/icons/',
 	'IMAGES_PATH' => '/images/products/',
 	'VIEWS_PATH' => ROOT . '/src/View/',
+	'COMPONENTS_PATH' => ROOT . '/src/View/components/',
 
 ];

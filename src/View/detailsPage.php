@@ -12,7 +12,7 @@ $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
 $priceString = $car->getPrice();
 $priceString = number_format($priceString, 0, '', ' ');
-$TE = new TemplateEngine(ROOT . '/src/View/components/');
+$TE = new TemplateEngine(Configurator::option("COMPONENTS_PATH"));
 
 ?>
 
