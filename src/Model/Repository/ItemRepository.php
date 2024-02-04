@@ -26,7 +26,7 @@ class ItemRepository extends Repository
 		$this->imageRepository = $imageRepository;
 	}
 
-	public function getById(int $id): Item
+	public function getById(int $id): ?Item
 	{
 		$connection = $this->dbConnection->getConnection();
 

@@ -5,11 +5,12 @@
  * @var string $content ;
  */
 
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 $TE = new TemplateEngine(ROOT . '/src/View/');
-$iconsPath = \N_ONE\Core\Configurator\Configurator::option('ICONS_PATH');
-$imagesPath = \N_ONE\Core\Configurator\Configurator::option('IMAGES_PATH');
+$iconsPath = Configurator::option('ICONS_PATH');
+$imagesPath = Configurator::option('IMAGES_PATH');
 
 ?>
 
@@ -28,10 +29,10 @@ $imagesPath = \N_ONE\Core\Configurator\Configurator::option('IMAGES_PATH');
 			<a href="/"><img src="<?= $iconsPath . 'logo.svg' ?>" alt=""></a>
 		</div>
 		<ul class="tags">
-			<li class="tag-item">Категория 1</a></li>
-			<li class="tag-item">Категория 2</li>
-			<li class="tag-item">Категория 3</li>
-			<li class="tag-item">Категория 4</li>
+			<li class="tag-item"><a class="tag-link" href="/products/1">Машина №1</a></li>
+			<li class="tag-item"><a class="tag-link" href="/products/2">Машина №2</a></li>
+			<li class="tag-item"><a class="tag-link" href="/products/3">Машина №3</a></li>
+			<li class="tag-item"><a class="tag-link" href="/products/4">Машина №4</a></li>
 		</ul>
 	</div>
 	<header>
@@ -51,7 +52,6 @@ $imagesPath = \N_ONE\Core\Configurator\Configurator::option('IMAGES_PATH');
 	</header>
 
 	<main>
-
 		<?= $content ?>
 	</main>
 
