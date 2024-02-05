@@ -2,6 +2,7 @@
 
 /**
  * @var Item $car
+ * @var TemplateEngine $TE
  */
 
 use N_ONE\App\Model\Item;
@@ -12,8 +13,6 @@ $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
 $priceString = $car->getPrice();
 $priceString = number_format($priceString, 0, '', ' ');
-$TE = new TemplateEngine(Configurator::option("COMPONENTS_PATH"));
-
 ?>
 
 <div class="car-info">
@@ -26,7 +25,10 @@ $TE = new TemplateEngine(Configurator::option("COMPONENTS_PATH"));
 	<div class="car-specs">
 		<h1 class="car-title-details"><?= $car->getTitle() ?></h1>
 		<h3 class="year-title-details"> 2024</h3>
-		<?= $TE->render('tags', ['tags' => $car->getTags()]) ?>
+		<?= $TE->render('components/tags', [
+			'tags' => $car->getTags(),
+			])
+		?>
 		<p class="price"><?= $priceString ?> ₽</p>
 		<button class="buy-button">КУПИТЬ</button>
 	</div>

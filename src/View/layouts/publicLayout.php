@@ -6,9 +6,7 @@
  */
 
 use N_ONE\Core\Configurator\Configurator;
-use N_ONE\Core\TemplateEngine\TemplateEngine;
 
-$TE = new TemplateEngine(ROOT . '/src/View/');
 $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
 

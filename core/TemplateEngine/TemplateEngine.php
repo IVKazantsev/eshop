@@ -2,15 +2,16 @@
 
 namespace N_ONE\Core\TemplateEngine;
 
+use N_ONE\Core\Configurator\Configurator;
 use RuntimeException;
 
 class TemplateEngine
 {
 	private string $templateDir;
 
-	public function __construct(string $templateDir)
+	public function __construct()
 	{
-
+		$templateDir = Configurator::option("VIEWS_PATH");
 		if (!is_dir($templateDir))
 		{
 			throw new RuntimeException('Invalid template dir');
@@ -21,7 +22,7 @@ class TemplateEngine
 
 	public function renderError(int $errorCode, string $errorMessage): string
 	{
-		$errorViewFile = 'errorPage';
+		$errorViewFile = 'pages/errorPage';
 
 		$variables = [
 			'errorCode' => $errorCode,
