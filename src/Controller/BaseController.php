@@ -23,4 +23,14 @@ abstract class BaseController
 			$dbConnection, $this->tagRepository, $this->imageRepository
 		);
 	}
+
+	public function renderPublicView($content): string
+	{
+		$tags = $this->tagRepository->getList();
+
+		return $this->templateEngine->render('layouts/publicLayout', [
+			'tags' => $tags,
+			'content' => $content,
+		]);
+	}
 }

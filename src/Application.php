@@ -15,6 +15,10 @@ class Application
 	{
 	}
 
+	private function __clone()
+	{
+	}
+
 	public static function getInstance(): Application
 	{
 		if (static::$instance)
@@ -27,7 +31,7 @@ class Application
 
 	public function run(): void
 	{
-		if(Configurator::option('MIGRATION_NEEDED'))
+		if (Configurator::option('MIGRATION_NEEDED'))
 		{
 			$migrator = Migrator::getInstance();
 			$migrator->migrate();
@@ -37,15 +41,11 @@ class Application
 		if (!$route)
 		{
 			http_response_code(404);
-			echo (new TemplateEngine())->renderError(404, "Page not found");
+			echo (TemplateEngine::getInstance())->renderError(404, "Page not found");
 			exit;
 		}
 		$action = $route->action;
 		$variables = $route->getVariables();
 		echo $action(...$variables);
-	}
-
-	private function __clone()
-	{
 	}
 }

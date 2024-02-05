@@ -3,8 +3,10 @@
 /**
  * @var array $cars
  * @var string $content
+ * @var Tag[] $tags
  */
 
+use N_ONE\App\Model\Tag;
 use N_ONE\Core\Configurator\Configurator;
 
 $iconsPath = Configurator::option('ICONS_PATH');
@@ -27,10 +29,9 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 			<a href="/"><img src="<?= $iconsPath . 'logo.svg' ?>" alt=""></a>
 		</div>
 		<ul class="tags">
-			<li class="tag-item"><a class="tag-link" href="/products/1">Машина №1</a></li>
-			<li class="tag-item"><a class="tag-link" href="/products/2">Машина №2</a></li>
-			<li class="tag-item"><a class="tag-link" href="/products/3">Машина №3</a></li>
-			<li class="tag-item"><a class="tag-link" href="/products/4">Машина №4</a></li>
+			<?php foreach ($tags as $tag): ?>
+				<li class="tag-item"><a class="tag-link" href=""><?= $tag->getTitle() ?></a></li>
+			<?php endforeach; ?>
 		</ul>
 	</div>
 	<header>

@@ -23,9 +23,6 @@ class CatalogController extends BaseController
 			'cars' => $cars,
 		]);
 
-		return $this->templateEngine->render('layouts/publicLayout', [
-			'content' => $catalog,
-		]);
+		return $this->renderPublicView($catalog);
 	}
-
 }

@@ -18,13 +18,11 @@ class DetailController extends BaseController
 			echo $this->templateEngine->renderError(404, "Page not found");
 			exit;
 		}
+
 		$detailPage = $this->templateEngine->render('pages/detailPage', [
 			'car' => $car,
 		]);
 
-		return $this->templateEngine->render('layouts/publicLayout', [
-			'content' => $detailPage,
-		]);
+		return $this->renderPublicView($detailPage);
 	}
-
 }
