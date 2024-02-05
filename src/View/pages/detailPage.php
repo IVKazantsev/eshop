@@ -2,7 +2,6 @@
 
 /**
  * @var Item $car
- * @var TemplateEngine $TE
  */
 
 use N_ONE\App\Model\Item;
@@ -25,7 +24,7 @@ $priceString = number_format($priceString, 0, '', ' ');
 	<div class="car-specs">
 		<h1 class="car-title-details"><?= $car->getTitle() ?></h1>
 		<h3 class="year-title-details"> 2024</h3>
-		<?= $TE->render('components/tags', [
+		<?= TemplateEngine::getInstance()->render('components/tags', [
 			'tags' => $car->getTags(),
 			])
 		?>

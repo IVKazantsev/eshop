@@ -5,22 +5,7 @@ namespace N_ONE\Core\Routing;
 class Router
 {
 
-	public static array $routes = [];
-	static private ?Router $instance = null;
-
-	private function __construct()
-	{
-	}
-
-	public static function getInstance(): Router
-	{
-		if (static::$instance)
-		{
-			return static::$instance;
-		}
-
-		return static::$instance = new self();
-	}
+	private static array $routes = [];
 
 	public static function get(string $uri, callable $action): void
 	{
@@ -62,9 +47,4 @@ class Router
 	{
 		self::add('POST', $uri, $action);
 	}
-
-	private function __clone()
-	{
-	}
-
 }

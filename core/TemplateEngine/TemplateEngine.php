@@ -7,9 +7,10 @@ use RuntimeException;
 
 class TemplateEngine
 {
+	static private ?TemplateEngine $instance = null;
 	private string $templateDir;
 
-	public function __construct()
+	private function __construct()
 	{
 		$templateDir = Configurator::option("VIEWS_PATH");
 		if (!is_dir($templateDir))
@@ -18,6 +19,20 @@ class TemplateEngine
 		}
 
 		$this->templateDir = $templateDir;
+	}
+
+	private function __clone()
+	{
+	}
+
+	public static function getInstance(): TemplateEngine
+	{
+		if (static::$instance)
+		{
+			return static::$instance;
+		}
+
+		return static::$instance = new self();
 	}
 
 	public function renderError(int $errorCode, string $errorMessage): string

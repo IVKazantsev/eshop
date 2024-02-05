@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @var array $cars ;
- * @var string $content ;
+ * @var array $cars
+ * @var string $content
  */
 
 use N_ONE\Core\Configurator\Configurator;

@@ -16,21 +16,11 @@ abstract class BaseController
 	public function __construct()
 	{
 		$dbConnection = DbConnector::getInstance();
-		$this->templateEngine = new TemplateEngine();
+		$this->templateEngine = TemplateEngine::getInstance();
 		$this->tagRepository = new Repository\TagRepository($dbConnection);
 		$this->imageRepository = new Repository\ImageRepository($dbConnection);
 		$this->itemRepository = new Repository\ItemRepository(
-			$dbConnection,
-			$this->tagRepository,
-			$this->imageRepository
-		);
-	}
-
-	public function renderPublicView(string $pageName, array $params): string
-	{
-		return $this->templateEngine->render('layouts/publicLayout', [
-			'content' => $this->templateEngine->render($pageName, $params),
-			]
+			$dbConnection, $this->tagRepository, $this->imageRepository
 		);
 	}
 }

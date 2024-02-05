@@ -17,4 +17,5 @@ return [
 	'PAGES_PATH' => ROOT . '/src/View/pages/',
 	'LAYOUTS_PATH' => ROOT . '/src/View/layouts/',
 
+	'MIGRATION_NEEDED' => true,
 ];

@@ -4,9 +4,9 @@ namespace N_ONE\App\Controller;
 
 use Exception;
 
-class CatalogueController extends BaseController
+class CatalogController extends BaseController
 {
-	public function renderCatalogue(): string
+	public function renderCatalog(): string
 	{
 		try
 		{
@@ -18,11 +18,14 @@ class CatalogueController extends BaseController
 			echo $this->templateEngine->renderError(404, "Page not found");
 			exit;
 		}
-		return $this->renderPublicView('pages/cataloguePage', [
+
+		$catalog = $this->templateEngine->render('pages/catalogPage', [
 			'cars' => $cars,
-			'TE' => $this->templateEngine,
-			]
-		);
+		]);
+
+		return $this->templateEngine->render('layouts/publicLayout', [
+			'content' => $catalog,
+		]);
 	}
 
 }

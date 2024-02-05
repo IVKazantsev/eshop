@@ -4,7 +4,7 @@ namespace N_ONE\App\Controller;
 
 use Exception;
 
-class DetailsController extends BaseController
+class DetailController extends BaseController
 {
 	public function renderDetails(string $carId): string
 	{
@@ -18,11 +18,13 @@ class DetailsController extends BaseController
 			echo $this->templateEngine->renderError(404, "Page not found");
 			exit;
 		}
-		return $this->renderPublicView('pages/detailsPage', [
+		$detailPage = $this->templateEngine->render('pages/detailPage', [
 			'car' => $car,
-			'TE' => $this->templateEngine,
-			]
-		);
+		]);
+
+		return $this->templateEngine->render('layouts/publicLayout', [
+			'content' => $detailPage,
+		]);
 	}
 
 }

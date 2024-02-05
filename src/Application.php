@@ -3,6 +3,7 @@
 namespace N_ONE\App;
 
 use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\Migrator\Migrator;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
@@ -26,6 +27,12 @@ class Application
 
 	public function run(): void
 	{
+		if(Configurator::option('MIGRATION_NEEDED'))
+		{
+			$migrator = Migrator::getInstance();
+			$migrator->migrate();
+		}
+
 		$route = Router::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 		if (!$route)
 		{

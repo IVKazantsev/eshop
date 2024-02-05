@@ -1,8 +1,7 @@
 <?php
 
 /**
- * @var array $cars;
- * @var TemplateEngine $TE
+ * @var array $cars
  */
 
 use N_ONE\Core\TemplateEngine\TemplateEngine;
@@ -12,9 +11,8 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 <div class="catalogue">
 
 	<?php foreach ($cars as $car): ?>
-		<?= $TE->render('components/carCard', [
+		<?= TemplateEngine::getInstance()->render('components/carCard', [
 			'car' => $car,
-			'TE' => $TE
 		])
 		?>
 	<?php endforeach; ?>
