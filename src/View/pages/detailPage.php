@@ -24,7 +24,7 @@ $priceString = number_format($priceString, 0, '', ' ');
 	<div class="car-specs">
 		<h1 class="car-title-details"><?= $car->getTitle() ?></h1>
 		<h3 class="year-title-details"> 2024</h3>
-		<?= TemplateEngine::getInstance()->render('components/tags', [
+		<?= TemplateEngine::render('components/tags', [
 			'tags' => $car->getTags(),
 			])
 		?>

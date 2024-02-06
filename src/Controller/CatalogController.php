@@ -3,6 +3,7 @@
 namespace N_ONE\App\Controller;
 
 use Exception;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
@@ -15,11 +16,11 @@ class CatalogController extends BaseController
 		catch (Exception)
 		{
 			http_response_code(404);
-			echo $this->templateEngine->renderError(404, "Page not found");
+			echo TemplateEngine::renderError(404, "Page not found");
 			exit;
 		}
 
-		$catalog = $this->templateEngine->render('pages/catalogPage', [
+		$catalog = TemplateEngine::render('pages/catalogPage', [
 			'cars' => $cars,
 		]);
 

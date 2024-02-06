@@ -41,7 +41,7 @@ class Application
 		if (!$route)
 		{
 			http_response_code(404);
-			echo (TemplateEngine::getInstance())->renderError(404, "Page not found");
+			echo (TemplateEngine::renderError(404, "Page not found"));
 			exit;
 		}
 		$action = $route->action;

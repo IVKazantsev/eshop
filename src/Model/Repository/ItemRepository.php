@@ -5,8 +5,6 @@ namespace N_ONE\App\Model\Repository;
 use Exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
-use N_ONE\App\Model\Tag;
-use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 
 class ItemRepository extends Repository
@@ -75,10 +73,8 @@ class ItemRepository extends Repository
 
 		$result = mysqli_query(
 			$connection,
-			"
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
-		FROM N_ONE_ITEMS i;
-	"
+			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+			FROM N_ONE_ITEMS i;"
 		);
 
 		if (!$result)
@@ -89,7 +85,13 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				[],
+				[]
 			);
 		}
 
@@ -98,9 +100,7 @@ class ItemRepository extends Repository
 			throw new Exception("Items not found");
 		}
 
-		$itemsIds = array_map(function($item) {
-			return $item->getId();
-		}, $items);
+		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
