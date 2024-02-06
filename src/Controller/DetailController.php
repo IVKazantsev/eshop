@@ -3,6 +3,7 @@
 namespace N_ONE\App\Controller;
 
 use Exception;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class DetailController extends BaseController
 {
@@ -15,11 +16,11 @@ class DetailController extends BaseController
 		catch (Exception)
 		{
 			http_response_code(404);
-			echo $this->templateEngine->renderError(404, "Page not found");
+			echo TemplateEngine::renderError(404, "Page not found");
 			exit;
 		}
 
-		$detailPage = $this->templateEngine->render('pages/detailPage', [
+		$detailPage = TemplateEngine::render('pages/detailPage', [
 			'car' => $car,
 		]);
 

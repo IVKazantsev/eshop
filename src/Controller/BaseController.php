@@ -8,7 +8,6 @@ use N_ONE\App\Model\Repository;
 
 abstract class BaseController
 {
-	protected TemplateEngine $templateEngine;
 	protected Repository\TagRepository $tagRepository;
 	protected Repository\ImageRepository $imageRepository;
 	protected Repository\ItemRepository $itemRepository;
@@ -16,7 +15,6 @@ abstract class BaseController
 	public function __construct()
 	{
 		$dbConnection = DbConnector::getInstance();
-		$this->templateEngine = TemplateEngine::getInstance();
 		$this->tagRepository = new Repository\TagRepository($dbConnection);
 		$this->imageRepository = new Repository\ImageRepository($dbConnection);
 		$this->itemRepository = new Repository\ItemRepository(
@@ -28,7 +26,7 @@ abstract class BaseController
 	{
 		$tags = $this->tagRepository->getList();
 
-		return $this->templateEngine->render('layouts/publicLayout', [
+		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
 			'content' => $content,
 		]);

@@ -11,7 +11,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 <div class="catalogue">
 
 	<?php foreach ($cars as $car): ?>
-		<?= TemplateEngine::getInstance()->render('components/carCard', [
+		<?= TemplateEngine::render('components/carCard', [
 			'car' => $car,
 		])
 		?>
