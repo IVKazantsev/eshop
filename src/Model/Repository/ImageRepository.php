@@ -36,7 +36,6 @@ class ImageRepository extends Repository
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$images[$row['item_id']][] = new Image(
-				$row['id'],
 				$row['item_id'],
 				$row['path'],
 				$row['is_main'],
@@ -73,7 +72,6 @@ class ImageRepository extends Repository
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$image = new Image(
-				$row['id'],
 				$row['item_id'],
 				$row['path'],
 				$row['is_main'],

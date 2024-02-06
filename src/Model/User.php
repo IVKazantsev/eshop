@@ -5,14 +5,13 @@ namespace N_ONE\App\Model;
 class User extends Entity
 {
 	public function __construct(
-		protected int  $id,
 		private int    $roleId,
 		private string $role,
 		private string $name,
 		private string $email,
 		private string $pass,
 		private string $number,
-		private string $address
+		private string $address,
 	){}
 
 	public function getRoleId(): int

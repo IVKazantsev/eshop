@@ -5,7 +5,6 @@ namespace N_ONE\App\Model;
 class Image extends Entity
 {
 	public function __construct(
-		protected int    $id,
 		private int      $itemId,
 		private string   $path,
 		private bool     $isMain,

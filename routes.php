@@ -11,5 +11,23 @@ Router::get('/', function() {
 Router::get('/products/:id', function(Route $route) {
 	$carId = $route->getVariables()[0];
 
-	return (new Controller\DetailController())->renderDetails($carId);
+	return (new Controller\DetailController())->renderDetailPage($carId);
+});
+
+Router::get('/products/:id/order', function(Route $route) {
+	$carId = $route->getVariables()[0];
+
+	return (new Controller\OrderController())->renderOrderPage($carId);
+});
+
+Router::post('/products/:id/order', function(Route $route) {
+	$carId = $route->getVariables()[0];
+
+	return (new Controller\OrderController())->processOrder($carId);
+});
+
+Router::get('/successOrder/:id', function(Route $route) {
+	$orderId = $route->getVariables()[0];
+
+	return (new Controller\OrderController())->renderSuccessOrderPage($orderId);
 });

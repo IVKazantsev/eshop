@@ -7,7 +7,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class DetailController extends BaseController
 {
-	public function renderDetails(string $carId): string
+	public function renderDetailPage(string $carId): string
 	{
 		try
 		{

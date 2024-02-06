@@ -29,7 +29,7 @@ $priceString = number_format($priceString, 0, '', ' ');
 			])
 		?>
 		<p class="price"><?= $priceString ?> ₽</p>
-		<button class="buy-button">КУПИТЬ</button>
+		<a class="buy-link" href="<?= '/products/' . $car->getId() . '/order' ?>">КУПИТЬ</a>
 	</div>
 	<div class="car-description">
 		<h2>Описание машины</h2>
