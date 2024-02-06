@@ -5,7 +5,6 @@ namespace N_ONE\App\Model;
 class Tag extends Entity
 {
 	public function __construct(
-		protected int    $id,
 		private string $title
 	){}
 

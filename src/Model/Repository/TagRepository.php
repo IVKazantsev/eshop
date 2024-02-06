@@ -34,7 +34,6 @@ class TagRepository extends Repository
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
 				$row['TITLE'],
 			);
 		}
@@ -65,7 +64,6 @@ class TagRepository extends Repository
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'],
 				$row['TITLE'],
 			);
 		}
@@ -87,7 +85,7 @@ class TagRepository extends Repository
 		$tags = [];
 
 		$result = mysqli_query($connection, "
-		SELECT it.ITEM_ID, t.ID, t.TITLE
+		SELECT it.ITEM_ID, t.TITLE
 		FROM N_ONE_TAGS t 
 		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE it.ITEM_ID IN ($itemsIdsString);
@@ -100,10 +98,7 @@ class TagRepository extends Repository
 
 		while($row = mysqli_fetch_assoc($result))
 		{
-			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-			);
+			$tags[$row['ITEM_ID']][] = new Tag($row['TITLE']);
 		}
 		return $tags;
 	}

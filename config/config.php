@@ -18,4 +18,6 @@ return [
 	'LAYOUTS_PATH' => ROOT . '/src/View/layouts/',
 
 	'MIGRATION_NEEDED' => true,
+
+	'HOST_NAME' => $_SERVER['HTTP_HOST'],
 ];

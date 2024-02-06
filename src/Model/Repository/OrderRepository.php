@@ -47,9 +47,11 @@ class OrderRepository extends Repository
 
 		while ($row = mysqli_fetch_assoc($result))
 		{
-			$orders[] = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+			$order = new Order(
+				$row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
+			$order->setId($row['ID']);
+			$orders[] = $order;
 		}
 
 		if (empty($orders))
@@ -82,7 +84,8 @@ class OrderRepository extends Repository
 			"
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
+		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+		WHERE o.ID = $id;
 	");
 
 		if (!$result)
@@ -94,15 +97,55 @@ class OrderRepository extends Repository
 		while($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'],
 				$row['USER_ID'],
 				$row['ITEM_ID'],
 				$row['STATUS_ID'],
 				$row['TITLE'],
 				$row['PRICE'],
-				$this->userRepository->getById($row['USER_ID']),
-				$this->itemRepository->getById($row['ITEM_ID'])
 			);
+
+			$order->setId($row['ID']);
+		}
+
+		if ($order === null)
+		{
+			throw new RuntimeException("Item with id $id not found");
+		}
+
+		return $order;
+	}
+
+	public function getByUserAndItem(int $userId, int $itemId): Order
+	{
+		$connection = $this->dbConnection->getConnection();
+
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+		FROM N_ONE_ORDERS o
+		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+		WHERE o.USER_ID = $userId AND o.ITEM_ID = $itemId
+		ORDER BY o.ID DESC
+		LIMIT 1;
+	");
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		$order = null;
+		while($row = mysqli_fetch_assoc($result))
+		{
+			$order = new Order(
+				$row['USER_ID'],
+				$row['ITEM_ID'],
+				$row['STATUS_ID'],
+				$row['TITLE'],
+				$row['PRICE'],
+			);
+			$order->setId($row['ID']);
 		}
 
 		if ($order === null)
@@ -116,18 +159,16 @@ class OrderRepository extends Repository
 	public function add(Order|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
-		$orderId = $entity->getId();
-		$userId = $entity->getUser()->getId();
-		$itemId = $entity->getItem()->getId();
+		$userId = $entity->getUserId();
+		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ORDERS (ID, USER_ID, ITEM_ID, STATUS_ID, PRICE) 
+		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
 		VALUES (
-			$orderId,
 			$userId,
 			$itemId,
 			$statusId,

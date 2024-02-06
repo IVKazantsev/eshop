@@ -8,7 +8,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 ?>
 
-<div class="catalogue">
+<div class="catalog">
 
 	<?php foreach ($cars as $car): ?>
 		<?= TemplateEngine::render('components/carCard', [

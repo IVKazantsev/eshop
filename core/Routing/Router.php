@@ -2,6 +2,8 @@
 
 namespace N_ONE\Core\Routing;
 
+use N_ONE\Core\Configurator\Configurator;
+
 class Router
 {
 
@@ -46,5 +48,11 @@ class Router
 	public static function post(string $uri, callable $action): void
 	{
 		self::add('POST', $uri, $action);
+	}
+
+	public static function redirect($url): void
+	{
+		$host = Configurator::option('HOST_NAME');
+		header("Location: http://$host$url");
 	}
 }

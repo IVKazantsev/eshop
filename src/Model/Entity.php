@@ -4,8 +4,8 @@ namespace N_ONE\App\Model;
 
 abstract class Entity
 {
-	protected int $id;
-	public function getId(): int
+	protected ?int $id = null;
+	public function getId(): ?int
 	{
 		return $this->id;
 	}

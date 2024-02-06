@@ -33,7 +33,7 @@ class ItemRepository extends Repository
 			"
 		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
 		FROM N_ONE_ITEMS i
-		WHERE i.ID = {$id};
+		WHERE i.ID = $id;
 		"
 		);
 
@@ -45,14 +45,15 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$item = new Item(
-				$row['ID'],
 				$row['TITLE'],
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
-				$this->tagRepository->getByItemsIds([$row['ID'],])[$row['ID']],
+				$this->tagRepository->getByItemsIds([$row['ID']])[$row['ID']],
 				$this->imageRepository->getList([$row['ID']]) [$row['ID']]
 			);
+
+			$item->setId($id);
 		}
 
 		if (empty($item))
@@ -85,14 +86,15 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'],
 				$row['TITLE'],
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
 				[],
-				[]
+				[],
 			);
+
+			$items[count($items) - 1]->setId($row['ID']);
 		}
 
 		if (empty($items))
@@ -136,7 +138,7 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
+				$row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
 			);
 		}
 

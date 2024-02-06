@@ -11,7 +11,6 @@ class Item extends Entity
 	 * @param Image[] $images
 	 */
 	public function __construct(
-		protected int    $id,
 		private string $title,
 		private bool   $isActive,
 		private int    $price,
