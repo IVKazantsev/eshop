@@ -9,7 +9,7 @@ Router::get('/', function()
 {
 	$di = Application::getDI();
 	$currentTag = $_GET['tag'] ?? null;
-	$currentTitle = $_GET['title'] ?? null;
+	$currentTitle = $_GET['CarTitle'] ?? null;
 	return ($di->getComponent('catalogController'))->renderCatalog($currentTag, $currentTitle);
 });
 

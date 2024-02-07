@@ -13,18 +13,23 @@ class CatalogController extends BaseController
 		{
 			$filter = ['tag' => $carsTag, 'title' => $carsTitle];
 			$cars = $this->itemRepository->getList($filter);
+			$content = TemplateEngine::render('pages/catalogPage', [
+				'cars' => $cars,
+			]);
 		}
 		catch (Exception)
 		{
-			http_response_code(404);
-			echo TemplateEngine::renderError(404, "Page not found");
-			exit;
+			// http_response_code(404);
+			// echo TemplateEngine::renderError(404, "Page not found");
+			// exit;
+			$content = TemplateEngine::render('pages/errorPage', [
+				'errorCode' => ':(',
+				'errorMessage' => 'Товары не найдены',
+			]);
 		}
 
-		$catalog = TemplateEngine::render('pages/catalogPage', [
-			'cars' => $cars,
-		]);
 
-		return $this->renderPublicView($catalog);
+
+		return $this->renderPublicView($content);
 	}
 }
