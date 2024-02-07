@@ -17,18 +17,16 @@ $priceString = number_format($priceString, 0, '', ' ');
 
 
 <div class="car-card">
-
-
-	<img class="car-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath() ?>" alt="image of a car">
-	<div class="description">
-		<h2 class="car-name"><?= $car->getTitle() ?></h2>
-		<p class="car-year">2024</p>
-		<?= TemplateEngine::render('components/tags', [
-			'tags' => $car->getTags(),
-			])
-		?>
-		<p class="price"><?= $priceString ?> ₽</p>
-		<a href = '<?= '/products/' . $car->getId() ?>'> Подробнее </a>
-	</div>
-
+	<a class="car-card-link" href='<?= '/products/' . $car->getId() ?>'>
+		<img class="car-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath() ?>" alt="image of a car">
+		<div class="description">
+			<h2 class="car-name"><?= $car->getTitle() ?></h2>
+			<p class="car-year">2024</p>
+			<?= TemplateEngine::render('components/tags', [
+				'tags' => $car->getTags(),
+				])
+			?>
+			<p class="price"><?= $priceString ?> ₽</p>
+		</div>
+	</a>
 </div>

@@ -125,9 +125,9 @@ footer {
 
 
 .catalog {
-	margin-top: 60px;
+	margin-top: 50px;
 	display: flex;
-	padding: 0 0 40px;
+	padding: 10px 0 40px;
 	flex-wrap: wrap;
 	gap: 30px;
 	height: calc(100% - 60px - 20px);
@@ -139,6 +139,7 @@ footer {
 }
 
 .car-card {
+	display: flex;
 	width: 30%;
 	min-width: 250px;
 	height: 500px;
@@ -146,14 +147,30 @@ footer {
 	margin-bottom: 20px;
 	border: 1px solid #dcdcdc;
 	border-radius: 7px;
+	flex-direction: column;
+	transition: transform 0.3s ease;
+}
+
+.car-card-link {
 	display: flex;
 	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	text-decoration: none;
+	color: black;
+}
+
+.car-card-link:active {
+	color: black;
+}
+
+.car-card:hover {
+	transform: translateY(-5px);
 }
 
 
 .car-image {
 	width: 100%;
-	margin-bottom: 10px;
 }
 
 
@@ -191,7 +208,7 @@ footer {
 .price {
 	font-size: 28px;
 	margin-top: auto;
-	padding-bottom: 14px;
+	margin-bottom: 10px;
 }
 
 
@@ -201,8 +218,8 @@ footer {
 
 
 .description {
-	padding: 0 10px 10px 10px;
-	height: 100%;
+	padding: 0 10px;
+	flex: 1;
 	display: flex;
 	flex-direction: column;
 }
@@ -213,7 +230,7 @@ footer {
 	grid-template-columns: 3fr 1fr;
 	grid-template-rows: 1fr 300px;
 	background-color: #fff;
-	padding: 40px 20px 0 20px;
+	padding: 40px 0;
 }
 
 .tags-container {
@@ -434,8 +451,7 @@ footer {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	padding: 60px 20px;
-	margin: 0 400px;
+	padding: 60px 0 0;
 	background-color: #fff;
 }
 
