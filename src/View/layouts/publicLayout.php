@@ -29,7 +29,7 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 			<div class="tags-title">Каталог товаров</div>
 			<ul class="tags">
 				<?php foreach ($tags as $tag): ?>
-					<li class="tag-item"><a class="tag-link" href=""><?= $tag->getTitle() ?></a></li>
+					<li class="tag-item"><a class="tag-link" href="<?='/?tag=' . $tag->getTitle()?>"><?= $tag->getTitle() ?></a></li>
 				<?php endforeach; ?>
 			</ul>
 		</div>
@@ -40,9 +40,9 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 	<header>
 		<div class="bar">
 			<div class="searchbar">
-				<form class="search-form" action="" method="get">
+				<form class="search-form" action="/" method="get">
 					<div class="search-icon-and-input">
-						<input type="text" placeholder="Поиск" class="search-input">
+						<input name="CarTitle" type="text" placeholder="Поиск" class="search-input">
 					</div>
 					<button type="submit" class="search-button btn"><img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
 				</form>
