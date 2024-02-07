@@ -29,7 +29,7 @@ class UserRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
 				$row['ROLE_ID'],
@@ -48,6 +48,49 @@ class UserRepository extends Repository
 
 		return $users;
 	}
+
+	public function getByEmail(string $email): User
+	{
+		$connection = $this->dbConnection->getConnection();
+		$escapedEmail = mysqli_real_escape_string($connection, $email);
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
+		FROM N_ONE_USERS u
+		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+		WHERE u.EMAIL = '$escapedEmail';
+		"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		$user = null;
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$user = new User(
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['TITLE'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
+			);
+		}
+
+		if ($user === null)
+		{
+			throw new RuntimeException("Item with id $email not found");
+		}
+
+		return $user;
+	}
+
 	public function getById(int $id): User
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -65,7 +108,7 @@ class UserRepository extends Repository
 		}
 
 		$user = null;
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
 				$row['ROLE_ID'],
@@ -84,6 +127,7 @@ class UserRepository extends Repository
 
 		return $user;
 	}
+
 
 	public function getByNumber(string $phone): User|null
 	{
@@ -136,7 +180,7 @@ class UserRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
 				$row['ROLE_ID'],
@@ -155,6 +199,7 @@ class UserRepository extends Repository
 
 		return $users;
 	}
+
 	public function add(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -183,6 +228,7 @@ class UserRepository extends Repository
 
 		return true;
 	}
+
 	public function update(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();

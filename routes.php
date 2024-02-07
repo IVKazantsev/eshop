@@ -3,7 +3,7 @@
 use N_ONE\App\Application;
 use N_ONE\Core\Routing\Route;
 use N_ONE\Core\Routing\Router;
-
+use N_ONE\App\Controller;
 
 Router::get('/', function()
 {
@@ -38,3 +38,13 @@ Router::get('/successOrder/:id', function(Route $route) {
 	$di = Application::getDI();
 	return ($di->getComponent('orderController'))->renderSuccessOrderPage($orderId);
 });
+
+// Router::get('/login', function() {
+// 	return (new Controller\AdminController())->render('login', []);
+// });
+// Router::post('/login', function() {
+// 	return (new Controller\AdminController())->login($_POST['email'], $_POST['password']);
+// });
+// Router::get('/admin', function() {
+// 	return (new Controller\AdminController())->renderDashboard();
+// });

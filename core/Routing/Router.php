@@ -8,7 +8,22 @@ use N_ONE\Core\Configurator\Configurator;
 class Router
 {
 
-	private static array $routes = [];
+	public static array $routes = [];
+	static private ?Router $instance = null;
+
+	private function __construct()
+	{
+	}
+
+	public static function getInstance(): Router
+	{
+		if (static::$instance)
+		{
+			return static::$instance;
+		}
+
+		return static::$instance = new self();
+	}
 
 	public static function get(string $uri, callable $action): void
 	{
@@ -17,6 +32,7 @@ class Router
 
 	public static function add(string $method, string $uri, callable $action): void
 	{
+		// self::$routes[] = new Route($method, $uri, $action(...));
 		self::$routes[] = new Route($method, $uri, function() use ($action) {
 			$route = self::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 			if ($route instanceof Route)
@@ -55,4 +71,5 @@ class Router
 		$host = Configurator::option('HOST_NAME');
 		header("Location: http://$host$url");
 	}
+
 }

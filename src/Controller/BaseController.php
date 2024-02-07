@@ -29,4 +29,8 @@ abstract class BaseController
 			'currentSearchRequest' => $currentSearchRequest
 		]);
 	}
+	// public function render(string $view, array $params): string
+	// {
+	// 	return $this->templateEngine->render("pages/$view", $params);
+	// }
 }
