@@ -32,7 +32,6 @@ class Migrator
 		}
 
 		$dbConnector = DbConnector::getInstance();
-
 		return static::$instance = new self($dbConnector);
 	}
 

@@ -13,18 +13,6 @@ use N_ONE\App\Model\Repository;
 
 class OrderController extends BaseController
 {
-	protected Repository\UserRepository $userRepository;
-	protected Repository\OrderRepository $orderRepository;
-
-	public function __construct()
-	{
-		parent::__construct();
-		$dbConnection = DbConnector::getInstance();
-		$this->userRepository = new Repository\UserRepository($dbConnection);
-		$this->orderRepository = new Repository\OrderRepository(
-			$dbConnection, $this->userRepository, $this->itemRepository
-		);
-	}
 
 	public function renderOrderPage(int $carId): string
 	{

@@ -19,5 +19,7 @@ return [
 
 	'MIGRATION_NEEDED' => true,
 
+	'SERVICES_PATH' => ROOT . '/services.xml',
+
 	'HOST_NAME' => $_SERVER['HTTP_HOST'],
 ];
