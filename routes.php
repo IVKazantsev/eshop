@@ -39,12 +39,50 @@ Router::get('/successOrder/:id', function(Route $route) {
 	return ($di->getComponent('orderController'))->renderSuccessOrderPage($orderId);
 });
 
-// Router::get('/login', function() {
-// 	return (new Controller\AdminController())->render('login', []);
-// });
-// Router::post('/login', function() {
-// 	return (new Controller\AdminController())->login($_POST['email'], $_POST['password']);
-// });
-// Router::get('/admin', function() {
-// 	return (new Controller\AdminController())->renderDashboard();
-// });
+// TODO отрефакторить middleware куда-нибудь
+function adminMiddleware(callable $action)
+{
+	return function() use ($action) {
+		session_start();
+		if (!isset($_SESSION['user_id']))
+		{
+			Router::redirect('/login');
+			exit();
+		}
+		else
+		{
+			return $action();
+		}
+	};
+}
+
+//роуты с защитой
+Router::get('/admin', adminMiddleware(function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderDashboard();
+}));
+
+Router::get('/admin/items', adminMiddleware(function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderItemsPage();
+}));
+
+//роуты доступные всем
+Router::get('/login', function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderLoginPage('login', []);
+});
+
+Router::post('/login', function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->login($_POST['email'], $_POST['password']);
+});
+Router::get('/logout', function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->logout();
+});

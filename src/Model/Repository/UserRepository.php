@@ -11,18 +11,23 @@ class UserRepository extends Repository
 {
 	public function __construct(
 		private readonly DbConnector $dbConnection
-	){}
+	)
+	{
+	}
 
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
 		$users = [];
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID;
-		");
+		"
+		);
 
 		if (!$result)
 		{
@@ -32,12 +37,7 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
+				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
 			);
 		}
 
@@ -72,15 +72,9 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
-				$row['ID'],
-				$row['ROLE_ID'],
-				$row['TITLE'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
+				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
 			);
+			$user->setId($row['ID']);
 		}
 
 		if ($user === null)
@@ -95,12 +89,15 @@ class UserRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.ID = $id;
-		");
+		"
+		);
 
 		if (!$result)
 		{
@@ -111,12 +108,7 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
+				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
 			);
 		}
 
@@ -128,17 +120,19 @@ class UserRepository extends Repository
 		return $user;
 	}
 
-
 	public function getByNumber(string $phone): User|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.PHONE_NUMBER = '$phone';
-		");
+		"
+		);
 
 		if (!$result)
 		{
@@ -146,15 +140,10 @@ class UserRepository extends Repository
 		}
 
 		$user = null;
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
+				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
 			);
 
 			$user->setId($row['ID']);
@@ -168,12 +157,15 @@ class UserRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		$users = [];
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.ID IN (" . implode(',', $ids) . ");
-		");
+		"
+		);
 
 		if (!$result)
 		{
@@ -183,12 +175,7 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
+				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
 			);
 		}
 
@@ -210,7 +197,9 @@ class UserRepository extends Repository
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		INSERT INTO N_ONE_USERS (ROLE_ID, NAME, EMAIL, PASSWORD, PHONE_NUMBER, ADDRESS) 
 		VALUES (
 			'$roleId',
@@ -219,7 +208,8 @@ class UserRepository extends Repository
 			'$password',
 			'$phoneNumber',
 			'$address'
-		);");
+		);"
+		);
 
 		if (!$result)
 		{
@@ -240,7 +230,9 @@ class UserRepository extends Repository
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		UPDATE N_ONE_USERS 
 		SET ROLE_ID = $roleId,
 			NAME = '$name', 
@@ -248,7 +240,8 @@ class UserRepository extends Repository
 			PASSWORD = '$password', 
 			PHONE_NUMBER = '$phoneNumber', 
 			ADDRESS = '$address'
-		WHERE ID = $userId");
+		WHERE ID = $userId"
+		);
 
 		if (!$result)
 		{

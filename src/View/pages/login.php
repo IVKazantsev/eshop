@@ -13,14 +13,15 @@
 </head>
 <body>
 <div class="login-container">
+	<?= \N_ONE\App\Controller\AdminController::displayLoginError() ?>
 	<form action="/login" class="login-form" method="post">
 		<label class="input-label" for="email">
 			Email
-			<input type="text" name="email" id="login-email" placeholder="Введите email...">
+			<input type="text" name="email" id="login-email" placeholder="Введите email..." required>
 		</label>
 		<label class="input-label" for="password">
 			Password
-			<input type="password" name="password" id="login-password" placeholder="Введите пароль...">
+			<input type="password" name="password" id="login-password" placeholder="Введите пароль..." required>
 		</label>
 		<div class="remember-container">
 			<label class="checkbox-label" for="remember">

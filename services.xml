@@ -26,6 +26,15 @@
 			<arg service="orderRepository"/>
 		</class>
 	</service>
+	<service name="adminController">
+		<class name="N_ONE\App\Controller\AdminController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+		</class>
+	</service>
 	<service name="orderRepository">
 		<class name="\N_ONE\App\Model\Repository\OrderRepository">
 			<arg service="dbConnector"/>
@@ -64,5 +73,3 @@
 		<class name="N_ONE\Core\DbConnector\DbConnector" isSingleton="1"/>
 	</service>
 </services>
-
-

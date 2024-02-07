@@ -12,12 +12,14 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 abstract class BaseController
 {
 	public function __construct(
-		protected TagRepository $tagRepository,
+		protected TagRepository   $tagRepository,
 		protected ImageRepository $imageRepository,
-		protected ItemRepository $itemRepository,
-		protected UserRepository $userRepository,
-		protected OrderRepository $orderRepository)
-	{}
+		protected ItemRepository  $itemRepository,
+		protected UserRepository  $userRepository,
+		protected OrderRepository $orderRepository
+	)
+	{
+	}
 
 	public function renderPublicView($content, string $currentSearchRequest = null): string
 	{
@@ -29,8 +31,16 @@ abstract class BaseController
 			'currentSearchRequest' => $currentSearchRequest
 		]);
 	}
-	// public function render(string $view, array $params): string
-	// {
-	// 	return $this->templateEngine->render("pages/$view", $params);
-	// }
+
+	public function renderAdminView($content): string
+	{
+		session_start();
+		$user = $this->userRepository->getById($_SESSION['user_id']);
+
+		return TemplateEngine::render('layouts/adminLayout', [
+			'user' => $user,
+			'content' => $content,
+		]);
+	}
+
 }
