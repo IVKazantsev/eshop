@@ -10,12 +10,11 @@ use RuntimeException;
 class ImageRepository extends Repository
 {
 
-	private DbConnector $dbConnection;
 
-	public function __construct(DbConnector $dbConnection)
-	{
-		$this->dbConnection = $dbConnection;
-	}
+
+	public function __construct(
+		private readonly DbConnector $dbConnection)
+	{}
 
 	public function getList(array $filter = null): array
 	{
