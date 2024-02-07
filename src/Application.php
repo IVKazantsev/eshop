@@ -32,9 +32,6 @@ class Application
 		$variables = $route->getVariables();
 		echo $action(...$variables);
 	}
-
-
-
 	private static function setDI($di): void
 	{
 		self::$di = $di;

@@ -1,4 +1,31 @@
 <services>
+	<service name="orderController">
+		<class name="N_ONE\App\Controller\OrderController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+		</class>
+	</service>
+	<service name="catalogController">
+		<class name="N_ONE\App\Controller\CatalogController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+		</class>
+	</service>
+	<service name="detailController">
+		<class name="N_ONE\App\Controller\DetailController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+		</class>
+	</service>
 	<service name="orderRepository">
 		<class name="\N_ONE\App\Model\Repository\OrderRepository">
 			<arg service="dbConnector"/>

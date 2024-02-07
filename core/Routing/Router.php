@@ -3,7 +3,6 @@
 namespace N_ONE\Core\Routing;
 
 use Exception;
-
 use N_ONE\Core\Configurator\Configurator;
 
 class Router
