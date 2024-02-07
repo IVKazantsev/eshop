@@ -25,18 +25,20 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 <body>
 <div class="container">
 	<div class="sidebar">
-		<div id="logo">
-			<a href="/"><img src="<?= $iconsPath . 'logo.svg' ?>" alt=""></a>
+		<div class="tags-container">
+			<div class="tags-title">Каталог товаров</div>
+			<ul class="tags">
+				<?php foreach ($tags as $tag): ?>
+					<li class="tag-item"><a class="tag-link" href=""><?= $tag->getTitle() ?></a></li>
+				<?php endforeach; ?>
+			</ul>
 		</div>
-		<ul class="tags">
-			<?php foreach ($tags as $tag): ?>
-				<li class="tag-item"><a class="tag-link" href=""><?= $tag->getTitle() ?></a></li>
-			<?php endforeach; ?>
-		</ul>
+	</div>
+	<div id="logo">
+		<a class="logo-link" href="/"><img src="<?= $iconsPath . 'logo.svg' ?>" alt=""></a>
 	</div>
 	<header>
 		<div class="bar">
-
 			<div class="searchbar">
 				<form class="search-form" action="" method="get">
 					<div class="search-icon-and-input">
