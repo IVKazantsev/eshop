@@ -125,14 +125,18 @@ footer {
 
 
 .catalog {
+	margin-top: 60px;
 	display: flex;
-	padding: 0 40px 40px;
+	padding: 0 0 40px;
 	flex-wrap: wrap;
 	gap: 30px;
 	height: calc(100% - 60px - 20px);
 	overflow: auto;
 }
 
+.catalog::-webkit-scrollbar {
+	display: none;
+}
 
 .car-card {
 	width: 30%;
@@ -140,13 +144,14 @@ footer {
 	height: 500px;
 	background-color: white;
 	margin-bottom: 20px;
+	border: 1px solid #dcdcdc;
+	border-radius: 7px;
 	display: flex;
 	flex-direction: column;
 }
 
 
 .car-image {
-	height: 200px;
 	width: 100%;
 	margin-bottom: 10px;
 }
@@ -177,14 +182,14 @@ footer {
 
 
 .car-spec p {
-	font-size: 18px;
-	line-height: 24px;
+	font-size: 16px;
+	line-height: 16px;
 	color: #252525;
 }
 
 
 .price {
-	font-size: 32px;
+	font-size: 28px;
 	margin-top: auto;
 	padding-bottom: 14px;
 }
@@ -196,7 +201,7 @@ footer {
 
 
 .description {
-	padding: 0 10px 0 10px;
+	padding: 0 10px 10px 10px;
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -501,16 +506,10 @@ header {
 
 
 main {
-	padding: 60px;
+	padding: 0;
 	max-height: calc(100vh - 60px - 20px);
 	overflow-y: auto;
 }
-
-
-.catalog::-webkit-scrollbar {
-	display: none;
-}
-
 
 footer {
 	height: 25px;
