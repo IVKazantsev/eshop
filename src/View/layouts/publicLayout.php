@@ -42,10 +42,9 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 			<div class="searchbar">
 				<form class="search-form" action="" method="get">
 					<div class="search-icon-and-input">
-						<img src="<?= $iconsPath ?>search.svg" alt="search-icon"/>
 						<input type="text" placeholder="Поиск" class="search-input">
 					</div>
-					<button type="submit" class="search-button btn">Найти</button>
+					<button type="submit" class="search-button btn"><img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
 				</form>
 				<button type="submit" class="check-order-button btn">Проверить заказ</button>
 			</div>
