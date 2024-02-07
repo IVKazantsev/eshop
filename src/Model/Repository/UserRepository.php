@@ -21,18 +21,21 @@ class UserRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		$users = [];
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE, u.ROLE_ID
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID;
-		");
+		"
+		);
 
 		if (!$result)
 		{
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
 				$row['ID'],
@@ -53,16 +56,20 @@ class UserRepository extends Repository
 
 		return $users;
 	}
-	public function getById(int $id): User
+
+	public function getByEmail(string $email): User
 	{
 		$connection = $this->dbConnection->getConnection();
-
-		$result = mysqli_query($connection, "
+		$escapedEmail = mysqli_real_escape_string($connection, $email);
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-		WHERE u.ID = $id;
-		");
+		WHERE u.EMAIL = '$escapedEmail';
+		"
+		);
 
 		if (!$result)
 		{
@@ -70,7 +77,49 @@ class UserRepository extends Repository
 		}
 
 		$user = null;
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$user = new User(
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['TITLE'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
+			);
+		}
+
+		if ($user === null)
+		{
+			throw new RuntimeException("Item with id $email not found");
+		}
+
+		return $user;
+	}
+
+	public function getById(int $id): User
+	{
+		$connection = $this->dbConnection->getConnection();
+
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
+		FROM N_ONE_USERS u
+		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+		WHERE u.ID = $id;
+		"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		$user = null;
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
 				$row['ID'],
@@ -91,24 +140,28 @@ class UserRepository extends Repository
 
 		return $user;
 	}
+
 	public function getByIds(array $ids): array
 	{
 		$connection = $this->dbConnection->getConnection();
 		$users = [];
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE, u.ROLE_ID
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.ID IN (" . implode(',', $ids) . ");
-		");
+		"
+		);
 
 		if (!$result)
 		{
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
 				$row['ID'],
@@ -129,6 +182,7 @@ class UserRepository extends Repository
 
 		return $users;
 	}
+
 	public function add(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -140,7 +194,9 @@ class UserRepository extends Repository
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		INSERT INTO N_ONE_USERS (ID, ROLE_ID, NAME, EMAIL, PASSWORD, PHONE_NUMBER, ADDRESS) 
 		VALUES (
 			$tagId,
@@ -150,7 +206,8 @@ class UserRepository extends Repository
 			'$password',
 			$phoneNumber,
 			{$address}
-		);");
+		);"
+		);
 
 		if (!$result)
 		{
@@ -159,6 +216,7 @@ class UserRepository extends Repository
 
 		return true;
 	}
+
 	public function update(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -170,7 +228,9 @@ class UserRepository extends Repository
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		UPDATE N_ONE_USERS 
 		SET ROLE_ID = $roleId,
 			NAME = '$name', 
@@ -178,7 +238,8 @@ class UserRepository extends Repository
 			PASSWORD = '$password', 
 			PHONE_NUMBER = '$phoneNumber', 
 			ADDRESS = {$address}
-		WHERE ID = $tagId");
+		WHERE ID = $tagId"
+		);
 
 		if (!$result)
 		{

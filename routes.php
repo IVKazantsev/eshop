@@ -13,3 +13,13 @@ Router::get('/products/:id', function(Route $route) {
 
 	return (new Controller\DetailsController())->renderDetails($carId);
 });
+
+Router::get('/login', function() {
+	return (new Controller\AdminController())->render('login', []);
+});
+Router::post('/login', function() {
+	return (new Controller\AdminController())->login($_POST['email'], $_POST['password']);
+});
+Router::get('/admin', function() {
+	return (new Controller\AdminController())->renderDashboard();
+});

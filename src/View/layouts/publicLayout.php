@@ -9,7 +9,7 @@ use N_ONE\Core\Configurator\Configurator;
 
 $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
-
+//TODO СДЕЛАТЬ ПОДКЛЮЧЕНИЕ ДОП ФАЙЛОВ CSS В ЗАВИСИМОСТИ ОТ СТРАНИЦЫ
 ?>
 
 <!DOCTYPE html>
@@ -18,6 +18,11 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/styles/style.css">
+
+	<?php if (isset($additional_css)): ?>
+		<link rel="stylesheet" href="<?= $additional_css ?>">
+	<?php endif; ?>
+	
 	<title>eshop</title>
 </head>
 <body>

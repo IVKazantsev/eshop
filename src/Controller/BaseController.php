@@ -12,25 +12,32 @@ abstract class BaseController
 	protected Repository\TagRepository $tagRepository;
 	protected Repository\ImageRepository $imageRepository;
 	protected Repository\ItemRepository $itemRepository;
+	protected Repository\UserRepository $userRepository;
 
 	public function __construct()
 	{
 		$dbConnection = DbConnector::getInstance();
 		$this->templateEngine = new TemplateEngine();
 		$this->tagRepository = new Repository\TagRepository($dbConnection);
+		$this->userRepository = new Repository\UserRepository($dbConnection);
 		$this->imageRepository = new Repository\ImageRepository($dbConnection);
 		$this->itemRepository = new Repository\ItemRepository(
-			$dbConnection,
-			$this->tagRepository,
-			$this->imageRepository
+			$dbConnection, $this->tagRepository, $this->imageRepository
 		);
 	}
 
 	public function renderPublicView(string $pageName, array $params): string
 	{
 		return $this->templateEngine->render('layouts/publicLayout', [
-			'content' => $this->templateEngine->render($pageName, $params),
-			]
-		);
+			'content' => $this->templateEngine->render(
+				$pageName,
+				$params
+			),
+		]);
+	}
+
+	public function render(string $view, array $params): string
+	{
+		return $this->templateEngine->render("pages/$view", $params);
 	}
 }
