@@ -32,7 +32,7 @@ $priceString = number_format($priceString, 0, '', ' ');
 				</li>
 				<li class="user-info-item">
 					<label class="user-info-item_label" for="phone">Номер телефона</label>
-					<input class="user-info-item_input" type="tel" name="phone" required>
+					<input class="user-info-item_input" type="tel" pattern="\+?[0-9\s\-\(\)]+" maxlength="18" name="phone" placeholder="+7 (123) 456-78-90" required>
 				</li>
 				<li class="user-info-item">
 					<label class="user-info-item_label" for="address">Адрес доставки</label>

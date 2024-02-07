@@ -6,10 +6,8 @@ use Exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\User;
 use N_ONE\App\Service\ValidationService;
-use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
-use N_ONE\App\Model\Repository;
 
 class OrderController extends BaseController
 {
@@ -48,31 +46,39 @@ class OrderController extends BaseController
 			{
 				throw new Exception();
 			}
+			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
+			if(!$phone)
+			{
+				throw new Exception();
+			}
 
-			$user = $this->userRepository->getByNumber($_POST['phone']);
+			$user = $this->userRepository->getByNumber($phone);
 
 			$name = $_POST['name'];
 			$email = $_POST['email'];
 
-			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
+
 
 			$address = $_POST['address'];
 
 			if (!$user)
 			{
 				$this->userRepository->add(
-					new User(2, 'customer', $name, $email, "", $phone, $address)
+					new User(2, $name, $email, "", $phone, $address)
 				);
 
 				$user = $this->userRepository->getByNumber($phone);
 			}
 			elseif ($name !== $user->getName() || $email !== $user->getEmail() || $address !== $user->getAddress())
 			{
-				$this->userRepository->update($user);
+				$updatedUser = new User($user->getRoleId(), $name, $email, $user->getPass(), $phone, $address);
+				$updatedUser->setId($user->getId());
+				$this->userRepository->update($updatedUser);
 			}
 
-			$this->orderRepository->add(new Order($user->getId(), $carId, 1, 'обработка', $car->getPrice()));
-			$order = $this->orderRepository->getByUserAndItem($user->getId(), $carId);
+			$order = new Order($user->getId(), $carId, 1, 'обработка', $car->getPrice());
+			$order->generateNumber(time());
+			$this->orderRepository->add($order);
 		}
 		catch (Exception)
 		{
@@ -81,19 +87,19 @@ class OrderController extends BaseController
 			return TemplateEngine::renderError(404, "Page not found");
 		}
 
-		return $this->renderSuccessOrderPage($order->getId());
+		return $this->renderSuccessOrderPage($order->getNumber());
 
 	}
 
-	public function renderSuccessOrderPage(int $orderId): string
+	public function renderSuccessOrderPage(string $orderNumber): string
 	{
-		if ($_SERVER['REQUEST_URI'] !== "/successOrder/$orderId")
+		if ($_SERVER['REQUEST_URI'] !== "/successOrder/$orderNumber")
 		{
-			Router::redirect("/successOrder/$orderId");
+			Router::redirect("/successOrder/$orderNumber");
 		}
 
 		$successOrderPage = TemplateEngine::render(
-			'pages/successOrderPage', ['orderId' => $orderId]
+			'pages/successOrderPage', ['orderNumber' => $orderNumber]
 		);
 
 		return $this->renderPublicView($successOrderPage);

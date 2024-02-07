@@ -3,6 +3,7 @@
 namespace N_ONE\Core\DependencyInjection;
 
 use Exception;
+use ReflectionClass;
 
 class DependencyInjection
 {
@@ -23,7 +24,7 @@ class DependencyInjection
 			return;
 		}
 
-		$configuration = simplexml_load_file($this->configurationPath);
+		$configuration = simplexml_load_string(file_get_contents($this->configurationPath));
 
 		foreach ($configuration as $service)
 		{
@@ -59,8 +60,7 @@ class DependencyInjection
 					return $className::getInstance();
 				}
 
-				$reflection = new \ReflectionClass($className);
-				return $reflection->newInstanceArgs($loadedArguments);
+				return (new ReflectionClass($className))->newInstanceArgs($loadedArguments);
 			};
 		}
 	}
@@ -74,10 +74,8 @@ class DependencyInjection
 		{
 			return $this->components[$serviceName]();
 		}
-		else
-		{
-			throw new Exception('Service is not found');
-		}
+
+		throw new Exception('Service is not found');
 
 	}
 }

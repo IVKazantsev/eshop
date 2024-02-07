@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var int $orderId
+ * @var string $orderNumber
  */
 use N_ONE\Core\Configurator\Configurator;
 
@@ -17,7 +17,7 @@ $iconsPath = Configurator::option('ICONS_PATH');
 	</div>
 	<div class="order-number-container">
 		<div class="order-number-header">НОМЕР ВАШЕГО ЗАКАЗА:</div>
-		<div class="specific-order-number">#<?= $orderId ?></div>
+		<div class="specific-order-number">#<?= $orderNumber ?></div>
 	</div>
 	<div class="order-info">
 		Мы свяжемся с Вами в ближайшее время

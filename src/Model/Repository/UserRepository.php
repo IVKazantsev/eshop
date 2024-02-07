@@ -22,7 +22,7 @@ class UserRepository extends Repository
 		$users = [];
 
 		$result = mysqli_query($connection, "
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE, u.ROLE_ID
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID;
 		");
@@ -36,7 +36,6 @@ class UserRepository extends Repository
 		{
 			$users[] = new User(
 				$row['ROLE_ID'],
-				$row['TITLE'],
 				$row['NAME'],
 				$row['EMAIL'],
 				$row['PASSWORD'],
@@ -57,7 +56,7 @@ class UserRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 
 		$result = mysqli_query($connection, "
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.ID = $id;
@@ -73,7 +72,6 @@ class UserRepository extends Repository
 		{
 			$user = new User(
 				$row['ROLE_ID'],
-				$row['TITLE'],
 				$row['NAME'],
 				$row['EMAIL'],
 				$row['PASSWORD'],
@@ -95,7 +93,7 @@ class UserRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 
 		$result = mysqli_query($connection, "
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.PHONE_NUMBER = '$phone';
@@ -111,7 +109,6 @@ class UserRepository extends Repository
 		{
 			$user = new User(
 				$row['ROLE_ID'],
-				$row['TITLE'],
 				$row['NAME'],
 				$row['EMAIL'],
 				$row['PASSWORD'],
@@ -131,7 +128,7 @@ class UserRepository extends Repository
 		$users = [];
 
 		$result = mysqli_query($connection, "
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE, u.ROLE_ID
+		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
 		FROM N_ONE_USERS u
 		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 		WHERE u.ID IN (" . implode(',', $ids) . ");
@@ -146,7 +143,6 @@ class UserRepository extends Repository
 		{
 			$users[] = new User(
 				$row['ROLE_ID'],
-				$row['TITLE'],
 				$row['NAME'],
 				$row['EMAIL'],
 				$row['PASSWORD'],

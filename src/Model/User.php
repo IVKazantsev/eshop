@@ -6,7 +6,6 @@ class User extends Entity
 {
 	public function __construct(
 		private int    $roleId,
-		private string $role,
 		private string $name,
 		private string $email,
 		private string $pass,
@@ -22,16 +21,6 @@ class User extends Entity
 	public function setRoleId(int $roleId): void
 	{
 		$this->roleId = $roleId;
-	}
-
-	public function getRole(): string
-	{
-		return $this->role;
-	}
-
-	public function setRole(string $role): void
-	{
-		$this->role = $role;
 	}
 
 	public function getName(): string

@@ -22,4 +22,7 @@ return [
 	'SERVICES_PATH' => ROOT . '/services.xml',
 
 	'HOST_NAME' => $_SERVER['HTTP_HOST'],
+
+	'ORDER_HASH_PREFIX' => 'BITCAR_ORD',
+	'ORDER_HASH_ALGO' => 'crc32'
 ];

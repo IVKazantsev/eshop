@@ -16,7 +16,10 @@ class ValidationService
 		{
 			return null;
 		}
-
+		if($phone[0] === '7')
+		{
+			$phone[0] = '8';
+		}
 		return $phone;
 	}
 }

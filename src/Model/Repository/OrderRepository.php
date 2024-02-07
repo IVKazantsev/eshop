@@ -82,7 +82,7 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+		SELECT o.ID, o.NUMBER, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
 		WHERE o.ID = $id;
@@ -105,47 +105,7 @@ class OrderRepository extends Repository
 			);
 
 			$order->setId($row['ID']);
-		}
-
-		if ($order === null)
-		{
-			throw new RuntimeException("Item with id $id not found");
-		}
-
-		return $order;
-	}
-
-	public function getByUserAndItem(int $userId, int $itemId): Order
-	{
-		$connection = $this->dbConnection->getConnection();
-
-		$result = mysqli_query(
-			$connection,
-			"
-		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
-		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-		WHERE o.USER_ID = $userId AND o.ITEM_ID = $itemId
-		ORDER BY o.ID DESC
-		LIMIT 1;
-	");
-
-		if (!$result)
-		{
-			throw new RuntimeException(mysqli_error($connection));
-		}
-
-		$order = null;
-		while($row = mysqli_fetch_assoc($result))
-		{
-			$order = new Order(
-				$row['USER_ID'],
-				$row['ITEM_ID'],
-				$row['STATUS_ID'],
-				$row['TITLE'],
-				$row['PRICE'],
-			);
-			$order->setId($row['ID']);
+			$order->setNumber($row['NUMBER']);
 		}
 
 		if ($order === null)
@@ -163,16 +123,20 @@ class OrderRepository extends Repository
 		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
+		$number = $entity->getNumber();
+		$dateCreate = $entity->getDateCreate();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
+		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE, NUMBER, DATE_CREATE) 
 		VALUES (
 			$userId,
 			$itemId,
 			$statusId,
-			{$price}
+			$price,
+		    '$number',
+		    '$dateCreate'
 		);"
 		);
 
@@ -188,10 +152,11 @@ class OrderRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 		$orderId = $entity->getId();
-		$userId = $entity->getUser()->getId();
-		$itemId = $entity->getItem()->getId();
+		$userId = $entity->getUserId();
+		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
+		$number = $entity->getNumber();
 
 		$result = mysqli_query(
 			$connection,
@@ -201,7 +166,8 @@ class OrderRepository extends Repository
 			USER_ID = $userId,
 			ITEM_ID = $itemId,
 			STATUS_ID = $statusId,
-			PRICE = {$price}
+			PRICE = $price,
+			NUMBER = '$number'
 		where ID = $orderId;
 		");
 

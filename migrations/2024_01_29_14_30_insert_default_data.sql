@@ -48,6 +48,6 @@ values (1, 1),
        (3, 7),
        (3, 9);
 
-insert into N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE)
-values (3, 1, 1, 3990000),
-       (4, 3, 2, 2149000);
+# insert into N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE)
+# values (3, 1, 1, 3990000),
+#        (4, 3, 2, 2149000);
