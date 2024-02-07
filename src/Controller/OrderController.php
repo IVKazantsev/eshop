@@ -34,7 +34,11 @@ class OrderController extends BaseController
 
 	public function processOrder(int $carId): string
 	{
-		if (!($_POST['name']) || !($_POST['email']) || !($_POST['phone']) || !($_POST['address']))
+		$phone = trim(ValidationService::validatePhoneNumber($_POST['phone']));
+		$name = trim($_POST['name']);
+		$email = trim($_POST['email']);
+		$address = trim($_POST['address']);
+		if (!($phone) || !($name) || !($email) || !($address) || !(filter_var($email, FILTER_VALIDATE_EMAIL)))
 		{
 			return TemplateEngine::renderError(404, "Something went wrong");
 		}
@@ -53,13 +57,6 @@ class OrderController extends BaseController
 			}
 
 			$user = $this->userRepository->getByNumber($phone);
-
-			$name = $_POST['name'];
-			$email = $_POST['email'];
-
-
-
-			$address = $_POST['address'];
 
 			if (!$user)
 			{

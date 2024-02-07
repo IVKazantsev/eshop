@@ -28,7 +28,7 @@ $priceString = number_format($priceString, 0, '', ' ');
 				</li>
 				<li class="user-info-item">
 					<label class="user-info-item_label" for="email">Адрес электронной почты</label>
-					<input class="user-info-item_input" type="email" name="email" required>
+					<input class="user-info-item_input" type="email" name="email" placeholder="mail@example.com" required>
 				</li>
 				<li class="user-info-item">
 					<label class="user-info-item_label" for="phone">Номер телефона</label>
