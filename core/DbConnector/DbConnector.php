@@ -10,7 +10,7 @@ use RuntimeException;
 class DbConnector
 {
 	static private ?DbConnector $instance = null;
-
+	private static mysqli|false $connection;
 	/**
 	 * @throws Exception
 	 */
@@ -33,9 +33,6 @@ class DbConnector
 
 		return static::$instance = new self();
 	}
-
-	private static mysqli|false $connection;
-
 	/**
 	 * @throws Exception
 	 */

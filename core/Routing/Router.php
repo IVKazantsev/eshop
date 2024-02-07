@@ -2,6 +2,8 @@
 
 namespace N_ONE\Core\Routing;
 
+use Exception;
+
 use N_ONE\Core\Configurator\Configurator;
 
 class Router
@@ -16,7 +18,6 @@ class Router
 
 	public static function add(string $method, string $uri, callable $action): void
 	{
-		// self::$routes[] = new Route($method, $uri, $action(...));
 		self::$routes[] = new Route($method, $uri, function() use ($action) {
 			$route = self::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 			if ($route instanceof Route)
