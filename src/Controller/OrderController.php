@@ -5,6 +5,7 @@ namespace N_ONE\App\Controller;
 use Exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\User;
+use N_ONE\App\Service\ValidationService;
 use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
@@ -33,12 +34,11 @@ class OrderController extends BaseController
 		return $this->renderPublicView($orderPage);
 	}
 
-	public function processOrder(int $carId): void
+	public function processOrder(int $carId): string
 	{
 		if (!($_POST['name']) || !($_POST['email']) || !($_POST['phone']) || !($_POST['address']))
 		{
-			echo TemplateEngine::renderError(404, "Something went wrong");
-			exit();
+			return TemplateEngine::renderError(404, "Something went wrong");
 		}
 
 		try
@@ -53,7 +53,9 @@ class OrderController extends BaseController
 
 			$name = $_POST['name'];
 			$email = $_POST['email'];
-			$phone = $_POST['phone'];
+
+			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
+
 			$address = $_POST['address'];
 
 			if (!$user)
@@ -75,20 +77,23 @@ class OrderController extends BaseController
 		catch (Exception)
 		{
 			http_response_code(404);
-			echo TemplateEngine::renderError(404, "Page not found");
-			exit;
+
+			return TemplateEngine::renderError(404, "Page not found");
 		}
 
-		Router::redirect("/successOrder/{$order->getId()}");
+		return $this->renderSuccessOrderPage($order->getId());
+
 	}
 
 	public function renderSuccessOrderPage(int $orderId): string
 	{
+		if ($_SERVER['REQUEST_URI'] !== "/successOrder/$orderId")
+		{
+			Router::redirect("/successOrder/$orderId");
+		}
+
 		$successOrderPage = TemplateEngine::render(
-			'pages/successOrderPage',
-			[
-				'orderId' => $orderId,
-			]
+			'pages/successOrderPage', ['orderId' => $orderId]
 		);
 
 		return $this->renderPublicView($successOrderPage);
