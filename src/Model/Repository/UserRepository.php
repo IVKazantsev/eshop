@@ -132,7 +132,7 @@ class UserRepository extends Repository
 	public function add(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
-		$tagId = $entity->getId();
+		$id = $entity->getId();
 		$roleId = $entity->getRoleId();
 		$name = mysqli_real_escape_string($connection, $entity->getName());
 		$email = mysqli_real_escape_string($connection, $entity->getEmail());
@@ -143,7 +143,7 @@ class UserRepository extends Repository
 		$result = mysqli_query($connection, "
 		INSERT INTO N_ONE_USERS (ID, ROLE_ID, NAME, EMAIL, PASSWORD, PHONE_NUMBER, ADDRESS) 
 		VALUES (
-			$tagId,
+			$id,
 			'$roleId',
 			$name,
 			$email,

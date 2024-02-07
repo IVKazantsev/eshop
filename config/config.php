@@ -18,4 +18,6 @@ return [
 	'LAYOUTS_PATH' => ROOT . '/src/View/layouts/',
 
 	'MIGRATION_NEEDED' => true,
+
+	'SERVICES_PATH' => ROOT . '/services.xml',
 ];

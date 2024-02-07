@@ -2,25 +2,22 @@
 
 namespace N_ONE\App\Controller;
 
-use N_ONE\Core\DbConnector\DbConnector;
+use N_ONE\App\Model\Repository\ImageRepository;
+use N_ONE\App\Model\Repository\ItemRepository;
+use N_ONE\App\Model\Repository\OrderRepository;
+use N_ONE\App\Model\Repository\TagRepository;
+use N_ONE\App\Model\Repository\UserRepository;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
-use N_ONE\App\Model\Repository;
 
 abstract class BaseController
 {
-	protected Repository\TagRepository $tagRepository;
-	protected Repository\ImageRepository $imageRepository;
-	protected Repository\ItemRepository $itemRepository;
-
-	public function __construct()
-	{
-		$dbConnection = DbConnector::getInstance();
-		$this->tagRepository = new Repository\TagRepository($dbConnection);
-		$this->imageRepository = new Repository\ImageRepository($dbConnection);
-		$this->itemRepository = new Repository\ItemRepository(
-			$dbConnection, $this->tagRepository, $this->imageRepository
-		);
-	}
+	public function __construct(
+		protected TagRepository $tagRepository,
+		protected ImageRepository $imageRepository,
+		protected ItemRepository $itemRepository,
+		protected UserRepository $userRepository,
+		protected OrderRepository $orderRepository)
+	{}
 
 	public function renderPublicView($content): string
 	{
