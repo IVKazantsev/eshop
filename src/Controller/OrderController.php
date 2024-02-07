@@ -6,10 +6,8 @@ use Exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\User;
 use N_ONE\App\Service\ValidationService;
-use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
-use N_ONE\App\Model\Repository;
 
 class OrderController extends BaseController
 {
