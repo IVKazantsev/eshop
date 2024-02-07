@@ -8,7 +8,9 @@ use N_ONE\Core\Routing\Router;
 Router::get('/', function()
 {
 	$di = Application::getDI();
-	return ($di->getComponent('catalogController'))->renderCatalog();
+	$currentTag = $_GET['tag'] ?? null;
+	$currentTitle = $_GET['title'] ?? null;
+	return ($di->getComponent('catalogController'))->renderCatalog($currentTag, $currentTitle);
 });
 
 Router::get('/products/:id', function(Route $route)

@@ -19,7 +19,6 @@ class Route
 
 	public function match($uri): bool
 	{
-
 		$regexpVar = '([A-Za-z0-9_-]+)';
 		$regexp = '#^' . preg_replace('(:[A-Za-z]+)', $regexpVar, $this->uri) . '$#';
 

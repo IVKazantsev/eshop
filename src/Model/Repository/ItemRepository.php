@@ -3,26 +3,20 @@
 namespace N_ONE\App\Model\Repository;
 
 use Exception;
+use mysqli;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
 use N_ONE\Core\DbConnector\DbConnector;
 
 class ItemRepository extends Repository
 {
-	private DbConnector $dbConnection;
-	private TagRepository $tagRepository;
-	private ImageRepository $imageRepository;
+
 
 	public function __construct(
-		DbConnector     $dbConnection,
-		TagRepository   $tagRepository,
-		ImageRepository $imageRepository
-	)
-	{
-		$this->dbConnection = $dbConnection;
-		$this->tagRepository = $tagRepository;
-		$this->imageRepository = $imageRepository;
-	}
+		private readonly DbConnector   $dbConnection,
+		private readonly TagRepository $tagRepository,
+		private readonly ImageRepository $imageRepository
+	){}
 
 	public function getById(int $id): ?Item
 	{
@@ -39,7 +33,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new Exception(mysqli_connect_error());
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -69,18 +63,21 @@ class ItemRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		// $currentLimit = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
 		// $offset = calculateCurrentOffset($currentPageNumber);
-		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
+		$tag = $filter['tag'] ?? null;
+		$title = $filter['title'] ?? null;
+		$whereQueryBlock = $this->getWhereQueryBlock($tag, $title, $connection);
 		$items = [];
 
 		$result = mysqli_query(
 			$connection,
 			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
-			FROM N_ONE_ITEMS i;"
+			FROM N_ONE_ITEMS i
+			$whereQueryBlock;"
 		);
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new Exception(mysqli_connect_error());
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -271,5 +268,37 @@ class ItemRepository extends Repository
 		}
 
 		return true;
+	}
+
+	private function getWhereQueryBlock(?string $tag, ?string $title, mysqli $connection): string
+	{
+		$whereQueryBlock = "";
+		if ($tag !== null && $title !== null)
+		{
+			$tagTitle = mysqli_real_escape_string($connection, $tag);
+			$itemTitle = mysqli_real_escape_string($connection, $title);
+			$whereQueryBlock = "
+			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
+			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
+			WHERE t.TITLE = '$tagTitle'  and i.TITLE LIKE '%$itemTitle%'
+		";
+		}
+		elseif ($tag !== null)
+		{
+			$tagTitle = mysqli_real_escape_string($connection, $tag);
+			$whereQueryBlock = "
+			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
+			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
+			WHERE t.TITLE = '$tagTitle'
+		";
+		}
+		elseif ($title !== null)
+		{
+			$itemTitle = mysqli_real_escape_string($connection, $title);
+			$whereQueryBlock = "
+			WHERE i.TITLE LIKE '%$itemTitle%'
+		";
+		}
+		return $whereQueryBlock;
 	}
 }

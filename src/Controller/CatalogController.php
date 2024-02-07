@@ -7,11 +7,12 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(): string
+	public function renderCatalog(string $carsTag = null, string $carsTitle= null): string
 	{
 		try
 		{
-			$cars = $this->itemRepository->getList();
+			$filter = ['tag' => $carsTag, 'title' => $carsTitle];
+			$cars = $this->itemRepository->getList($filter);
 		}
 		catch (Exception)
 		{

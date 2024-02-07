@@ -9,20 +9,12 @@ use RuntimeException;
 
 class OrderRepository extends Repository
 {
-	private DbConnector $dbConnection;
-	private UserRepository $userRepository;
-	private ItemRepository $itemRepository;
 
 	public function __construct(
-		DbConnector    $dbConnection,
-		UserRepository $userRepository,
-		ItemRepository $itemRepository
-	)
-	{
-		$this->dbConnection = $dbConnection;
-		$this->userRepository = $userRepository;
-		$this->itemRepository = $itemRepository;
-	}
+		private readonly DbConnector    $dbConnection,
+		private readonly UserRepository $userRepository,
+		private readonly ItemRepository $itemRepository
+	){}
 
 	public function getList(array $filter = null): array
 	{
@@ -150,7 +142,7 @@ class OrderRepository extends Repository
 
 		if ($order === null)
 		{
-			throw new RuntimeException("Item with id $id not found");
+			throw new RuntimeException("Item not found");
 		}
 
 		return $order;

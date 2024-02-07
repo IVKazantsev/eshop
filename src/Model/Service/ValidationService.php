@@ -1,6 +1,6 @@
 <?php
 
-namespace N_ONE\App\Service;
+namespace N_ONE\App\Model\Service;
 
 class ValidationService
 {
