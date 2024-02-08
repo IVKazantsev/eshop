@@ -9,16 +9,17 @@ use N_ONE\Core\Configurator\Configurator;
 
 $iconsPath = Configurator::option('ICONS_PATH');
 $price = PriceFormatService::formatPrice($item->getPrice());
+$itemId = $item->getId();
 ?>
 
 <tr class="admin-table-content-row">
-	<td class="id-field"><?= $item->getId() ?></td>
+	<td class="id-field"><?= $itemId ?></td>
 	<td class="title-field"><?= $item->getTitle() ?></td>
 	<td class="price-field"><?= $price ?></td>
 	<td class="description-field"><?= $item->getDescription() ?></td>
 	<td class="sort-order-field"><?= $item->getSortOrder() ?></td>
 	<td class="actions-field">
-		<img src=<?= $iconsPath . 'settings.png' ?> alt="">
-		<img src=<?= $iconsPath . 'bin.png' ?> alt="">
+		<a href="<?= '/admin/items/edit/' . $itemId ?>"><img src=<?= $iconsPath . 'settings.png' ?> alt=""></a>
+		<a href="<?= '/admin/items/delete/' . $itemId ?>"><img src=<?= $iconsPath . 'bin.png' ?> alt=""></a>
 	</td>
 </tr>

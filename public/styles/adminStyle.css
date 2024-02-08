@@ -204,3 +204,86 @@ header {
 .admin-table-content-row:nth-child(even) {
 	background-color: #e9ecef; /* Slightly darker gray for alternating rows */
 }
+
+/*.edit-form-container {*/
+/*	padding: 40px;*/
+
+/*}*/
+
+/*.edit-form {*/
+/*	display: flex;*/
+/*	width: 100%;*/
+/*	justify-content: space-between;*/
+
+/*}*/
+
+/*.form-section {*/
+/*	background-color: #f45507;*/
+/*	display: flex;*/
+/*	flex-direction: column;*/
+/*	gap: 18px;*/
+/*}*/
+/* Container for the edit form */
+.edit-form-container {
+	display: flex;
+	justify-content: space-between; /* Distribute space between sections */
+	align-items: flex-start; /* Align sections to the top */
+	gap: 20px; /* Space between the form sections */
+	padding: 20px; /* Padding around the form container */
+}
+
+/* Edit form styles */
+.edit-form {
+	display: flex;
+	/*flex-wrap: wrap; !* Allow form sections to wrap onto multiple lines if needed *!*/
+	width: 100%; /* Full width of the container */
+	gap: 20px;
+}
+
+/* Form section styles */
+.form-section {
+	flex: 1; /* Grow and shrink equally */
+	min-width: 45%; /* Minimum width for each section */
+	padding: 20px; /* Padding around each section */
+	box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Input field styles */
+.form-section input[type="text"],
+.form-section textarea {
+	width: 100%; /* Full width of the parent section */
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+/* Radio button group styles */
+.tag-group {
+	margin-bottom: 10px; /* Space between radio button groups */
+}
+
+/* Radio button styles */
+.tag-group input[type="radio"] {
+	margin-right: 5px; /* Space between the radio button and its label */
+}
+
+/* Button styles (if you have buttons in your form) */
+.form-section button {
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-top: 10px; /* Space above the button */
+}
+
+.form-section button:hover {
+	background-color: #0056b3;
+}
+
+.description-textarea {
+	resize: none;
+	height: 100px;
+}

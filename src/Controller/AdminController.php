@@ -11,7 +11,6 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 class AdminController extends BaseController
 {
 	protected UserRepository $userRepository;
-	private User $user;
 
 	public static function displayLoginError(): void
 	{
@@ -27,43 +26,65 @@ class AdminController extends BaseController
 	{
 		$trimmedEmail = filter_var(trim($email), FILTER_SANITIZE_EMAIL);
 		$trimmedPassword = trim($password);
+		session_start();
 
 		if (empty($trimmedEmail) || empty($trimmedPassword))
 		{
-			session_start();
 			$_SESSION['login_error'] = 'Please enter both email and password.';
 			Router::redirect('/login');
 			exit();
 		}
 		try
 		{
-			$this->user = $this->userRepository->getByEmail($trimmedEmail);
+			$user = $this->userRepository->getByEmail($trimmedEmail);
 
 		}
 		catch (\RuntimeException)
 		{
-			session_start();
 
 			$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
 			Router::redirect('/login');
 			exit();
 		}
 
-		if ($trimmedPassword === $this->user->getPass())
+		if ($user->getRoleId() !== 1)
 		{
-			session_start();
-			ob_start();
-			$_SESSION['user_id'] = $this->user->getId();
-			Router::redirect('/admin');
-			ob_end_flush();
-			exit();
+			$_SESSION['login_error'] = 'Insufficient rights';
+			Router::redirect('/login');
+			exit(401);
 		}
-		else
+
+		if ($trimmedPassword !== $user->getPass())
 		{
 			$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
 			Router::redirect('/login');
-			exit();
 		}
+		ob_start();
+		$_SESSION['user_id'] = $user->getId();
+		Router::redirect('/admin');
+		ob_end_flush();
+		exit();
+	}
+
+	public function renderEditPage(string $itemId): string
+	{
+		try
+		{
+			$item = $this->itemRepository->getById($itemId);
+
+			$content = TemplateEngine::render('pages/adminEditPage', [
+				'item' => $item,
+			]);
+		}
+		catch (Exception)
+		{
+			$content = TemplateEngine::render('pages/errorPage', [
+				'errorCode' => ':(',
+				'errorMessage' => 'Что-то пошло не так',
+			]);
+		}
+
+		return $this->renderAdminView($content);
 	}
 
 	public function renderLoginPage(string $view, array $params): string

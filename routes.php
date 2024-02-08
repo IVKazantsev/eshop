@@ -42,7 +42,7 @@ Router::get('/successOrder/:id', function(Route $route) {
 // TODO отрефакторить middleware куда-нибудь
 function adminMiddleware(callable $action)
 {
-	return function() use ($action) {
+	return function(Route $route) use ($action) {
 		session_start();
 		if (!isset($_SESSION['user_id']))
 		{
@@ -51,7 +51,7 @@ function adminMiddleware(callable $action)
 		}
 		else
 		{
-			return $action();
+			return $action($route);
 		}
 	};
 }
@@ -68,7 +68,12 @@ Router::get('/admin/items', adminMiddleware(function() {
 
 	return ($di->getComponent('adminController'))->renderItemsPage();
 }));
+Router::get('/admin/items/edit/:id', adminMiddleware(function(Route $route) {
+	$itemId = $route->getVariables()[0];
+	$di = Application::getDI();
 
+	return ($di->getComponent('adminController'))->renderEditPage($itemId);
+}));
 //роуты доступные всем
 Router::get('/login', function() {
 	$di = Application::getDI();
