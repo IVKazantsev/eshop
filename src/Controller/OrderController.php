@@ -51,6 +51,7 @@ class OrderController extends BaseController
 				throw new Exception();
 			}
 			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
+
 			if(!$phone)
 			{
 				throw new Exception();

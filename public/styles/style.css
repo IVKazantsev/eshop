@@ -531,3 +531,21 @@ footer {
 	background-color: #ee753b;
 	text-align: center;
 }
+
+.pagination {
+	display: flex;
+	justify-content: space-evenly;
+	margin-bottom: 50px;
+}
+.pagination a {
+	text-decoration: none;
+	font-size: 50px;
+	color: #383838;
+}
+
+.pagination a:hover {
+	text-decoration: none;
+	font-size: 53px;
+	color: #666666;
+	transition: .3s;
+}
