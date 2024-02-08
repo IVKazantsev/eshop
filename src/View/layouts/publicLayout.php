@@ -4,8 +4,10 @@
  * @var array $cars
  * @var string $content
  * @var Tag[] $tags
+ * @var string $currentSearchRequest
  */
 
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\Tag;
 use N_ONE\Core\Configurator\Configurator;
 
@@ -42,7 +44,7 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 			<div class="searchbar">
 				<form class="search-form" action="/" method="get">
 					<div class="search-icon-and-input">
-						<input name="CarTitle" type="text" placeholder="Поиск" class="search-input">
+						<input name="SearchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe($currentSearchRequest ?? '')?>" class="search-input">
 					</div>
 					<button type="submit" class="search-button btn"><img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
 				</form>

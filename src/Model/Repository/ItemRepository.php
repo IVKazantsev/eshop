@@ -6,6 +6,7 @@ use Exception;
 use mysqli;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 
 class ItemRepository extends Repository
@@ -61,10 +62,12 @@ class ItemRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		// $currentLimit = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		// $offset = calculateCurrentOffset($currentPageNumber);
+		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
+		$currentLimit = $numItemsPerPage + 1;
+		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
 		$tag = $filter['tag'] ?? null;
 		$title = $filter['title'] ?? null;
+
 		$whereQueryBlock = $this->getWhereQueryBlock($tag, $title, $connection);
 		$items = [];
 
@@ -72,7 +75,8 @@ class ItemRepository extends Repository
 			$connection,
 			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
 			FROM N_ONE_ITEMS i
-			$whereQueryBlock;"
+			$whereQueryBlock
+			LIMIT {$currentLimit} OFFSET {$offset};"
 		);
 
 		if (!$result)

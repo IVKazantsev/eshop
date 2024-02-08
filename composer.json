@@ -7,6 +7,7 @@
 	},
 	"require": {
 		"ext-mysqli": "*",
-		"ext-simplexml": "*"
+		"ext-simplexml": "*",
+		"ext-mbstring": "*"
 	}
 }

@@ -9,8 +9,9 @@ Router::get('/', function()
 {
 	$di = Application::getDI();
 	$currentTag = $_GET['tag'] ?? null;
-	$currentTitle = $_GET['CarTitle'] ?? null;
-	return ($di->getComponent('catalogController'))->renderCatalog($currentTag, $currentTitle);
+	$currentSearchRequest = $_GET['SearchRequest'] ?? null;
+	$currentPageNumber = $_GET['page'] ?? null;
+	return ($di->getComponent('catalogController'))->renderCatalog($currentPageNumber, $currentTag, $currentSearchRequest);
 });
 
 Router::get('/products/:id', function(Route $route)

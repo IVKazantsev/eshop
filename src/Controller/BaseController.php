@@ -19,13 +19,14 @@ abstract class BaseController
 		protected OrderRepository $orderRepository)
 	{}
 
-	public function renderPublicView($content): string
+	public function renderPublicView($content, string $currentSearchRequest = null): string
 	{
 		$tags = $this->tagRepository->getList();
 
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
 			'content' => $content,
+			'currentSearchRequest' => $currentSearchRequest
 		]);
 	}
 }
