@@ -12,12 +12,13 @@ use N_ONE\Core\DbConnector\DbConnector;
 class ItemRepository extends Repository
 {
 
-
 	public function __construct(
-		private readonly DbConnector   $dbConnection,
-		private readonly TagRepository $tagRepository,
+		private readonly DbConnector     $dbConnection,
+		private readonly TagRepository   $tagRepository,
 		private readonly ImageRepository $imageRepository
-	){}
+	)
+	{
+	}
 
 	public function getById(int $id): ?Item
 	{
@@ -40,6 +41,7 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$item = new Item(
+				$row['ID'],
 				$row['TITLE'],
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
@@ -87,15 +89,10 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['TITLE'],
-				$row['IS_ACTIVE'],
-				$row['PRICE'],
-				$row['DESCRIPTION'],
-				[],
-				[],
+				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], [],
 			);
 
-			$items[count($items) - 1]->setId($row['ID']);
+			// $items[count($items) - 1]->setId($row['ID']);
 		}
 
 		if (empty($items))
@@ -103,7 +100,9 @@ class ItemRepository extends Repository
 			throw new Exception("Items not found");
 		}
 
-		$itemsIds = array_map(function($item) {return $item->getId();}, $items);
+		$itemsIds = array_map(function($item) {
+			return $item->getId();
+		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
@@ -115,6 +114,39 @@ class ItemRepository extends Repository
 		}
 
 		return $items;
+	}
+
+	private function getWhereQueryBlock(?string $tag, ?string $title, mysqli $connection): string
+	{
+		$whereQueryBlock = "";
+		if ($tag !== null && $title !== null)
+		{
+			$tagTitle = mysqli_real_escape_string($connection, $tag);
+			$itemTitle = mysqli_real_escape_string($connection, $title);
+			$whereQueryBlock = "
+			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
+			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
+			WHERE t.TITLE = '$tagTitle'  and i.TITLE LIKE '%$itemTitle%'
+		";
+		}
+		elseif ($tag !== null)
+		{
+			$tagTitle = mysqli_real_escape_string($connection, $tag);
+			$whereQueryBlock = "
+			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
+			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
+			WHERE t.TITLE = '$tagTitle'
+		";
+		}
+		elseif ($title !== null)
+		{
+			$itemTitle = mysqli_real_escape_string($connection, $title);
+			$whereQueryBlock = "
+			WHERE i.TITLE LIKE '%$itemTitle%'
+		";
+		}
+
+		return $whereQueryBlock;
 	}
 
 	public function getByIds(array $ids): array
@@ -139,7 +171,7 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
+				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
 			);
 		}
 
@@ -272,37 +304,5 @@ class ItemRepository extends Repository
 		}
 
 		return true;
-	}
-
-	private function getWhereQueryBlock(?string $tag, ?string $title, mysqli $connection): string
-	{
-		$whereQueryBlock = "";
-		if ($tag !== null && $title !== null)
-		{
-			$tagTitle = mysqli_real_escape_string($connection, $tag);
-			$itemTitle = mysqli_real_escape_string($connection, $title);
-			$whereQueryBlock = "
-			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
-			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
-			WHERE t.TITLE = '$tagTitle'  and i.TITLE LIKE '%$itemTitle%'
-		";
-		}
-		elseif ($tag !== null)
-		{
-			$tagTitle = mysqli_real_escape_string($connection, $tag);
-			$whereQueryBlock = "
-			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
-			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
-			WHERE t.TITLE = '$tagTitle'
-		";
-		}
-		elseif ($title !== null)
-		{
-			$itemTitle = mysqli_real_escape_string($connection, $title);
-			$whereQueryBlock = "
-			WHERE i.TITLE LIKE '%$itemTitle%'
-		";
-		}
-		return $whereQueryBlock;
 	}
 }

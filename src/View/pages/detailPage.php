@@ -28,7 +28,7 @@ $priceString = PriceFormatService::formatPrice($car->getPrice())
 		<?= TemplateEngine::render('components/tags', [
 			'tags' => $car->getTags(),
 		]) ?>
-		<p class="price"><?= $priceString ?> ₽</p>
+		<p class="price"><?= $priceString ?> </p>
 		<a class="buy-link" href="<?= '/products/' . $car->getId() . '/order' ?>">КУПИТЬ</a>
 	</div>
 	<div class="car-description">

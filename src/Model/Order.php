@@ -6,17 +6,37 @@ use N_ONE\Core\Configurator\Configurator;
 
 class Order extends Entity
 {
-	private string $number;
+	// private string $number;
 	private string $dateCreate;
 
 	public function __construct(
-		private int    $userId,
-		private int    $itemId,
-		private int    $statusId,
-		private string $status,
-		private int    $price,
+		protected int|null $id,
+		private string     $number,
+		private int        $userId,
+		private int        $itemId,
+		private int        $statusId,
+		private string     $status,
+		private int        $price,
 	)
 	{
+	}
+
+	public function getExludedFields(): array
+	{
+		return ['dateCreate'];
+	}
+
+	public function getInfoForTable(): array
+	{
+		return [
+			'id' => $this->id,
+			'number' => $this->number,
+			'userId' => $this->userId,
+			'itemId' => $this->itemId,
+			'statusId' => $this->statusId,
+			'status' => $this->status,
+			'price' => $this->price,
+		];
 	}
 
 	public function generateNumber(int $time): void

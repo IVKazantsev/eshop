@@ -44,7 +44,7 @@ class AdminController extends BaseController
 
 			$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
 			Router::redirect('/login');
-			exit();
+			exit(401);
 		}
 
 		if ($user->getRoleId() !== 1)
@@ -58,6 +58,7 @@ class AdminController extends BaseController
 		{
 			$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
 			Router::redirect('/login');
+			exit(401);
 		}
 		ob_start();
 		$_SESSION['user_id'] = $user->getId();
@@ -130,10 +131,102 @@ class AdminController extends BaseController
 		try
 		{
 			$items = $this->itemRepository->getList();
-
+			$itemsToDisplay = [];
+			foreach ($items as $item)
+			{
+				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
+			}
 			$content = TemplateEngine::render('pages/adminItemsPage', [
-				'items' => $items,
+				'items' => $itemsToDisplay,
 			]);
+		}
+		catch (Exception)
+		{
+			$content = TemplateEngine::render('pages/errorPage', [
+				'errorCode' => ':(',
+				'errorMessage' => 'Что-то пошло не так',
+			]);
+		}
+
+		return $this->renderAdminView($content);
+	}
+
+	public function renderTagsPage(): string
+	{
+
+		try
+		{
+			$items = $this->tagRepository->getList();
+			$itemsToDisplay = [];
+			foreach ($items as $item)
+			{
+				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
+			}
+			$content = TemplateEngine::render('pages/adminItemsPage', [
+				'items' => $itemsToDisplay,
+			]);
+			// $content = TemplateEngine::render('pages/adminItemsPage', [
+			// 	'items' => $items,
+			// ]);
+		}
+		catch (Exception)
+		{
+			$content = TemplateEngine::render('pages/errorPage', [
+				'errorCode' => ':(',
+				'errorMessage' => 'Что-то пошло не так',
+			]);
+		}
+
+		return $this->renderAdminView($content);
+	}
+
+	//TODO Разобраться с заказами
+	public function renderOrdersPage(): string
+	{
+
+		try
+		{
+			$items = $this->orderRepository->getList();
+			$itemsToDisplay = [];
+			foreach ($items as $item)
+			{
+				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
+			}
+			$content = TemplateEngine::render('pages/adminItemsPage', [
+				'items' => $itemsToDisplay,
+			]);
+			// $content = TemplateEngine::render('pages/adminItemsPage', [
+			// 	'items' => $items,
+			// ]);
+		}
+		catch (Exception)
+		{
+			$content = TemplateEngine::render('pages/errorPage', [
+				'errorCode' => ':(',
+				'errorMessage' => 'Что-то пошло не так',
+			]);
+		}
+
+		return $this->renderAdminView($content);
+	}
+
+	public function renderUsersPage(): string
+	{
+
+		try
+		{
+			$items = $this->userRepository->getList();
+			$itemsToDisplay = [];
+			foreach ($items as $item)
+			{
+				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
+			}
+			$content = TemplateEngine::render('pages/adminItemsPage', [
+				'items' => $itemsToDisplay,
+			]);
+			// $content = TemplateEngine::render('pages/adminItemsPage', [
+			// 	'items' => $items,
+			// ]);
 		}
 		catch (Exception)
 		{

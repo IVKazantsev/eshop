@@ -5,13 +5,34 @@ namespace N_ONE\App\Model;
 class User extends Entity
 {
 	public function __construct(
-		private int    $roleId,
-		private string $name,
-		private string $email,
-		private string $pass,
-		private string $number,
-		private string $address,
-	){}
+		protected int|null $id,
+		private int        $roleId,
+		private string     $name,
+		private string     $email,
+		private string     $pass,
+		private string     $number,
+		private string     $address,
+	)
+	{
+	}
+
+	public function getInfoForTable(): array
+	{
+		return [
+			'id' => $this->id,
+			'roleId' => $this->roleId,
+			'name' => $this->name,
+			'email' => $this->email,
+			'pass' => $this->pass,
+			'number' => $this->number,
+			'address' => $this->address,
+		];
+	}
+
+	public function getExludedFields(): array
+	{
+		return ['pass'];
+	}
 
 	public function getRoleId(): int
 	{

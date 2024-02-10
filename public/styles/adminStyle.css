@@ -176,7 +176,8 @@ header {
 .title-field,
 .price-field,
 .description-field,
-.sort-order-field {
+.sort-order-field,
+td {
 	vertical-align: middle; /* Vertical alignment of content */
 }
 

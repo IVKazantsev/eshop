@@ -12,27 +12,64 @@ class TagRepository extends Repository
 
 	public function __construct(
 		private readonly DbConnector $dbConnection
-	){}
+	)
+	{
+	}
 
+	// public function getList(array $filter = null): array
+	// {
+	// 	$connection = $this->dbConnection->getConnection();
+	// 	$tags = [];
+	//
+	// 	$result = mysqli_query(
+	// 		$connection,
+	// 		"
+	// 	SELECT t.ID, t.TITLE
+	// 	FROM N_ONE_TAGS t;
+	// 	"
+	// 	);
+	//
+	// 	if (!$result)
+	// 	{
+	// 		throw new RuntimeException(mysqli_error($connection));
+	// 	}
+	//
+	// 	while ($row = mysqli_fetch_assoc($result))
+	// 	{
+	// 		$tags[] = new Tag(
+	// 			$row['TITLE'],
+	// 		);
+	// 	}
+	//
+	// 	if (empty($tags))
+	// 	{
+	// 		throw new RuntimeException("Items not found");
+	// 	}
+	//
+	// 	return $tags;
+	// }
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tags = [];
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT t.ID, t.TITLE
 		FROM N_ONE_TAGS t;
-		");
+		"
+		);
 
 		if (!$result)
 		{
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['TITLE'],
+				$row['ID'], $row['TITLE'],
 			);
 		}
 
@@ -43,15 +80,53 @@ class TagRepository extends Repository
 
 		return $tags;
 	}
+
+
+	// public function getById(int $id): Tag
+	// {
+	// 	$connection = $this->dbConnection->getConnection();
+	//
+	// 	$result = mysqli_query(
+	// 		$connection,
+	// 		"
+	// 	SELECT t.ID, t.TITLE
+	// 	FROM N_ONE_TAGS t
+	// 	WHERE t.ID = $id;
+	// 	"
+	// 	);
+	//
+	// 	if (!$result)
+	// 	{
+	// 		throw new RuntimeException(mysqli_error($connection));
+	// 	}
+	//
+	// 	$tag = null;
+	// 	while ($row = mysqli_fetch_assoc($result))
+	// 	{
+	// 		$tag = new Tag(
+	// 			$row['ID'], $row['TITLE'],
+	// 		);
+	// 	}
+	//
+	// 	if ($tag === null)
+	// 	{
+	// 		throw new RuntimeException("Item with id $id not found");
+	// 	}
+	//
+	// 	return $tag;
+	// }
 	public function getById(int $id): Tag
 	{
 		$connection = $this->dbConnection->getConnection();
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		SELECT t.ID, t.TITLE
 		FROM N_ONE_TAGS t
 		WHERE t.ID = $id;
-		");
+		"
+		);
 
 		if (!$result)
 		{
@@ -59,10 +134,10 @@ class TagRepository extends Repository
 		}
 
 		$tag = null;
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['TITLE'],
+				$row['ID'], $row['TITLE'],
 			);
 		}
 
@@ -73,45 +148,84 @@ class TagRepository extends Repository
 
 		return $tag;
 	}
+
 	/**
 	 * @param int[] $itemsIds
 	 */
+	// public function getByItemsIds(array $itemsIds): array
+	// {
+	// 	$connection = $this->dbConnection->getConnection();
+	// 	$itemsIdsString = implode(',', $itemsIds);
+	// 	$tags = [];
+	//
+	// 	$result = mysqli_query(
+	// 		$connection,
+	// 		"
+	// 	SELECT it.ITEM_ID, t.TITLE
+	// 	FROM N_ONE_TAGS t
+	// 	JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
+	// 	WHERE it.ITEM_ID IN ($itemsIdsString);
+	// "
+	// 	);
+	//
+	// 	if (!$result)
+	// 	{
+	// 		throw new RuntimeException(mysqli_error($connection));
+	// 	}
+	//
+	// 	while ($row = mysqli_fetch_assoc($result))
+	// 	{
+	// 		$tags[$row['ITEM_ID']][] = new Tag($row['ID'], $row['TITLE'],);
+	// 	}
+	//
+	// 	return $tags;
+	// }
 	public function getByItemsIds(array $itemsIds): array
 	{
 		$connection = $this->dbConnection->getConnection();
 		$itemsIdsString = implode(',', $itemsIds);
 		$tags = [];
 
-		$result = mysqli_query($connection, "
-		SELECT it.ITEM_ID, t.TITLE
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT it.ITEM_ID, t.ID, t.TITLE
 		FROM N_ONE_TAGS t 
 		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE it.ITEM_ID IN ($itemsIdsString);
-	");
+	"
+		);
 
 		if (!$result)
 		{
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
-			$tags[$row['ITEM_ID']][] = new Tag($row['TITLE']);
+			$tags[$row['ITEM_ID']][] = new Tag(
+				$row['ID'], $row['TITLE'],
+			);
 		}
+
 		return $tags;
 	}
+
 	public function add(Tag|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tagId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		INSERT INTO N_ONE_TAGS (ID, TITLE)
 		VALUES (
 			$tagId,
 			'$title'
-		);");
+		);"
+		);
 
 		if (!$result)
 		{
@@ -120,16 +234,20 @@ class TagRepository extends Repository
 
 		return true;
 	}
+
 	public function update(Tag|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tagId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		UPDATE N_ONE_ITEMS 
 		SET TITLE = '$title'
-		WHERE ID = $tagId");
+		WHERE ID = $tagId"
+		);
 
 		if (!$result)
 		{

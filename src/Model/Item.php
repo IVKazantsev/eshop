@@ -2,6 +2,8 @@
 
 namespace N_ONE\App\Model;
 
+use ReflectionClass;
+use ReflectionProperty;
 use RuntimeException;
 
 class Item extends Entity
@@ -11,14 +13,28 @@ class Item extends Entity
 	 * @param Image[] $images
 	 */
 	public function __construct(
-		private string $title,
-		private bool   $isActive,
-		private int    $price,
-		private string $description,
-		private array  $tags,
-		private array  $images,
-		private int    $sortOrder = 0
-	){}
+		protected int|null $id,
+		private string     $title,
+		private bool       $isActive,
+		private int        $price,
+		private string     $description,
+		private array      $tags,
+		private array      $images,
+		private int        $sortOrder = 0
+	)
+	{
+	}
+
+	public function getInfoForTable(): array
+	{
+		return [
+			'id' => $this->id,
+			'title' => $this->title,
+			'price' => $this->price,
+			'description' => $this->description,
+			'sortOrder' => $this->sortOrder,
+		];
+	}
 
 	public function getPreviewImage(): Image
 	{
@@ -30,6 +46,11 @@ class Item extends Entity
 			}
 		}
 		throw new RuntimeException("Preview image for Item with id {$this->getId()} not found");
+	}
+
+	public function getExludedFields(): array
+	{
+		return ['isActive', 'tags', 'images'];
 	}
 
 	public function getFullSizeImages(): array
@@ -46,6 +67,7 @@ class Item extends Entity
 		{
 			throw new RuntimeException("FullSize image for Item with id {$this->getId()} not found");
 		}
+
 		return $images;
 	}
 

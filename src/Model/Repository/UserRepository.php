@@ -37,7 +37,13 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
-				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
 			);
 		}
 
@@ -72,9 +78,15 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
-				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
 			);
-			$user->setId($row['ID']);
+			// $user->setId($row['ID']);
 		}
 
 		if ($user === null)
@@ -108,7 +120,13 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
-				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
 			);
 		}
 
@@ -143,7 +161,13 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$user = new User(
-				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
 			);
 
 			$user->setId($row['ID']);
@@ -175,7 +199,13 @@ class UserRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$users[] = new User(
-				$row['ROLE_ID'], $row['NAME'], $row['EMAIL'], $row['PASSWORD'], $row['PHONE_NUMBER'], $row['ADDRESS'],
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
 			);
 		}
 

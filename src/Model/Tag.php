@@ -2,11 +2,30 @@
 
 namespace N_ONE\App\Model;
 
+use ReflectionClass;
+use ReflectionProperty;
+
 class Tag extends Entity
 {
 	public function __construct(
-		private string $title
-	){}
+		protected int|null $id,
+		private string     $title
+	)
+	{
+	}
+
+	public function getInfoForTable(): array
+	{
+		return [
+			'id' => $this->id,
+			'title' => $this->title,
+		];
+	}
+
+	public function getExludedFields(): array
+	{
+		return [];
+	}
 
 	public function getTitle(): string
 	{
@@ -17,4 +36,5 @@ class Tag extends Entity
 	{
 		$this->title = $title;
 	}
+
 }
