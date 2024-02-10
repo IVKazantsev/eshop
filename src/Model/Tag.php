@@ -2,11 +2,34 @@
 
 namespace N_ONE\App\Model;
 
+use ReflectionClass;
+use ReflectionProperty;
+
 class Tag extends Entity
 {
 	public function __construct(
-		private string $title
-	){}
+		protected int|null $id,
+		private string     $title
+	)
+	{
+	}
+
+	public function getClassname()
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getExcludedFields(): array
+	{
+		return [];
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
+	}
 
 	public function getTitle(): string
 	{
@@ -17,4 +40,5 @@ class Tag extends Entity
 	{
 		$this->title = $title;
 	}
+
 }

@@ -5,13 +5,14 @@
  */
 
 use N_ONE\App\Model\Item;
+use N_ONE\App\Model\Service\PriceFormatService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
-$priceString = $car->getPrice();
-$priceString = number_format($priceString, 0, '', ' ');
+$priceString = PriceFormatService::formatPrice($car->getPrice())
+
 ?>
 
 <div class="car-info">
@@ -26,9 +27,8 @@ $priceString = number_format($priceString, 0, '', ' ');
 		<h3 class="year-title-details"> 2024</h3>
 		<?= TemplateEngine::render('components/tags', [
 			'tags' => $car->getTags(),
-			])
-		?>
-		<p class="price"><?= $priceString ?> ₽</p>
+		]) ?>
+		<p class="price"><?= $priceString ?> </p>
 		<a class="buy-link" href="<?= '/products/' . $car->getId() . '/order' ?>">КУПИТЬ</a>
 	</div>
 	<div class="car-description">

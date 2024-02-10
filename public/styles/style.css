@@ -238,6 +238,7 @@ footer {
 	width: 80%;
 	margin-top: 60px;
 }
+
 .tags-container::-webkit-scrollbar {
 	display: none;
 }
@@ -548,4 +549,103 @@ footer {
 	font-size: 53px;
 	color: #666666;
 	transition: .3s;
+}
+/* Center the login container */
+.login-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100vh; /* Full viewport height */
+	width: 100%; /* Full viewport width */
+}
+
+/* Style the login form */
+.login-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1em; /* Space between form elements */
+	max-width: 300px; /* Maximum width of the form */
+	padding: 1em; /* Padding around the form */
+	border: 1px solid #ccc; /* Optional border */
+	background-color: #fff; /* Background color */
+}
+
+/* Position labels above inputs */
+.input-label {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start; /* Align items to the start of the label */
+	margin-bottom: 0.5em; /* Space below the label */
+}
+
+/* Style the paragraph text inside labels */
+.input-label p {
+	margin: 0; /* Remove default margins */
+	font-weight: bold; /* Bold text for labels */
+}
+
+/* Style the remember container */
+.remember-container {
+	display: flex;
+	align-items: center; /* Vertically center the checkbox and text */
+	gap: 0.5em; /* Space between checkbox and text */
+}
+
+/* Style the checkbox label */
+.checkbox-label {
+	cursor: pointer;
+	font-size: 0.9em; /* Smaller font size for the label */
+}
+
+/* Style the submit button */
+.login-form button[type="submit"] {
+	background-color: #007bff; /* Blue background */
+	color: white; /* White text */
+	border: none; /* No border */
+	padding: 0.5em 1em; /* Padding around the text */
+	cursor: pointer; /* Pointer cursor on hover */
+	transition: background-color 0.3s ease; /* Transition effect */
+}
+
+/* Change button background color on hover */
+.login-form button[type="submit"]:hover {
+	background-color: #0056b3; /* Darker blue on hover */
+}
+
+#dashboard-logo {
+	aspect-ratio: 16/9;
+	width: 200px;
+	height: 150px;
+	margin: 0 auto;
+}
+
+#dashboard-logo img {
+	aspect-ratio: 16/9;
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+}
+
+.dashboard-header {
+	background-color: #007bff;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.notification-card {
+	background-color: white;
+	width: 400px;
+	height: 200px;
+	display: flex;
+	flex-direction: column;
+	padding: 12px 12px 0 12px;
+}
+
+.notification-card-button {
+	display: block;
+	text-align: center;
+	margin-top: auto;
+	padding-bottom: 8px;
 }

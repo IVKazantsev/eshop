@@ -2,6 +2,7 @@
 
 namespace N_ONE\Core\TemplateEngine;
 
+use N_ONE\App\Model\Entity;
 use N_ONE\Core\Configurator\Configurator;
 use RuntimeException;
 
@@ -39,5 +40,15 @@ class TemplateEngine
 		require $absolutePath;
 
 		return ob_get_clean();
+	}
+
+	public static function renderTable(array $items): string
+	{
+		$tableViewFile = 'components/table';
+		$variables = [
+			'items' => $items,
+		];
+
+		return self::render($tableViewFile, $variables);
 	}
 }

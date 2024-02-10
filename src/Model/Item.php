@@ -11,14 +11,17 @@ class Item extends Entity
 	 * @param Image[] $images
 	 */
 	public function __construct(
-		private string $title,
-		private bool   $isActive,
-		private int    $price,
-		private string $description,
-		private array  $tags,
-		private array  $images,
-		private int    $sortOrder = 0
-	){}
+		protected int|null $id,
+		private string     $title,
+		private bool       $isActive,
+		private int        $price,
+		private string     $description,
+		private array      $tags,
+		private array      $images,
+		private int        $sortOrder = 0
+	)
+	{
+	}
 
 	public function getPreviewImage(): Image
 	{
@@ -46,7 +49,25 @@ class Item extends Entity
 		{
 			throw new RuntimeException("FullSize image for Item with id {$this->getId()} not found");
 		}
+
 		return $images;
+	}
+
+	public function getExcludedFields(): array
+	{
+		return ['isActive', 'tags', 'images'];
+	}
+
+	public function getClassname()
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
 	}
 
 	public function getImages(): array

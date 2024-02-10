@@ -1,0 +1,290 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
+
+* {
+	margin: 0;
+	padding: 0;
+	font-family: "Open Sans", sans-serif;
+}
+
+main {
+
+	grid-column: 3;
+	grid-row: 2/4;
+	max-height: calc(100vh - 60px - 20px);
+	overflow-y: auto;
+	padding: 0;
+}
+
+header {
+	grid-column: 3;
+	left: 300px;
+}
+
+
+.container {
+	margin: 0 auto;
+	height: 100vh;
+	display: grid;
+	grid-template-rows: 10% 1fr 1%;
+	grid-template-columns: 10% 20% 1fr 10%;
+	overflow-y: auto;
+}
+
+.sidebar {
+	grid-row: 1/-1;
+	grid-column: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	position: sticky;
+	height: 100%;
+	z-index: 1;
+	top: 0;
+}
+
+.tags-container {
+	overflow-y: auto;
+	width: 80%;
+	margin-top: 60px;
+}
+
+.tags-container::-webkit-scrollbar {
+	display: none;
+}
+
+.tags {
+	list-style-type: none;
+	border: 2px solid #dcdcdc;
+	border-top: none;
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
+}
+
+.tags-title {
+	text-transform: uppercase;
+	padding: 20px 20px 20px 50px;
+	color: white;
+	background-color: #f45507;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+}
+
+.tag-item {
+	padding: 15px 100px 15px 50px;
+}
+
+.tag-link {
+	text-decoration: none;
+	color: #000;
+}
+
+.tag-link:active,
+.tag-link:hover,
+.tag-link:visited {
+	color: #000;
+}
+
+
+#dashboard-logo {
+	aspect-ratio: 16/9;
+	width: 200px;
+	height: 150px;
+	/*margin: 0 auto;*/
+}
+
+#dashboard-logo img {
+	aspect-ratio: 16/9;
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+}
+
+.dashboard-header {
+	background-color: #007bff;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.notification-card {
+	background-color: white;
+	width: 400px;
+	height: 200px;
+	display: flex;
+	flex-direction: column;
+	padding: 12px 12px 0 12px;
+}
+
+.notification-card-button {
+	display: block;
+	text-align: center;
+	margin-top: auto;
+	padding-bottom: 8px;
+}
+
+.admin-content {
+	padding: 40px;
+}
+
+.admin-table {
+	width: 100%;
+	border: 1px solid #dcdcdc;
+}
+
+.description-field {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 400px;
+}
+
+/* General table styling */
+.admin-table {
+	width: 100%; /* Full width of the container */
+	border-collapse: collapse; /* Collapse borders */
+	margin-bottom: 20px; /* Space below the table */
+}
+
+/* Table header row styling */
+.admin-table-header-row {
+	background-color: #f8f9fa; /* Light gray background */
+	color: #343a40; /* Dark text for contrast */
+	font-weight: bold; /* Bold text for emphasis */
+}
+
+/* Table header cells styling */
+.admin-table th {
+	padding: 10px; /* Padding around cell content */
+	text-align: left; /* Left-aligned text */
+	border-bottom: 2px solid #dee2e6; /* Bottom border for separation */
+}
+
+/* Table content row styling */
+.admin-table-content-row {
+	background-color: #fff; /* White background */
+}
+
+/* Table content cells styling */
+.admin-table td {
+	padding: 10px; /* Padding around cell content */
+	text-align: left; /* Left-aligned text */
+	border-bottom: 1px solid #dee2e6; /* Bottom border for separation */
+}
+
+/* Specific field styling */
+.id-field,
+.title-field,
+.price-field,
+.description-field,
+.sort-order-field,
+td {
+	vertical-align: middle; /* Vertical alignment of content */
+}
+
+.actions-field {
+	display: flex;
+	justify-content: center;
+	gap: 12px;
+}
+
+.actions-field img {
+	/*width: 16px;*/
+}
+
+/* Remove bottom border from the last row */
+.admin-table-content-row:last-child td {
+	border-bottom: none; /* No bottom border on the last row */
+}
+
+/* Optional: Highlight hovered rows */
+.admin-table-content-row:hover {
+	background-color: #f8f9fa; /* Light gray background on hover */
+}
+
+/* Optional: Even row styling */
+.admin-table-content-row:nth-child(even) {
+	background-color: #e9ecef; /* Slightly darker gray for alternating rows */
+}
+
+/*.edit-form-container {*/
+/*	padding: 40px;*/
+
+/*}*/
+
+/*.edit-form {*/
+/*	display: flex;*/
+/*	width: 100%;*/
+/*	justify-content: space-between;*/
+
+/*}*/
+
+/*.form-section {*/
+/*	background-color: #f45507;*/
+/*	display: flex;*/
+/*	flex-direction: column;*/
+/*	gap: 18px;*/
+/*}*/
+/* Container for the edit form */
+.edit-form-container {
+	display: flex;
+	justify-content: space-between; /* Distribute space between sections */
+	align-items: flex-start; /* Align sections to the top */
+	gap: 20px; /* Space between the form sections */
+	padding: 20px; /* Padding around the form container */
+}
+
+/* Edit form styles */
+.edit-form {
+	display: flex;
+	/*flex-wrap: wrap; !* Allow form sections to wrap onto multiple lines if needed *!*/
+	width: 100%; /* Full width of the container */
+	gap: 20px;
+}
+
+/* Form section styles */
+.form-section {
+	flex: 1; /* Grow and shrink equally */
+	min-width: 45%; /* Minimum width for each section */
+	padding: 20px; /* Padding around each section */
+	box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Input field styles */
+.form-section input[type="text"],
+.form-section textarea {
+	width: 100%; /* Full width of the parent section */
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+/* Radio button group styles */
+.tag-group {
+	margin-bottom: 10px; /* Space between radio button groups */
+}
+
+/* Radio button styles */
+.tag-group input[type="radio"] {
+	margin-right: 5px; /* Space between the radio button and its label */
+}
+
+/* Button styles (if you have buttons in your form) */
+.form-section button {
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-top: 10px; /* Space above the button */
+}
+
+.form-section button:hover {
+	background-color: #0056b3;
+}
+
+.description-textarea {
+	resize: none;
+	height: 100px;
+}

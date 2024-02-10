@@ -52,7 +52,7 @@ class OrderController extends BaseController
 			}
 			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
 
-			if(!$phone)
+			if (!$phone)
 			{
 				throw new Exception();
 			}
@@ -62,19 +62,19 @@ class OrderController extends BaseController
 			if (!$user)
 			{
 				$this->userRepository->add(
-					new User(2, $name, $email, "", $phone, $address)
+					new User(null, 2, $name, $email, "", $phone, $address)
 				);
 
 				$user = $this->userRepository->getByNumber($phone);
 			}
 			elseif ($name !== $user->getName() || $email !== $user->getEmail() || $address !== $user->getAddress())
 			{
-				$updatedUser = new User($user->getRoleId(), $name, $email, $user->getPass(), $phone, $address);
+				$updatedUser = new User(null, $user->getRoleId(), $name, $email, $user->getPass(), $phone, $address);
 				$updatedUser->setId($user->getId());
 				$this->userRepository->update($updatedUser);
 			}
 
-			$order = new Order($user->getId(), $carId, 1, 'обработка', $car->getPrice());
+			$order = new Order(null, 1, $user->getId(), $carId, 1, 'обработка', $car->getPrice());
 			$order->generateNumber(time());
 			$this->orderRepository->add($order);
 		}

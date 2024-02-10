@@ -5,13 +5,33 @@ namespace N_ONE\App\Model;
 class User extends Entity
 {
 	public function __construct(
-		private int    $roleId,
-		private string $name,
-		private string $email,
-		private string $pass,
-		private string $number,
-		private string $address,
-	){}
+		protected int|null $id,
+		private int        $roleId,
+		private string     $name,
+		private string     $email,
+		private string     $pass,
+		private string     $number,
+		private string     $address,
+	)
+	{
+	}
+
+	public function getExcludedFields(): array
+	{
+		return ['pass'];
+	}
+
+	public function getClassname()
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
+	}
 
 	public function getRoleId(): int
 	{

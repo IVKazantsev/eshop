@@ -14,7 +14,9 @@ class OrderRepository extends Repository
 		private readonly DbConnector    $dbConnection,
 		private readonly UserRepository $userRepository,
 		private readonly ItemRepository $itemRepository
-	){}
+	)
+	{
+	}
 
 	public function getList(array $filter = null): array
 	{
@@ -27,10 +29,19 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+		SELECT o.ID, o.NUMBER, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
-	");
+	"
+		);
+		// 	$result = mysqli_query(
+		// 		$connection,
+		// 		"
+		// 	SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE
+		// 	FROM N_ONE_ORDERS o
+		// 	JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
+		// "
+		// 	);
 
 		if (!$result)
 		{
@@ -40,9 +51,15 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'],
+				$row['NUMBER'],
+				$row['USER_ID'],
+				$row['ITEM_ID'],
+				$row['STATUS_ID'],
+				$row['TITLE'],
+				$row['PRICE'],
 			);
-			$order->setId($row['ID']);
+			// $order->setId();
 			$orders[] = $order;
 		}
 
@@ -51,8 +68,12 @@ class OrderRepository extends Repository
 			throw new RuntimeException("Items not found");
 		}
 
-		$itemsIds = array_map(static function($order) {return $order->getItemId();}, $orders);
-		$usersIds = array_map(static function($user) {return $user->getUserId();}, $orders);
+		$itemsIds = array_map(static function($order) {
+			return $order->getItemId();
+		}, $orders);
+		$usersIds = array_map(static function($user) {
+			return $user->getUserId();
+		}, $orders);
 
 		$items = $this->itemRepository->getByIds($itemsIds);
 		$users = $this->userRepository->getByIds($usersIds);
@@ -60,8 +81,8 @@ class OrderRepository extends Repository
 		$ordersCount = count($orders);
 		for ($i = 0; $i < $ordersCount; $i++)
 		{
-			$orders[$i]->setItem($items[$i]);
-			$orders[$i]->setUser($users[$i]);
+			// $orders[$i]->setItem($items[$i]);
+			// $orders[$i]->setUser($users[$i]);
 		}
 
 		return $orders;
@@ -78,7 +99,8 @@ class OrderRepository extends Repository
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
 		WHERE o.ID = $id;
-	");
+	"
+		);
 
 		if (!$result)
 		{
@@ -86,17 +108,13 @@ class OrderRepository extends Repository
 		}
 
 		$order = null;
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['USER_ID'],
-				$row['ITEM_ID'],
-				$row['STATUS_ID'],
-				$row['TITLE'],
-				$row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
 
-			$order->setId($row['ID']);
+			// $order->setId($row['ID']);
 			$order->setNumber($row['NUMBER']);
 		}
 
@@ -161,8 +179,8 @@ class OrderRepository extends Repository
 			PRICE = $price,
 			NUMBER = '$number'
 		where ID = $orderId;
-		");
-
+		"
+		);
 
 		if (!$result)
 		{

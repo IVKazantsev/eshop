@@ -6,17 +6,24 @@ use N_ONE\Core\Configurator\Configurator;
 
 class Order extends Entity
 {
-	private string $number;
+	// private string $number;
 	private string $dateCreate;
 
 	public function __construct(
-		private int    $userId,
-		private int    $itemId,
-		private int    $statusId,
-		private string $status,
-		private int    $price,
+		protected int|null $id,
+		private string     $number,
+		private int        $userId,
+		private int        $itemId,
+		private int        $statusId,
+		private string     $status,
+		private int        $price,
 	)
 	{
+	}
+
+	public function getExcludedFields(): array
+	{
+		return ['dateCreate'];
 	}
 
 	public function generateNumber(int $time): void
@@ -25,6 +32,18 @@ class Order extends Entity
 
 		$hashString = Configurator::option('ORDER_HASH_PREFIX') . $this->userId . $this->itemId . $this->dateCreate;
 		$this->number = hash(Configurator::option('ORDER_HASH_ALGO'), $hashString);
+	}
+
+	public function getClassname()
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
 	}
 
 	public function getUserId(): int
