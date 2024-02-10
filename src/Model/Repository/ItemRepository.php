@@ -305,4 +305,24 @@ class ItemRepository extends Repository
 
 		return true;
 	}
+
+	public function delete(int $itemId): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+
+		$result = mysqli_query(
+			$connection,
+			"
+		UPDATE N_ONE_ITEMS 
+		SET IS_ACTIVE = 0
+		WHERE ID = {$itemId}"
+		);
+
+		if (!$result)
+		{
+			throw new Exception(mysqli_error($connection));
+		}
+
+		return true;
+	}
 }
