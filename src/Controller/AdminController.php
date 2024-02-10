@@ -139,6 +139,9 @@ class AdminController extends BaseController
 			$content = TemplateEngine::render('pages/adminItemsPage', [
 				'items' => $itemsToDisplay,
 			]);
+			// $content = TemplateEngine::render('pages/adminItemsPage', [
+			// 	'items' => $itemsToDisplay,
+			// ]);
 		}
 		catch (Exception)
 		{
@@ -165,9 +168,7 @@ class AdminController extends BaseController
 			$content = TemplateEngine::render('pages/adminItemsPage', [
 				'items' => $itemsToDisplay,
 			]);
-			// $content = TemplateEngine::render('pages/adminItemsPage', [
-			// 	'items' => $items,
-			// ]);
+
 		}
 		catch (Exception)
 		{
@@ -195,9 +196,6 @@ class AdminController extends BaseController
 			$content = TemplateEngine::render('pages/adminItemsPage', [
 				'items' => $itemsToDisplay,
 			]);
-			// $content = TemplateEngine::render('pages/adminItemsPage', [
-			// 	'items' => $items,
-			// ]);
 		}
 		catch (Exception)
 		{
