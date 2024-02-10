@@ -6,6 +6,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="repositoryFactory"/>
 		</class>
 	</service>
 	<service name="catalogController">
@@ -15,6 +16,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="repositoryFactory"/>
 		</class>
 	</service>
 	<service name="detailController">
@@ -24,6 +26,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="repositoryFactory"/>
 		</class>
 	</service>
 	<service name="adminController">

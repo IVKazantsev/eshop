@@ -149,6 +149,41 @@ class TagRepository extends Repository
 		return $tag;
 	}
 
+	public function getByTitle(string $title): Tag
+	{
+		$connection = $this->dbConnection->getConnection();
+		$title = mysqli_real_escape_string($connection, $title);
+
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT t.ID, t.TITLE
+		FROM N_ONE_TAGS t
+		WHERE t.TITLE = '$title'
+		"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		$tag = null;
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$tag = new Tag(
+				$row['ID'], $row['TITLE'],
+			);
+		}
+
+		if ($tag === null)
+		{
+			throw new RuntimeException("Item with id $id not found");
+		}
+
+		return $tag;
+	}
+
 	/**
 	 * @param int[] $itemsIds
 	 */
@@ -208,6 +243,13 @@ class TagRepository extends Repository
 			);
 		}
 
+		if(empty($tags))
+		{
+			foreach ($itemsIds as $itemsId)
+			{
+				$tags[$itemsId] = [];
+			}
+		}
 		return $tags;
 	}
 

@@ -56,10 +56,8 @@ function adminMiddleware(callable $action)
 			Router::redirect('/login');
 			exit();
 		}
-		else
-		{
-			return $action($route);
-		}
+
+		return $action($route);
 	};
 }
 
@@ -84,6 +82,40 @@ Router::get('/admin/:string/edit/:id', adminMiddleware(function(Route $route) {
 
 	return ($di->getComponent('adminController'))->renderEditPage($entityToEdit, $itemId);
 }));
+
+Router::post('/admin/items/edit/:id', adminMiddleware(function(Route $route) {
+	$itemId = $route->getVariables()[0];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->updateItem($itemId);
+}));
+
+Router::get('/admin/edit/success', adminMiddleware(function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderSuccessEditPage();
+}));
+
+Router::get('/admin/items/delete/:id', adminMiddleware(function(Route $route) {
+	$itemId = $route->getVariables()[0];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderConfirmDeletePage($itemId);
+}));
+
+Router::post('/admin/items/delete/:id', function(Route $route) {
+	$itemId = $route->getVariables()[0];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->processDeletion($itemId);
+});
+
+Router::get('/admin/delete/success', adminMiddleware(function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderSuccessDeletePage();
+}));
+
 
 //роуты доступные всем
 Router::get('/login', function() {

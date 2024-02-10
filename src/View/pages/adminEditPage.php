@@ -8,7 +8,7 @@ use N_ONE\App\Model\Item;
 // var_dump($item);
 ?>
 <div class="edit-form-container">
-	<form action="" class="edit-form">
+	<form action="" class="edit-form" method="post">
 		<div class="form-section">
 
 			<p>ID товара: <?= $item->getId() ?></p>
@@ -76,6 +76,7 @@ use N_ONE\App\Model\Item;
 					Атмосферный
 				</label>
 			</div>
+			<button type="submit">Сохранить</button>
 		</div>
 	</form>
 </div>

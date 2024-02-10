@@ -3,11 +3,16 @@
 namespace N_ONE\App\Controller;
 
 use Exception;
+use N_ONE\App\Model\Item;
+use N_ONE\App\Model\Repository\UserRepository;
+use N_ONE\App\Model\User;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class AdminController extends BaseController
 {
+	protected UserRepository $userRepository;
+
 	public static function displayLoginError(): void
 	{
 		session_start();
@@ -171,6 +176,62 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
+	public function updateItem(string $itemId): string
+	{
+		$title = trim($_POST['title']);
+		$price = trim($_POST['price']);
+		$description = trim($_POST['description']);
+		$driveType = trim($_POST['drive-type']);
+		$transmissionType = trim($_POST['transmission-type']);
+		$fuelType = trim($_POST['fuel-type']);
+		$engineType = trim($_POST['engine-type']);
+		if (
+			!($title)
+			|| !($price)
+			|| !($description)
+			|| !($driveType)
+			|| !($transmissionType)
+			|| !($fuelType)
+			|| !($engineType)
+		)
+		{
+			return TemplateEngine::renderError(404, "Something went wrong");
+		}
+
+		try
+		{
+			$driveType = $this->tagRepository->getByTitle($driveType);
+			$transmissionType = $this->tagRepository->getByTitle($transmissionType);
+			$fuelType = $this->tagRepository->getByTitle($fuelType);
+			$engineType = $this->tagRepository->getByTitle($engineType);
+			$tags = [$driveType, $transmissionType, $fuelType, $engineType];
+			$item = new Item($itemId, $title, 1, $price, $description, $tags, []);
+			$this->itemRepository->update($item);
+		}
+		catch (Exception)
+		{
+			http_response_code(404);
+
+			return TemplateEngine::renderError(404, "Page not found");
+		}
+
+		return $this->renderSuccessEditPage();
+	}
+
+	public function renderSuccessEditPage(): string
+	{
+		if ($_SERVER['REQUEST_URI'] !== "/admin/edit/success")
+		{
+			Router::redirect("/admin/edit/success");
+		}
+
+		$successEditPage = TemplateEngine::render(
+			'pages/successEditPage'
+		);
+
+		return $this->renderAdminView($successEditPage);
+	}
+
 	public function logout(): void
 	{
 		session_start();
@@ -190,5 +251,59 @@ class AdminController extends BaseController
 		}
 		session_destroy();
 		Router::redirect('/login');
+	}
+
+	public function renderConfirmDeletePage(string $itemId): string
+	{
+		try
+		{
+			$item = $this->itemRepository->getById($itemId);
+		}
+		catch (Exception)
+		{
+			http_response_code(404);
+			echo TemplateEngine::renderError(404, "Page not found");
+			exit;
+		}
+
+		$confirmDeletePage = TemplateEngine::render('pages/confirmDeletePage', [
+			'item' => $item,
+		]);
+
+		return $this->renderAdminView($confirmDeletePage);
+	}
+
+	public function processDeletion(string $itemId)
+	{
+		if (!$itemId)
+		{
+			return TemplateEngine::renderError(404, "Something went wrong");
+		}
+		try
+		{
+			$this->itemRepository->delete($itemId);
+		}
+		catch (Exception)
+		{
+			http_response_code(404);
+			echo TemplateEngine::renderError(404, "Page not found");
+			exit;
+		}
+
+		return $this->renderSuccessDeletePage();
+	}
+
+	public function renderSuccessDeletePage(): string
+	{
+		if ($_SERVER['REQUEST_URI'] !== "/admin/delete/success")
+		{
+			Router::redirect("/admin/delete/success");
+		}
+
+		$successDeletePage = TemplateEngine::render(
+			'pages/successDeletePage'
+		);
+
+		return $this->renderAdminView($successDeletePage);
 	}
 }

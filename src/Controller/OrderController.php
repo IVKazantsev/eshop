@@ -12,7 +12,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 class OrderController extends BaseController
 {
 
-	public function renderOrderPage(int $carId): string
+	public function renderOrderPage(string $carId): string
 	{
 		try
 		{
@@ -32,7 +32,7 @@ class OrderController extends BaseController
 		return $this->renderPublicView($orderPage);
 	}
 
-	public function processOrder(int $carId): string
+	public function processOrder(string $carId): string
 	{
 		$phone = trim(ValidationService::validatePhoneNumber($_POST['phone']));
 		$name = trim($_POST['name']);

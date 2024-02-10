@@ -20,7 +20,6 @@ header {
 	left: 300px;
 }
 
-
 .container {
 	margin: 0 auto;
 	height: 100vh;
@@ -287,4 +286,30 @@ td {
 .description-textarea {
 	resize: none;
 	height: 100px;
+}
+
+.confirm-delete-container {
+	display: flex;
+	justify-content: center;
+}
+
+.confirm-delete-form, .success-delete-container, .success-update-container{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: 20px;
+	padding: 20px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.cancel-delete-link {
+	color: black;
+	text-decoration: none;
+}
+
+.cancel-delete-link:active {
+	color: black;
+	text-decoration: none;
 }
