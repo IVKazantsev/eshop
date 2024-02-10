@@ -2,15 +2,14 @@
 
 /**
  * @var Entity[] $items
- * @var array $fieldNames
  */
 
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Configurator\Configurator;
 
-$fieldNames = array_keys($items[0]);
+$fieldNames = $items[0]->getFieldNames();
 $iconsPath = Configurator::option('ICONS_PATH');
-// var_dump(gettype($items[0]));
+$classname = $items[0]->getClassname();
 ?>
 <table class="admin-table">
 
@@ -22,13 +21,16 @@ $iconsPath = Configurator::option('ICONS_PATH');
 	</tr>
 	<?php foreach ($items as $item): ?>
 		<tr class="admin-table-content-row">
-			<?php foreach ($item as $type => $row): ?>
-				<td class="<?= $type ?>-field"><?= $row ?></td>
+
+			<?php foreach ($fieldNames as $fieldName): ?>
+				<td class="field"><?= $item->getField($fieldName) ?></td>
 			<?php endforeach; ?>
+
 			<td class="actions-field">
-				<a href="<?= '/admin/items/edit/' . $item['id'] ?>"><img src="<?= $iconsPath
+				<a href="<?= "/admin/{$classname}s/edit/" . $item->getId() ?>"><img src="<?= $iconsPath
 					. 'settings.png' ?>" alt="1"></a>
-				<a href="<?= '/admin/items/delete/' . $item['id'] ?>"><img src="<?= $iconsPath . 'bin.png' ?>" alt="1"></a>
+				<a href="<?= "/admin/{$classname}s/delete/" . $item->getId() ?>"><img src="<?= $iconsPath
+					. 'bin.png' ?>" alt="1"></a>
 			</td>
 		</tr>
 	<?php endforeach; ?>

@@ -49,8 +49,6 @@ class TemplateEngine
 			'items' => $items,
 		];
 
-		// var_dump($items);
-
 		return self::render($tableViewFile, $variables);
 	}
 }

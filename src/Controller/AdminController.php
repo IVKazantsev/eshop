@@ -3,15 +3,11 @@
 namespace N_ONE\App\Controller;
 
 use Exception;
-use N_ONE\App\Model\Repository\UserRepository;
-use N_ONE\App\Model\User;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class AdminController extends BaseController
 {
-	protected UserRepository $userRepository;
-
 	public static function displayLoginError(): void
 	{
 		session_start();
@@ -67,11 +63,32 @@ class AdminController extends BaseController
 		exit();
 	}
 
-	public function renderEditPage(string $itemId): string
+	// public function renderEditPage(string $itemId): string
+	// {
+	// 	try
+	// 	{
+	// 		$item = $this->itemRepository->getById($itemId);
+	//
+	// 		$content = TemplateEngine::render('pages/adminEditPage', [
+	// 			'item' => $item,
+	// 		]);
+	// 	}
+	// 	catch (Exception)
+	// 	{
+	// 		$content = TemplateEngine::render('pages/errorPage', [
+	// 			'errorCode' => ':(',
+	// 			'errorMessage' => 'Что-то пошло не так',
+	// 		]);
+	// 	}
+	//
+	// 	return $this->renderAdminView($content);
+	// }
+	public function renderEditPage(string $entityToEdit, string $itemId): string
 	{
+		$repository = $this->repositoryFactory->createRepository($entityToEdit);
 		try
 		{
-			$item = $this->itemRepository->getById($itemId);
+			$item = $repository->getById($itemId);
 
 			$content = TemplateEngine::render('pages/adminEditPage', [
 				'item' => $item,
@@ -88,6 +105,7 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
+	//TODO изменить
 	public function renderLoginPage(string $view, array $params): string
 	{
 		return TemplateEngine::render("pages/$view", $params);
@@ -125,106 +143,22 @@ class AdminController extends BaseController
 		return true;
 	}
 
-	public function renderItemsPage(): string
+	public function renderEntityPage(string $entityToDisplay): string
 	{
-
 		try
 		{
-			$items = $this->itemRepository->getList();
-			$itemsToDisplay = [];
-			foreach ($items as $item)
-			{
-				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
-			}
+			$repository = $this->repositoryFactory->createRepository($entityToDisplay);
+			$items = $repository->getList();
 			$content = TemplateEngine::render('pages/adminItemsPage', [
-				'items' => $itemsToDisplay,
+				'items' => $items,
 			]);
-			// $content = TemplateEngine::render('pages/adminItemsPage', [
-			// 	'items' => $itemsToDisplay,
-			// ]);
 		}
-		catch (Exception)
+		catch (\InvalidArgumentException)
 		{
 			$content = TemplateEngine::render('pages/errorPage', [
 				'errorCode' => ':(',
 				'errorMessage' => 'Что-то пошло не так',
 			]);
-		}
-
-		return $this->renderAdminView($content);
-	}
-
-	public function renderTagsPage(): string
-	{
-
-		try
-		{
-			$items = $this->tagRepository->getList();
-			$itemsToDisplay = [];
-			foreach ($items as $item)
-			{
-				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
-			}
-			$content = TemplateEngine::render('pages/adminItemsPage', [
-				'items' => $itemsToDisplay,
-			]);
-
-		}
-		catch (Exception)
-		{
-			$content = TemplateEngine::render('pages/errorPage', [
-				'errorCode' => ':(',
-				'errorMessage' => 'Что-то пошло не так',
-			]);
-		}
-
-		return $this->renderAdminView($content);
-	}
-
-	//TODO Разобраться с заказами
-	public function renderOrdersPage(): string
-	{
-
-		try
-		{
-			$items = $this->orderRepository->getList();
-			$itemsToDisplay = [];
-			foreach ($items as $item)
-			{
-				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
-			}
-			$content = TemplateEngine::render('pages/adminItemsPage', [
-				'items' => $itemsToDisplay,
-			]);
-		}
-		catch (Exception)
-		{
-			$content = TemplateEngine::render('pages/errorPage', [
-				'errorCode' => ':(',
-				'errorMessage' => 'Что-то пошло не так',
-			]);
-		}
-
-		return $this->renderAdminView($content);
-	}
-
-	public function renderUsersPage(): string
-	{
-
-		try
-		{
-			$items = $this->userRepository->getList();
-			$itemsToDisplay = [];
-			foreach ($items as $item)
-			{
-				$itemsToDisplay[] = $item->prepareEntityForTable($item->getExludedFields());
-			}
-			$content = TemplateEngine::render('pages/adminItemsPage', [
-				'items' => $itemsToDisplay,
-			]);
-			// $content = TemplateEngine::render('pages/adminItemsPage', [
-			// 	'items' => $items,
-			// ]);
 		}
 		catch (Exception)
 		{

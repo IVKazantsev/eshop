@@ -14,17 +14,21 @@ class Tag extends Entity
 	{
 	}
 
-	public function getInfoForTable(): array
+	public function getClassname()
 	{
-		return [
-			'id' => $this->id,
-			'title' => $this->title,
-		];
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
 	}
 
-	public function getExludedFields(): array
+	public function getExcludedFields(): array
 	{
 		return [];
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
 	}
 
 	public function getTitle(): string

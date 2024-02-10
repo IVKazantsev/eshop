@@ -21,22 +21,9 @@ class Order extends Entity
 	{
 	}
 
-	public function getExludedFields(): array
+	public function getExcludedFields(): array
 	{
 		return ['dateCreate'];
-	}
-
-	public function getInfoForTable(): array
-	{
-		return [
-			'id' => $this->id,
-			'number' => $this->number,
-			'userId' => $this->userId,
-			'itemId' => $this->itemId,
-			'statusId' => $this->statusId,
-			'status' => $this->status,
-			'price' => $this->price,
-		];
 	}
 
 	public function generateNumber(int $time): void
@@ -45,6 +32,18 @@ class Order extends Entity
 
 		$hashString = Configurator::option('ORDER_HASH_PREFIX') . $this->userId . $this->itemId . $this->dateCreate;
 		$this->number = hash(Configurator::option('ORDER_HASH_ALGO'), $hashString);
+	}
+
+	public function getClassname()
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
 	}
 
 	public function getUserId(): int

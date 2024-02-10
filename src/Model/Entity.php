@@ -19,49 +19,16 @@ abstract class Entity
 		$this->id = $id;
 	}
 
-	public function prepareEntityForTable(?array $excludeFields = []): array
+	public function getFieldNames(array $excludeFields = []): array
 	{
-		// $reflector = new ReflectionClass($this);
-		// $properties = $reflector->getProperties();
-
+		$reflectionClass = new ReflectionClass($this);
+		$properties = $reflectionClass->getProperties(); // Get all properties
 		$result = [];
-		$excludeFields = array_flip($excludeFields);
-		$item = array_diff_key(
-			$this->getInfoForTable(),
-			$excludeFields
-		);
-		foreach ($item as $fieldIndex => $value)
+		foreach ($properties as $property)
 		{
-			$result[$fieldIndex] = $value;
+			$result[] = $property->getName();
 		}
 
-		return $result;
+		return array_flip(array_diff_key(array_flip($result), array_flip($this->getExcludedFields())));
 	}
-
 }
-// public function getFieldNames(array $excludeFields = []): array
-// {
-// 	$serializedArray = (array)$this;
-// 	$namespacePattern = '/^\\\\[a-zA-Z0-9_]+\\\\/'; // Pattern to match the namespace
-//
-// 	return array_map(function($key) use ($namespacePattern) {
-// 		// Remove the namespace from the key
-// 		return preg_replace($namespacePattern, '', $key);
-// 	}, array_keys($serializedArray));
-// }
-//
-// public function getFieldNamesForHeader(array $excludeFields = []): array
-// {
-// 	$reflector = new ReflectionClass($this);
-// 	$properties = $reflector->getProperties(
-// 	// ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE
-// 	);
-//
-// 	// Get the names of the properties and exclude the specified ones
-// 	return array_diff(
-// 		array_map(function(ReflectionProperty $property) {
-// 			return $property->getName();
-// 		}, $properties),
-// 		$excludeFields
-// 	);
-// }

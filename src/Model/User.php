@@ -16,22 +16,21 @@ class User extends Entity
 	{
 	}
 
-	public function getInfoForTable(): array
-	{
-		return [
-			'id' => $this->id,
-			'roleId' => $this->roleId,
-			'name' => $this->name,
-			'email' => $this->email,
-			'pass' => $this->pass,
-			'number' => $this->number,
-			'address' => $this->address,
-		];
-	}
-
-	public function getExludedFields(): array
+	public function getExcludedFields(): array
 	{
 		return ['pass'];
+	}
+
+	public function getClassname()
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
 	}
 
 	public function getRoleId(): int

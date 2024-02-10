@@ -2,8 +2,6 @@
 
 namespace N_ONE\App\Model;
 
-use ReflectionClass;
-use ReflectionProperty;
 use RuntimeException;
 
 class Item extends Entity
@@ -25,17 +23,6 @@ class Item extends Entity
 	{
 	}
 
-	public function getInfoForTable(): array
-	{
-		return [
-			'id' => $this->id,
-			'title' => $this->title,
-			'price' => $this->price,
-			'description' => $this->description,
-			'sortOrder' => $this->sortOrder,
-		];
-	}
-
 	public function getPreviewImage(): Image
 	{
 		foreach ($this->images as $image)
@@ -46,11 +33,6 @@ class Item extends Entity
 			}
 		}
 		throw new RuntimeException("Preview image for Item with id {$this->getId()} not found");
-	}
-
-	public function getExludedFields(): array
-	{
-		return ['isActive', 'tags', 'images'];
 	}
 
 	public function getFullSizeImages(): array
@@ -69,6 +51,23 @@ class Item extends Entity
 		}
 
 		return $images;
+	}
+
+	public function getExcludedFields(): array
+	{
+		return ['isActive', 'tags', 'images'];
+	}
+
+	public function getClassname()
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
 	}
 
 	public function getImages(): array

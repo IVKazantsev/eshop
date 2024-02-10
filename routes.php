@@ -70,32 +70,21 @@ Router::get('/admin', adminMiddleware(function() {
 	return ($di->getComponent('adminController'))->renderDashboard();
 }));
 
-Router::get('/admin/items', adminMiddleware(function() {
+Router::get('/admin/:string', adminMiddleware(function(Route $route) {
+	$di = Application::getDI();
+	$entityToEdit = $route->getVariables()[0];
+
+	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit);
+}));
+
+Router::get('/admin/:string/edit/:id', adminMiddleware(function(Route $route) {
+	$entityToEdit = $route->getVariables()[0];
+	$itemId = $route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->renderItemsPage();
+	return ($di->getComponent('adminController'))->renderEditPage($entityToEdit, $itemId);
 }));
-Router::get('/admin/tags', adminMiddleware(function() {
-	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->renderTagsPage();
-}));
-Router::get('/admin/orders', adminMiddleware(function() {
-	$di = Application::getDI();
-
-	return ($di->getComponent('adminController'))->renderOrdersPage();
-}));
-Router::get('/admin/users', adminMiddleware(function() {
-	$di = Application::getDI();
-
-	return ($di->getComponent('adminController'))->renderUsersPage();
-}));
-Router::get('/admin/items/edit/:id', adminMiddleware(function(Route $route) {
-	$itemId = $route->getVariables()[0];
-	$di = Application::getDI();
-
-	return ($di->getComponent('adminController'))->renderEditPage($itemId);
-}));
 //роуты доступные всем
 Router::get('/login', function() {
 	$di = Application::getDI();

@@ -1,8 +1,7 @@
 <?php
 
 /**
- * // * @var Item[] $items
- * @var Entity[] $items
+ * @var array $items
  */
 
 use N_ONE\App\Model\Entity;
