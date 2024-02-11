@@ -269,7 +269,7 @@ td {
 }
 
 /* Button styles (if you have buttons in your form) */
-.form-section button {
+.submit-button {
 	padding: 10px 20px;
 	background-color: #007bff;
 	color: white;
@@ -279,7 +279,7 @@ td {
 	margin-top: 10px; /* Space above the button */
 }
 
-.form-section button:hover {
+.submit-button:hover {
 	background-color: #0056b3;
 }
 
@@ -293,7 +293,7 @@ td {
 	justify-content: center;
 }
 
-.confirm-delete-form, .success-delete-container, .success-update-container{
+.confirm-delete-form, .success-delete-container, .success-update-container {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -312,4 +312,27 @@ td {
 .cancel-delete-link:active {
 	color: black;
 	text-decoration: none;
+}
+
+.actions-field, #actions-column {
+	text-align: center;
+	width: 200px;
+}
+
+.add-entity-button {
+	display: block;
+	text-align: center;
+	line-height: 40px;
+	border-radius: 10px;
+	background-color: #ee753b;
+	text-decoration: none;
+	color: white;
+	width: 100px;
+	height: 40px;
+	margin-bottom: 12px;
+	margin-left: auto;
+}
+
+.add-entity-button:hover {
+	color: white;
 }
