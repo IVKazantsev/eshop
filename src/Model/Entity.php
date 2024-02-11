@@ -3,6 +3,7 @@
 namespace N_ONE\App\Model;
 
 use ReflectionClass;
+use ReflectionException;
 use ReflectionProperty;
 
 abstract class Entity
@@ -34,5 +35,22 @@ abstract class Entity
 		}
 
 		return array_flip(array_diff_key(array_flip($result), array_flip($this->getExcludedFields())));
+	}
+
+	/**
+	 * @throws ReflectionException
+	 */
+	public static function createDummyObject(): object
+	{
+		$reflection = new ReflectionClass(static::class);
+		$properties = $reflection->getProperties();
+
+		$stubObject = $reflection->newInstanceWithoutConstructor();
+
+		foreach ($properties as $property) {
+			$property->setValue($stubObject, null);
+		}
+
+		return $stubObject;
 	}
 }

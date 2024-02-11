@@ -5,13 +5,15 @@ namespace N_ONE\App\Model;
 class Image extends Entity
 {
 	public function __construct(
-		private int      $itemId,
-		private string   $path,
-		private bool     $isMain,
-		private int      $type,
-		private int      $height,
-		private int      $width,
-	){}
+		private int|null    $itemId,
+		private string|null $path,
+		private bool|null   $isMain,
+		private int|null    $type,
+		private int|null    $height,
+		private int|null    $width,
+	)
+	{
+	}
 
 	public function getType(): int
 	{

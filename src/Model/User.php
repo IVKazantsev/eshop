@@ -5,13 +5,13 @@ namespace N_ONE\App\Model;
 class User extends Entity
 {
 	public function __construct(
-		protected int|null $id,
-		private int        $roleId,
-		private string     $name,
-		private string     $email,
-		private string     $pass,
-		private string     $number,
-		private string     $address,
+		protected int|null  $id,
+		private int|null    $roleId,
+		private string|null $name,
+		private string|null $email,
+		private string|null $pass,
+		private string|null $number,
+		private string|null $address,
 	)
 	{
 	}

@@ -8,8 +8,8 @@ use ReflectionProperty;
 class Tag extends Entity
 {
 	public function __construct(
-		protected int|null $id,
-		private string     $title
+		protected int|null  $id,
+		private string|null $title
 	)
 	{
 	}
