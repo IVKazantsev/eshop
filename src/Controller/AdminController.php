@@ -68,26 +68,6 @@ class AdminController extends BaseController
 		exit();
 	}
 
-	// public function renderEditPage(string $itemId): string
-	// {
-	// 	try
-	// 	{
-	// 		$item = $this->itemRepository->getById($itemId);
-	//
-	// 		$content = TemplateEngine::render('pages/adminEditPage', [
-	// 			'item' => $item,
-	// 		]);
-	// 	}
-	// 	catch (Exception)
-	// 	{
-	// 		$content = TemplateEngine::render('pages/errorPage', [
-	// 			'errorCode' => ':(',
-	// 			'errorMessage' => 'Что-то пошло не так',
-	// 		]);
-	// 	}
-	//
-	// 	return $this->renderAdminView($content);
-	// }
 	public function renderEditPage(string $entityToEdit, string $itemId): string
 	{
 		$repository = $this->repositoryFactory->createRepository($entityToEdit);
@@ -178,8 +158,6 @@ class AdminController extends BaseController
 
 	public function updateItem(string $itemId): string
 	{
-		// var_dump($_POST);
-		// exit();
 		$title = trim($_POST['title']);
 		$price = trim($_POST['price']);
 		$description = trim($_POST['description']);

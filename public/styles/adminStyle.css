@@ -24,7 +24,7 @@ header {
 	margin: 0 auto;
 	height: 100vh;
 	display: grid;
-	grid-template-rows: 10% 1fr 1%;
+	grid-template-rows: 5% 1fr 1%;
 	grid-template-columns: 10% 20% 1fr 10%;
 	overflow-y: auto;
 }
@@ -43,7 +43,8 @@ header {
 
 .tags-container {
 	overflow-y: auto;
-	width: 80%;
+	/*width: 80%;*/
+	margin: 0 auto;
 	margin-top: 60px;
 }
 
@@ -88,7 +89,7 @@ header {
 	aspect-ratio: 16/9;
 	width: 200px;
 	height: 150px;
-	/*margin: 0 auto;*/
+	margin: 0 auto;
 }
 
 #dashboard-logo img {
@@ -99,9 +100,10 @@ header {
 }
 
 .dashboard-header {
-	background-color: #007bff;
+
 	display: flex;
 	justify-content: flex-end;
+	gap: 12px;
 	align-items: center;
 }
 

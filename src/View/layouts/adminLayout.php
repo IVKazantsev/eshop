@@ -32,7 +32,7 @@ $iconsPath = Configurator\Configurator::option('ICONS_PATH');
 			<img src="<?= $iconsPath . 'logo.svg' ?>" alt="">
 		</div>
 		<div class="tags-container">
-			<div class="tags-title">Каталог товаров</div>
+			<div class="tags-title">Просмотр сущностей</div>
 			<ul class="tags">
 				<li class="tag-item"><a class="tag-link" href="/admin/items">Товары</a></li>
 				<li class="tag-item"><a class="tag-link" href="/admin/tags">Теги</a></li>

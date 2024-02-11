@@ -22,7 +22,7 @@ abstract class Entity
 	public function getFieldNames(bool $getAll = false): array
 	{
 		$reflectionClass = new ReflectionClass($this);
-		$properties = $reflectionClass->getProperties(); // Get all properties
+		$properties = $reflectionClass->getProperties();
 		$result = [];
 		foreach ($properties as $property)
 		{

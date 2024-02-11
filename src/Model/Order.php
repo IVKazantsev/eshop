@@ -21,7 +21,7 @@ class Order extends Entity
 
 	public function getExcludedFields(): array
 	{
-		return ['dateCreate'];
+		return ['dateCreate', 'statusId'];
 	}
 
 	public function generateNumber(int $time): void
