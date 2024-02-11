@@ -30,4 +30,3 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 	</div>
 </div>
-<script src="../../../public/js/script.js"></script>
