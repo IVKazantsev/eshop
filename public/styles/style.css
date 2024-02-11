@@ -537,6 +537,7 @@ footer {
 	display: flex;
 	justify-content: space-evenly;
 	margin-bottom: 50px;
+	width: 100%;
 }
 .pagination a {
 	text-decoration: none;
