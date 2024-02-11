@@ -17,16 +17,17 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 		])
 		?>
 	<?php endforeach; ?>
+
+	<div class="pagination">
+
+		<?php if ($previousPageUri):?>
+			<a href="<?=$previousPageUri?>">&#10094</a>
+		<?php endif?>
+
+		<?php if ($nextPageUri):?>
+			<a href="<?=$nextPageUri?>">&#10095</a>
+		<?php endif?>
+
+	</div>
 </div>
-
-<div class="pagination">
-
-	<?php if ($previousPageUri):?>
-		<a href="<?=$previousPageUri?>">&#10094</a>
-	<?php endif?>
-
-	<?php if ($nextPageUri):?>
-		<a href="<?=$nextPageUri?>">&#10095</a>
-	<?php endif?>
-
-</div>
+<script src="../../../public/js/script.js"></script>

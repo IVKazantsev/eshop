@@ -140,6 +140,7 @@ footer {
 
 .car-card {
 	display: flex;
+	overflow: hidden;
 	width: 30%;
 	min-width: 250px;
 	height: 500px;
@@ -530,6 +531,7 @@ main {
 footer {
 	height: 25px;
 	background-color: #ee753b;
+	color: white;
 	text-align: center;
 }
 
@@ -537,6 +539,7 @@ footer {
 	display: flex;
 	justify-content: space-evenly;
 	margin-bottom: 50px;
+	width: 100%;
 }
 .pagination a {
 	text-decoration: none;
