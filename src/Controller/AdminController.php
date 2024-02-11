@@ -178,6 +178,8 @@ class AdminController extends BaseController
 
 	public function updateItem(string $itemId): string
 	{
+		// var_dump($_POST);
+		// exit();
 		$title = trim($_POST['title']);
 		$price = trim($_POST['price']);
 		$description = trim($_POST['description']);

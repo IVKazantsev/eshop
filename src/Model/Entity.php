@@ -19,7 +19,7 @@ abstract class Entity
 		$this->id = $id;
 	}
 
-	public function getFieldNames(array $excludeFields = []): array
+	public function getFieldNames(bool $getAll = false): array
 	{
 		$reflectionClass = new ReflectionClass($this);
 		$properties = $reflectionClass->getProperties(); // Get all properties
@@ -27,6 +27,10 @@ abstract class Entity
 		foreach ($properties as $property)
 		{
 			$result[] = $property->getName();
+		}
+		if ($getAll)
+		{
+			return $result;
 		}
 
 		return array_flip(array_diff_key(array_flip($result), array_flip($this->getExcludedFields())));

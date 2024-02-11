@@ -112,7 +112,13 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'],
+				$row['NUMBER'],
+				$row['USER_ID'],
+				$row['ITEM_ID'],
+				$row['STATUS_ID'],
+				$row['TITLE'],
+				$row['PRICE'],
 			);
 		}
 
