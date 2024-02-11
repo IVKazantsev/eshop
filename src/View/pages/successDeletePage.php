@@ -10,6 +10,6 @@ $iconsPath = Configurator::option('ICONS_PATH');
 		<img  class="success-img" src="<?= $iconsPath . 'checkmark.svg' ?>" alt="image of checkmark">
 	</div>
 	<div class="success-delete-title">
-		Вы успешно удалили товар
+		Вы успешно удалили сущность
 	</div>
 </div>

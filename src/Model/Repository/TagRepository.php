@@ -10,12 +10,6 @@ use RuntimeException;
 class TagRepository extends Repository
 {
 
-	public function __construct(
-		private readonly DbConnector $dbConnection
-	)
-	{
-	}
-
 	// public function getList(array $filter = null): array
 	// {
 	// 	$connection = $this->dbConnection->getConnection();
@@ -178,7 +172,7 @@ class TagRepository extends Repository
 
 		if ($tag === null)
 		{
-			throw new RuntimeException("Item with id $id not found");
+			throw new RuntimeException("Item with title $title not found");
 		}
 
 		return $tag;
@@ -253,7 +247,7 @@ class TagRepository extends Repository
 		return $tags;
 	}
 
-	public function add(Tag|Entity $entity): bool
+	public function add(Tag|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tagId = $entity->getId();

@@ -11,11 +11,13 @@ class OrderRepository extends Repository
 {
 
 	public function __construct(
-		private readonly DbConnector    $dbConnection,
+		DbConnector    $dbConnection,
 		private readonly UserRepository $userRepository,
 		private readonly ItemRepository $itemRepository
 	)
 	{
+		parent::__construct($dbConnection);
+
 	}
 
 	public function getList(array $filter = null): array
@@ -29,7 +31,7 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.NUMBER, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
 	"
@@ -52,7 +54,6 @@ class OrderRepository extends Repository
 		{
 			$order = new Order(
 				$row['ID'],
-				$row['NUMBER'],
 				$row['USER_ID'],
 				$row['ITEM_ID'],
 				$row['STATUS_ID'],
@@ -95,7 +96,7 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.NUMBER, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
 		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
 		WHERE o.ID = $id;
@@ -113,9 +114,6 @@ class OrderRepository extends Repository
 			$order = new Order(
 				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
-
-			// $order->setId($row['ID']);
-			$order->setNumber($row['NUMBER']);
 		}
 
 		if ($order === null)
@@ -126,27 +124,23 @@ class OrderRepository extends Repository
 		return $order;
 	}
 
-	public function add(Order|Entity $entity): bool
+	public function add(Order|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
 		$userId = $entity->getUserId();
 		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
-		$number = $entity->getNumber();
-		$dateCreate = $entity->getDateCreate();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE, NUMBER, DATE_CREATE) 
+		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
 		VALUES (
 			$userId,
 			$itemId,
 			$statusId,
-			$price,
-		    '$number',
-		    '$dateCreate'
+			$price
 		);"
 		);
 
@@ -155,7 +149,7 @@ class OrderRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		return true;
+		return mysqli_insert_id($connection);
 	}
 
 	public function update(Order|Entity $entity): bool
@@ -166,7 +160,6 @@ class OrderRepository extends Repository
 		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
-		$number = $entity->getNumber();
 
 		$result = mysqli_query(
 			$connection,
@@ -177,7 +170,6 @@ class OrderRepository extends Repository
 			ITEM_ID = $itemId,
 			STATUS_ID = $statusId,
 			PRICE = $price,
-			NUMBER = '$number'
 		where ID = $orderId;
 		"
 		);

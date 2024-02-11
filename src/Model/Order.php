@@ -6,12 +6,10 @@ use N_ONE\Core\Configurator\Configurator;
 
 class Order extends Entity
 {
-	// private string $number;
 	private string $dateCreate;
 
 	public function __construct(
 		protected int|null $id,
-		private string     $number,
 		private int        $userId,
 		private int        $itemId,
 		private int        $statusId,
@@ -94,16 +92,6 @@ class Order extends Entity
 	public function setPrice(int $price): void
 	{
 		$this->price = $price;
-	}
-
-	public function getNumber(): string
-	{
-		return $this->number;
-	}
-
-	public function setNumber(string $number): void
-	{
-		$this->number = $number;
 	}
 
 	public function getDateCreate(): string

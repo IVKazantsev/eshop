@@ -9,12 +9,6 @@ use RuntimeException;
 
 class UserRepository extends Repository
 {
-	public function __construct(
-		private readonly DbConnector $dbConnection
-	)
-	{
-	}
-
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -217,7 +211,7 @@ class UserRepository extends Repository
 		return $users;
 	}
 
-	public function add(User|Entity $entity): bool
+	public function add(User|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
 		$roleId = $entity->getRoleId();
@@ -246,7 +240,7 @@ class UserRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		return true;
+		return mysqli_insert_id($connection);
 	}
 
 	public function update(User|Entity $entity): bool

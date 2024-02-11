@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS N_ONE_ROLES
 CREATE TABLE IF NOT EXISTS N_ONE_USERS
 (
 	ID int not null auto_increment,
+	IS_ACTIVE bool not null DEFAULT TRUE,
 	ROLE_ID int not null,
 	NAME varchar(300),
 	EMAIL varchar(100) not null,
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS N_ONE_USERS
 CREATE TABLE IF NOT EXISTS N_ONE_TAGS
 (
 	ID int not null auto_increment,
+	IS_ACTIVE bool not null DEFAULT TRUE,
 	TITLE varchar(100) not null,
 	PRIMARY KEY (ID)
 );
@@ -33,8 +35,8 @@ CREATE TABLE IF NOT EXISTS N_ONE_TAGS
 CREATE TABLE IF NOT EXISTS N_ONE_ITEMS
 (
 	ID int not null auto_increment,
+	IS_ACTIVE bool not null DEFAULT TRUE,
 	TITLE varchar(100) not null,
-	IS_ACTIVE bool not null,
 	PRICE int not null,
 	DESCRIPTION text not null,
 	SORT_ORDER int not null default 0,
@@ -69,7 +71,7 @@ CREATE TABLE IF NOT EXISTS N_ONE_STATUSES
 CREATE TABLE IF NOT EXISTS N_ONE_ORDERS
 (
 	ID int not null auto_increment,
-	NUMBER varchar(100) not null,
+	IS_ACTIVE bool not null DEFAULT TRUE,
 	USER_ID int not null,
 	ITEM_ID int not null,
 	STATUS_ID int not null,

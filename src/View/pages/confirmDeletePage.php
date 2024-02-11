@@ -1,20 +1,14 @@
 <?php
 /**
- * @var Item $item
+ * @var string $entity
+ * @var int $entityId
  */
-
-use N_ONE\App\Model\Item;
-use N_ONE\Core\Configurator\Configurator;
-
-$imagesPath = Configurator::option('IMAGES_PATH');
 
 ?>
 
 <div class="confirm-delete-container">
 	<form class="confirm-delete-form" action="" method="post">
-		Вы уверены, что хотите удалить товар #<?= $item->getId() ?>:
-		<img class="car-image" src="<?= $imagesPath . $item->getPreviewImage()->getPath() ?>" alt="image of a car">
-		<?= $item->getTitle() ?>?
+		Вы уверены, что хотите удалить <?= $entity ?> #<?= $entityId ?>?
 		<div class="buttons-container">
 			<button class="confirm-delete-button" type="submit">Удалить</button>
 			<a class="cancel-delete-link" href="/admin/items">Отмена</a>
