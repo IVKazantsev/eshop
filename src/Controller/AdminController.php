@@ -253,35 +253,27 @@ class AdminController extends BaseController
 		Router::redirect('/login');
 	}
 
-	public function renderConfirmDeletePage(string $itemId): string
+	public function renderConfirmDeletePage(string $entities, string $entityId): string
 	{
-		try
-		{
-			$item = $this->itemRepository->getById($itemId);
-		}
-		catch (Exception)
-		{
-			http_response_code(404);
-			echo TemplateEngine::renderError(404, "Page not found");
-			exit;
-		}
-
+		$entity = substr($entities, 0, -1);
 		$confirmDeletePage = TemplateEngine::render('pages/confirmDeletePage', [
-			'item' => $item,
+			'entity' => $entity,
+			'entityId' => $entityId,
 		]);
 
 		return $this->renderAdminView($confirmDeletePage);
 	}
 
-	public function processDeletion(string $itemId)
+	public function processDeletion(string $entities, string $entityId): string
 	{
-		if (!$itemId)
+		if (!$entityId)
 		{
 			return TemplateEngine::renderError(404, "Something went wrong");
 		}
 		try
 		{
-			$this->itemRepository->delete($itemId);
+			$repository = $this->repositoryFactory->createRepository($entities);
+			$repository->delete($entities, $entityId);
 		}
 		catch (Exception)
 		{

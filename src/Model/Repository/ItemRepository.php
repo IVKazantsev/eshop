@@ -13,11 +13,13 @@ class ItemRepository extends Repository
 {
 
 	public function __construct(
-		private readonly DbConnector     $dbConnection,
+		DbConnector     $dbConnection,
 		private readonly TagRepository   $tagRepository,
 		private readonly ImageRepository $imageRepository
 	)
 	{
+		parent::__construct($dbConnection);
+
 	}
 
 	public function getById(int $id): ?Item
@@ -196,7 +198,7 @@ class ItemRepository extends Repository
 		return $items;
 	}
 
-	public function add(Item|Entity $entity): bool
+	public function add(Item|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
 		$itemId = $entity->getId();
@@ -297,26 +299,6 @@ class ItemRepository extends Repository
 
 		$sql = "INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";";
 		$result = mysqli_query($connection, $sql);
-
-		if (!$result)
-		{
-			throw new Exception(mysqli_error($connection));
-		}
-
-		return true;
-	}
-
-	public function delete(int $itemId): bool
-	{
-		$connection = $this->dbConnection->getConnection();
-
-		$result = mysqli_query(
-			$connection,
-			"
-		UPDATE N_ONE_ITEMS 
-		SET IS_ACTIVE = 0
-		WHERE ID = {$itemId}"
-		);
 
 		if (!$result)
 		{

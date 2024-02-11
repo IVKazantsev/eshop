@@ -96,18 +96,20 @@ Router::get('/admin/edit/success', adminMiddleware(function() {
 	return ($di->getComponent('adminController'))->renderSuccessEditPage();
 }));
 
-Router::get('/admin/items/delete/:id', adminMiddleware(function(Route $route) {
-	$itemId = $route->getVariables()[0];
+Router::get('/admin/:entity/delete/:id', adminMiddleware(function(Route $route) {
+	$entityToDelete = $route->getVariables()[0];
+	$entityId = $route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->renderConfirmDeletePage($itemId);
+	return ($di->getComponent('adminController'))->renderConfirmDeletePage($entityToDelete, $entityId);
 }));
 
-Router::post('/admin/items/delete/:id', function(Route $route) {
-	$itemId = $route->getVariables()[0];
+Router::post('/admin/:entity/delete/:id', function(Route $route) {
+	$entityToDelete = $route->getVariables()[0];
+	$entityId = $route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->processDeletion($itemId);
+	return ($di->getComponent('adminController'))->processDeletion($entityToDelete, $entityId);
 });
 
 Router::get('/admin/delete/success', adminMiddleware(function() {

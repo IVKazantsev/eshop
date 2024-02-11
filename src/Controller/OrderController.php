@@ -61,11 +61,8 @@ class OrderController extends BaseController
 
 			if (!$user)
 			{
-				$this->userRepository->add(
-					new User(null, 2, $name, $email, "", $phone, $address)
-				);
-
-				$user = $this->userRepository->getByNumber($phone);
+				$user = new User(null, 2, $name, $email, "", $phone, $address);
+				$user->setId($this->userRepository->add($user));
 			}
 			elseif ($name !== $user->getName() || $email !== $user->getEmail() || $address !== $user->getAddress())
 			{
@@ -74,9 +71,8 @@ class OrderController extends BaseController
 				$this->userRepository->update($updatedUser);
 			}
 
-			$order = new Order(null, 1, $user->getId(), $carId, 1, 'обработка', $car->getPrice());
-			$order->generateNumber(time());
-			$this->orderRepository->add($order);
+			$order = new Order(null, $user->getId(), $carId, 1, 'обработка', $car->getPrice());
+			$orderId = $this->orderRepository->add($order);
 		}
 		catch (Exception)
 		{
@@ -85,7 +81,7 @@ class OrderController extends BaseController
 			return TemplateEngine::renderError(404, "Page not found");
 		}
 
-		return $this->renderSuccessOrderPage($order->getNumber());
+		return $this->renderSuccessOrderPage($orderId);
 
 	}
 
