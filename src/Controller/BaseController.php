@@ -36,7 +36,10 @@ abstract class BaseController
 
 	public function renderAdminView($content): string
 	{
-		session_start();
+		if (session_status() == PHP_SESSION_NONE)
+		{
+			session_start();
+		}
 		$user = $this->userRepository->getById($_SESSION['user_id']);
 
 		return TemplateEngine::render('layouts/adminLayout', [

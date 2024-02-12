@@ -120,7 +120,7 @@ class ItemRepository extends Repository
 
 	private function getWhereQueryBlock(?string $tag, ?string $title, mysqli $connection): string
 	{
-		$whereQueryBlock = "";
+		$whereQueryBlock = "WHERE i.IS_ACTIVE = 1";
 		if ($tag !== null && $title !== null)
 		{
 			$tagTitle = mysqli_real_escape_string($connection, $tag);
@@ -128,7 +128,7 @@ class ItemRepository extends Repository
 			$whereQueryBlock = "
 			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
 			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
-			WHERE t.TITLE = '$tagTitle'  and i.TITLE LIKE '%$itemTitle%'
+			WHERE t.TITLE = '$tagTitle'  and i.TITLE LIKE '%$itemTitle%' and i.IS_ACTIVE = 1
 		";
 		}
 		elseif ($tag !== null)
@@ -137,14 +137,14 @@ class ItemRepository extends Repository
 			$whereQueryBlock = "
 			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
 			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
-			WHERE t.TITLE = '$tagTitle'
+			WHERE t.TITLE = '$tagTitle' and i.IS_ACTIVE = 1
 		";
 		}
 		elseif ($title !== null)
 		{
 			$itemTitle = mysqli_real_escape_string($connection, $title);
 			$whereQueryBlock = "
-			WHERE i.TITLE LIKE '%$itemTitle%'
+			WHERE i.TITLE LIKE '%$itemTitle%' and i.IS_ACTIVE = 1
 		";
 		}
 

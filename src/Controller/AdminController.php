@@ -15,7 +15,10 @@ class AdminController extends BaseController
 
 	public static function displayLoginError(): void
 	{
-		session_start();
+		if (session_status() == PHP_SESSION_NONE)
+		{
+			session_start();
+		}
 		if (isset($_SESSION['login_error']))
 		{
 			echo '<div class="error-message">' . $_SESSION['login_error'] . '</div>';
@@ -27,7 +30,10 @@ class AdminController extends BaseController
 	{
 		$trimmedEmail = filter_var(trim($email), FILTER_SANITIZE_EMAIL);
 		$trimmedPassword = trim($password);
-		session_start();
+		if (session_status() == PHP_SESSION_NONE)
+		{
+			session_start();
+		}
 
 		if (empty($trimmedEmail) || empty($trimmedPassword))
 		{
@@ -93,6 +99,7 @@ class AdminController extends BaseController
 	//TODO изменить
 	public function renderLoginPage(string $view, array $params): string
 	{
+		static::displayLoginError();
 		return TemplateEngine::render("pages/$view", $params);
 	}
 
@@ -119,7 +126,10 @@ class AdminController extends BaseController
 
 	public function checkIfLoggedIn(): bool
 	{
-		session_start();
+		if (session_status() == PHP_SESSION_NONE)
+		{
+			session_start();
+		}
 		if (!isset($_SESSION['user_id']))
 		{
 			return false;

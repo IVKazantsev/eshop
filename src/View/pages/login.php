@@ -1,5 +1,4 @@
 <?php
-
 ?>
 
 <!doctype html>
@@ -13,7 +12,6 @@
 </head>
 <body>
 <div class="login-container">
-	<?= \N_ONE\App\Controller\AdminController::displayLoginError() ?>
 	<form action="/login" class="login-form" method="post">
 		<label class="input-label" for="email">
 			Email
@@ -23,14 +21,14 @@
 			Password
 			<input type="password" name="password" id="login-password" placeholder="Введите пароль..." required>
 		</label>
+		<button type="submit" class = "submit-button">Войти</button>
 		<div class="remember-container">
 			<label class="checkbox-label" for="remember">
 				<input type="checkbox" name="remember" id="login-password">
 				Запомнить меня
 			</label>
-
 		</div>
-		<button type="submit" class>Войти</button>
+
 	</form>
 </div>
 </body>

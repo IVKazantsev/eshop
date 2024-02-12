@@ -3,7 +3,6 @@
 use N_ONE\App\Application;
 use N_ONE\Core\Routing\Route;
 use N_ONE\Core\Routing\Router;
-use N_ONE\App\Controller;
 
 Router::get('/', function() {
 	$di = Application::getDI();
