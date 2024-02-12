@@ -1,6 +1,7 @@
 <?php
 
 use N_ONE\App\Application;
+use N_ONE\App\Model\Service\MiddleWare;
 use N_ONE\Core\Routing\Route;
 use N_ONE\Core\Routing\Router;
 
@@ -45,36 +46,21 @@ Router::get('/successOrder/:id', function(Route $route) {
 	return ($di->getComponent('orderController'))->renderSuccessOrderPage($orderId);
 });
 
-// TODO отрефакторить middleware куда-нибудь
-function adminMiddleware(callable $action)
-{
-	return function(Route $route) use ($action) {
-		session_start();
-		if (!isset($_SESSION['user_id']))
-		{
-			Router::redirect('/login');
-			exit();
-		}
-
-		return $action($route);
-	};
-}
-
 //роуты с защитой
-Router::get('/admin', adminMiddleware(function() {
+Router::get('/admin', MiddleWare::adminMiddleware(function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderDashboard();
 }));
 
-Router::get('/admin/:string', adminMiddleware(function(Route $route) {
+Router::get('/admin/:string', MiddleWare::adminMiddleware(function(Route $route) {
 	$di = Application::getDI();
 	$entityToEdit = $route->getVariables()[0];
 
 	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit);
 }));
 
-Router::get('/admin/:string/edit/:id', adminMiddleware(function(Route $route) {
+Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];
 	$itemId = $route->getVariables()[1];
 	$di = Application::getDI();
@@ -82,20 +68,20 @@ Router::get('/admin/:string/edit/:id', adminMiddleware(function(Route $route) {
 	return ($di->getComponent('adminController'))->renderEditPage($entityToEdit, $itemId);
 }));
 
-Router::post('/admin/items/edit/:id', adminMiddleware(function(Route $route) {
+Router::post('/admin/items/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$itemId = $route->getVariables()[0];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->updateItem($itemId);
 }));
 
-Router::get('/admin/edit/success', adminMiddleware(function() {
+Router::get('/admin/edit/success', MiddleWare::adminMiddleware(function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderSuccessEditPage();
 }));
 
-Router::get('/admin/:entity/delete/:id', adminMiddleware(function(Route $route) {
+Router::get('/admin/:entity/delete/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToDelete = $route->getVariables()[0];
 	$entityId = $route->getVariables()[1];
 	$di = Application::getDI();
@@ -111,7 +97,7 @@ Router::post('/admin/:entity/delete/:id', function(Route $route) {
 	return ($di->getComponent('adminController'))->processDeletion($entityToDelete, $entityId);
 });
 
-Router::get('/admin/delete/success', adminMiddleware(function() {
+Router::get('/admin/delete/success', MiddleWare::adminMiddleware(function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderSuccessDeletePage();
