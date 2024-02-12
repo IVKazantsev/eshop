@@ -113,7 +113,6 @@ class OrderRepository extends Repository
 		{
 			$order = new Order(
 				$row['ID'],
-				$row['NUMBER'],
 				$row['USER_ID'],
 				$row['ITEM_ID'],
 				$row['STATUS_ID'],
