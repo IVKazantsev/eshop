@@ -121,3 +121,18 @@ Router::get('/logout', function() {
 
 	return ($di->getComponent('adminController'))->logout();
 });
+
+
+// роуты для картинок
+
+Router::get('/imageForm', function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('imageController'))->renderImageForm();
+});
+
+Router::post('/addImage', function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('imageController'))->addImage($_FILES, $_POST["submit"], 12, false);
+});

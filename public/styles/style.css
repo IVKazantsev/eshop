@@ -102,6 +102,11 @@ img {
 	border-bottom-left-radius: 7px;
 	border-bottom-right-radius: 7px;
 }
+.child-tags {
+	padding-left: 30px;
+	padding-right: 10px;
+	font-weight: 300;
+}
 
 
 main {
@@ -246,8 +251,9 @@ footer {
 
 .tags-container {
 	overflow-y: auto;
-	width: 80%;
+	width: 85%;
 	margin-top: 60px;
+	/*margin-bottom: 60px;*/
 }
 
 .tags-container::-webkit-scrollbar {
@@ -264,7 +270,7 @@ footer {
 }
 
 .tag-item {
-	padding: 15px 100px 15px 50px;
+	padding: 9px 100px 9px 50px;
 }
 
 .tag-link {

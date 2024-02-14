@@ -11,8 +11,6 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class AdminController extends BaseController
 {
-	protected UserRepository $userRepository;
-
 	public static function displayLoginError(): void
 	{
 		if (session_status() == PHP_SESSION_NONE)

@@ -8,6 +8,7 @@ use N_ONE\App\Model\Repository\OrderRepository;
 use N_ONE\App\Model\Repository\RepositoryFactory;
 use N_ONE\App\Model\Repository\TagRepository;
 use N_ONE\App\Model\Repository\UserRepository;
+use N_ONE\App\Model\Service\TagService;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 abstract class BaseController
@@ -19,13 +20,11 @@ abstract class BaseController
 		protected UserRepository    $userRepository,
 		protected OrderRepository   $orderRepository,
 		protected RepositoryFactory $repositoryFactory
-	)
-	{
-	}
+	){}
 
 	public function renderPublicView($content, string $currentSearchRequest = null): string
 	{
-		$tags = $this->tagRepository->getList();
+		$tags = TagService::reformatTags($this->tagRepository->getList());
 
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,

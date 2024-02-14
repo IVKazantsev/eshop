@@ -35,11 +35,28 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 	<div class="sidebar">
 		<div class="tags-container">
 			<div class="tags-title">КАТЕГОРИИ</div>
+
 			<ul class="tags">
-				<?php foreach ($tags as $tag): ?>
-					<li class="tag-item"><a class="tag-link" href="<?='/?tag=' . $tag->getTitle()?>"><?= $tag->getTitle() ?></a></li>
+				<?php foreach ($tags[""] as $parentTag): ?>
+					<li class="tag-item"><?= $parentTag->getTitle() ?></li>
+					<ul class="child-tags">
+						<?php if (empty($tags[$parentTag->getId()])): ?>
+
+						<?php else: ?>
+							<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
+								<li class="tag-item">
+									<a
+										class="tag-link"
+										href="<?= '/?tag=' . $childTag->getTitle() ?>">
+										<?= $childTag->getTitle() ?>
+									</a>
+								</li>
+							<?php endforeach; ?>
+						<?php endif; ?>
+					</ul>
 				<?php endforeach; ?>
 			</ul>
+
 		</div>
 	</div>
 	<div id="logo">

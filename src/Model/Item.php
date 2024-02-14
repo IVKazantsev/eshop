@@ -19,9 +19,7 @@ class Item extends Entity
 		private array      $tags,
 		private array      $images,
 		private int        $sortOrder = 0
-	)
-	{
-	}
+	){}
 
 	public function getPreviewImage(): Image
 	{
