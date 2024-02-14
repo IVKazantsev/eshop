@@ -4,44 +4,10 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Entity;
-use N_ONE\Core\DbConnector\DbConnector;
 use RuntimeException;
 
 class TagRepository extends Repository
 {
-
-	// public function getList(array $filter = null): array
-	// {
-	// 	$connection = $this->dbConnection->getConnection();
-	// 	$tags = [];
-	//
-	// 	$result = mysqli_query(
-	// 		$connection,
-	// 		"
-	// 	SELECT t.ID, t.TITLE
-	// 	FROM N_ONE_TAGS t;
-	// 	"
-	// 	);
-	//
-	// 	if (!$result)
-	// 	{
-	// 		throw new RuntimeException(mysqli_error($connection));
-	// 	}
-	//
-	// 	while ($row = mysqli_fetch_assoc($result))
-	// 	{
-	// 		$tags[] = new Tag(
-	// 			$row['TITLE'],
-	// 		);
-	// 	}
-	//
-	// 	if (empty($tags))
-	// 	{
-	// 		throw new RuntimeException("Items not found");
-	// 	}
-	//
-	// 	return $tags;
-	// }
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -50,7 +16,7 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE
+		SELECT t.ID, t.TITLE, t.PARENT_ID 
 		FROM N_ONE_TAGS t;
 		"
 		);
@@ -63,7 +29,10 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'],
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID'],
+				null,
 			);
 		}
 
@@ -116,8 +85,9 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE
+		SELECT t.ID, t.TITLE, t.PARENT_ID, it.VALUE
 		FROM N_ONE_TAGS t
+		join bitcar.N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE t.ID = $id;
 		"
 		);
@@ -131,7 +101,10 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'],
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID'],
+				$row['VALUE']
 			);
 		}
 
@@ -151,8 +124,9 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE
+		SELECT t.ID, t.TITLE, t.PARENT_ID, it.VALUE
 		FROM N_ONE_TAGS t
+		join bitcar.N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE t.TITLE = '$title'
 		"
 		);
@@ -166,7 +140,10 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'],
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID'],
+				$row['VALUE']
 			);
 		}
 
@@ -218,7 +195,7 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT it.ITEM_ID, t.ID, t.TITLE
+		SELECT it.ITEM_ID, t.ID, t.TITLE, t.PARENT_ID, it.VALUE
 		FROM N_ONE_TAGS t 
 		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE it.ITEM_ID IN ($itemsIdsString);
@@ -233,7 +210,10 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'], $row['TITLE'],
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID'],
+				$row['VALUE']
 			);
 		}
 
@@ -252,14 +232,15 @@ class TagRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		$tagId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
-
+		$parentId = $entity->getParentId();
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_TAGS (ID, TITLE)
+		INSERT INTO N_ONE_TAGS (ID, TITLE, PARENT_ID)
 		VALUES (
 			$tagId,
-			'$title'
+			'$title',
+			$parentId
 		);"
 		);
 
@@ -276,12 +257,14 @@ class TagRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		$tagId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
-
+		$parentId = $entity->getParentId();
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_ITEMS 
-		SET TITLE = '$title'
+		UPDATE N_ONE_TAGS 
+		SET 
+			TITLE = '$title',
+			PARENT_ID = $parentId
 		WHERE ID = $tagId"
 		);
 

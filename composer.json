@@ -8,6 +8,7 @@
 	"require": {
 		"ext-mysqli": "*",
 		"ext-simplexml": "*",
-		"ext-mbstring": "*"
+		"ext-mbstring": "*",
+		"ext-gd": "*"
 	}
 }

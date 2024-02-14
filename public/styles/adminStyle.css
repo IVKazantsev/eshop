@@ -41,9 +41,9 @@ header {
 
 .tags-container {
 	overflow-y: auto;
-	/*width: 80%;*/
-	margin: 0 auto;
-	margin-top: 60px;
+	width: 100%;
+	/*margin: 0 auto;*/
+	/*margin-top: 60px;*/
 }
 
 .tags-container::-webkit-scrollbar {
@@ -335,4 +335,22 @@ td {
 
 .add-entity-button:hover {
 	color: white;
+}
+
+/*Стили для формы картинок*/
+
+.image-form {
+	display: flex;
+	flex-direction: column;
+	margin: 200px 20px 20px 90px;
+	width: 60%;
+	align-items: center;
+}
+
+.choose-file-button {
+	margin-bottom: 50px;
+}
+
+.submit-image-button {
+
 }

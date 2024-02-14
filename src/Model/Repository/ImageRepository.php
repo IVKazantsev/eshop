@@ -4,7 +4,6 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
-use N_ONE\Core\DbConnector\DbConnector;
 use RuntimeException;
 
 class ImageRepository extends Repository
@@ -18,7 +17,7 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT id, item_id, height, width, is_main, type, path
+		SELECT id, item_id, height, width, is_main, type, extension
 		FROM N_ONE_IMAGES
 		WHERE item_id IN (" . implode(',', $filter) . ");
 		"
@@ -32,7 +31,13 @@ class ImageRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$images[$row['item_id']][] = new Image(
-				$row['item_id'], $row['path'], $row['is_main'], $row['type'], $row['height'], $row['width'],
+				$row['id'],
+				$row['item_id'],
+				$row['is_main'],
+				$row['type'],
+				$row['height'],
+				$row['width'],
+				$row['extension'],
 			);
 		}
 
@@ -51,7 +56,7 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT id, item_id, height, width, is_main, type, path
+		SELECT id, item_id, height, width, is_main, type, extension
 		FROM N_ONE_IMAGES 
 		WHERE id = $id;
 		"
@@ -66,7 +71,13 @@ class ImageRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$image = new Image(
-				$row['item_id'], $row['path'], $row['is_main'], $row['type'], $row['height'], $row['width'],
+				$row['id'],
+				$row['item_id'],
+				$row['is_main'],
+				$row['type'],
+				$row['height'],
+				$row['width'],
+				$row['extension'],
 			);
 		}
 
@@ -81,24 +92,24 @@ class ImageRepository extends Repository
 	public function add(Image|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
-		$imageId = $entity->getId();
 		$itemId = $entity->getItemId();
 		$height = $entity->getHeight();
 		$width = $entity->getWidth();
 		$isMain = $entity->isMain();
 		$type = $entity->getType();
+		$extension = mysqli_real_escape_string($connection, $entity->getExtension());
 
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_IMAGES (ID, ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE) 
+		INSERT INTO N_ONE_IMAGES (ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE, EXTENSION) 
 		VALUES (
-			$imageId,
 			$itemId,
 			$height,
 			$width,
 			$isMain,
-			{$type}
+			{$type},
+			'$extension'
 		);"
 		);
 
@@ -107,7 +118,7 @@ class ImageRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		return true;
+		return mysqli_insert_id($connection);
 	}
 
 	public function update(Image|Entity $entity): bool
@@ -119,6 +130,7 @@ class ImageRepository extends Repository
 		$width = $entity->getWidth();
 		$isMain = $entity->isMain();
 		$type = $entity->getType();
+		$extension = mysqli_real_escape_string($connection, $entity->getExtension());
 
 		$result = mysqli_query(
 			$connection,
@@ -129,7 +141,8 @@ class ImageRepository extends Repository
 			HEIGHT = $height,
 			WIDTH = $width,
 			IS_MAIN = $isMain,
-			TYPE = {$type}
+			TYPE = {$type},
+			EXTENSION = '$extension'
 		where ID = $imageId;
 		"
 		);
