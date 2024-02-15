@@ -8,6 +8,10 @@ use N_ONE\App\Model\Item;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Exceptions\LoginException;
 use N_ONE\Core\Exceptions\ValidateException;
+use N_ONE\App\Model\Order;
+use N_ONE\App\Model\Repository\UserRepository;
+use N_ONE\App\Model\Tag;
+use N_ONE\App\Model\User;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 use N_ONE\App\Model\Service\ValidationService;
@@ -90,10 +94,68 @@ class AdminController extends BaseController
 
 				return $this->renderAdminView($content);
 			}
+			switch (get_class($item))
+			{
+				case Item::class:
+				{
+					$parentTags = $this->tagRepository->getParentTags();
+					$itemTags = [];
+					$childrenTags = [];
+					foreach ($parentTags as $parentTag)
+					{
+						$childrenTags[(string)($parentTag->getTitle())] = $this->tagRepository->getByParentId(
+							$parentTag->getId()
+						);
 
-			$content = TemplateEngine::render('pages/adminEditPage', [
-				'item' => $item,
-			]);
+					}
+					foreach ($item->getTags() as $tag)
+					{
+						$itemTags[$tag->getParentId()] = $tag->getId();
+
+					}
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'item' => $item,
+						'childrenTags' => $childrenTags,
+						'parentTags' => $parentTags,
+						'itemTags' => $itemTags,
+					]);
+					break;
+				}
+				case Tag::class:
+				{
+					$parentTags = $repository->getParentTags();
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'item' => $item,
+						'parentTags' => $parentTags,
+					]);
+					break;
+
+				}
+				case User::class:
+				{
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'item' => $item,
+					]);
+					break;
+
+				}
+				case Order::class:
+				{
+					$statuses = $this->orderRepository->getStatuses();
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'item' => $item,
+						'statuses' => $statuses,
+					]);
+					break;
+
+				}
+				default:
+				{
+					$content = TemplateEngine::render('pages/adminEditPage', []);
+					break;
+
+				}
+			}
 		}
 		catch (InvalidArgumentException|Exception)
 		{
@@ -103,7 +165,6 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
-	//TODO изменить
 	public function renderLoginPage(string $view, array $params): string
 	{
 		static::displayLoginError();
@@ -172,25 +233,61 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
-	public function updateItem(string $itemId): string
+	public function updateItem(string $entityType, string $itemId): string
 	{
+		$fields = $_POST;
+		foreach ($fields as $field){
+			$fields[$field] = ValidationService::validateEntryField($field);
+		}
+		$className = 'N_ONE\App\Model\\' . ucfirst(
+				substr_replace($entityType, '', -1)
+			); //Костыль на приведение названия типа сущности из URL к названию класса
+		if ($entityType === 'tags')
+		{
+			foreach ($fields as $field => $value)
+			{
+				if ($field === 'value' && $value === '')
+				{
+					$fields[$field] = 'null';
+				}
+			}
+		}
+		if ($entityType === 'items')
+		{
+			$tags = [];
+
+			foreach ($fields as $field => $value)
+			{
+				if (is_numeric($field))
+				{
+					$tags[] = new Tag($value, '', $field, null);
+					unset($fields[$field]);
+				}
+				if (
+					($field === 'isActive' || $field === 'sortOrder')
+					&& $value === '0'
+				) //РАЗРЕШЕНИЕ НА ИСПОЛЬЗОВАНИЕ FALSY ДЛЯ УКАЗАННЫХ ПОЛЕЙ
+				{
+					continue;
+				}
+			}
+
+			$fields['tags'] = $tags;
+			$fields['images'] = [];
+		}
+		foreach ($fields as $field => $value)
+		{
+			if (!trim($value))
+			{
+				return TemplateEngine::renderError(404, "Missing required field: {$field}");
+			}
+			$fields[$field] = trim($value);
+		}
 		try
 		{
-			$title = ValidationService::validateEntryField($_POST['title']);
-			$price = ValidationService::validateEntryField($_POST['price']);
-			$description = ValidationService::validateEntryField($_POST['description']);
-			$driveType = ValidationService::validateEntryField($_POST['drive-type']);
-			$transmissionType = ValidationService::validateEntryField($_POST['transmission-type']);
-			$fuelType = ValidationService::validateEntryField($_POST['fuel-type']);
-			$engineType = ValidationService::validateEntryField($_POST['engine-type']);
-
-			$driveType = $this->tagRepository->getByTitle($driveType);
-			$transmissionType = $this->tagRepository->getByTitle($transmissionType);
-			$fuelType = $this->tagRepository->getByTitle($fuelType);
-			$engineType = $this->tagRepository->getByTitle($engineType);
-			$tags = [$driveType, $transmissionType, $fuelType, $engineType];
-			$item = new Item($itemId, $title, 1, $price, $description, $tags, []);
-			$this->itemRepository->update($item);
+			$repository = $this->repositoryFactory->createRepository($entityType);
+			$item = new $className($itemId, ...array_values($fields));
+			$repository->update($item);
 		}
 		catch (ValidateException $e)
 		{

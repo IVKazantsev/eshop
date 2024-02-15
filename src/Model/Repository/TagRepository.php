@@ -27,60 +27,93 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new DatabaseException(mysqli_error($connection));
+			throw new RuntimeException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID'],
-				null,
+				$row['ID'], $row['TITLE'], $row['PARENT_ID'], null,
 			);
+		}
+
+		if (empty($tags))
+		{
+			throw new RuntimeException("Items not found");
 		}
 
 		return $tags;
 	}
 
+	public function getParentTags(): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$tags = [];
 
-	// public function getById(int $id): Tag
-	// {
-	// 	$connection = $this->dbConnection->getConnection();
-	//
-	// 	$result = mysqli_query(
-	// 		$connection,
-	// 		"
-	// 	SELECT t.ID, t.TITLE
-	// 	FROM N_ONE_TAGS t
-	// 	WHERE t.ID = $id;
-	// 	"
-	// 	);
-	//
-	// 	if (!$result)
-	// 	{
-	// 		throw new RuntimeException(mysqli_error($connection));
-	// 	}
-	//
-	// 	$tag = null;
-	// 	while ($row = mysqli_fetch_assoc($result))
-	// 	{
-	// 		$tag = new Tag(
-	// 			$row['ID'], $row['TITLE'],
-	// 		);
-	// 	}
-	//
-	// 	if ($tag === null)
-	// 	{
-	// 		throw new RuntimeException("Item with id $id not found");
-	// 	}
-	//
-	// 	return $tag;
-	// }
-	/**
-	 * @throws DatabaseException
-	 */
-	public function getById(int $id): Tag|null
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT t.ID, t.TITLE 
+		FROM N_ONE_TAGS t
+		WHERE t.PARENT_ID IS NULL
+		"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$tags[] = new Tag(
+				$row['ID'], $row['TITLE'], null, null,
+			);
+		}
+
+		if (empty($tags))
+		{
+			throw new RuntimeException("Items not found");
+		}
+
+		return $tags;
+	}
+
+	public function getByParentId(int $id): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$tags = [];
+
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT t.ID, t.TITLE
+		FROM N_ONE_TAGS t
+		WHERE t.PARENT_ID = $id;
+		"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$tags[] = new Tag(
+				$row['ID'], $row['TITLE'], $id, null,
+			);
+		}
+
+		if (empty($tags))
+		{
+			throw new RuntimeException("Items not found");
+		}
+
+		return $tags;
+	}
+
+	public function getById(int $id): Tag
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -89,7 +122,7 @@ class TagRepository extends Repository
 			"
 		SELECT t.ID, t.TITLE, t.PARENT_ID, it.VALUE
 		FROM N_ONE_TAGS t
-		join bitcar.N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
+		join N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE t.ID = $id;
 		"
 		);
@@ -150,39 +183,6 @@ class TagRepository extends Repository
 		return $tag;
 	}
 
-	/**
-	 * @param int[] $itemsIds
-	 *
-	 * @throws DatabaseException
-	 */
-	// public function getByItemsIds(array $itemsIds): array
-	// {
-	// 	$connection = $this->dbConnection->getConnection();
-	// 	$itemsIdsString = implode(',', $itemsIds);
-	// 	$tags = [];
-	//
-	// 	$result = mysqli_query(
-	// 		$connection,
-	// 		"
-	// 	SELECT it.ITEM_ID, t.TITLE
-	// 	FROM N_ONE_TAGS t
-	// 	JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-	// 	WHERE it.ITEM_ID IN ($itemsIdsString);
-	// "
-	// 	);
-	//
-	// 	if (!$result)
-	// 	{
-	// 		throw new RuntimeException(mysqli_error($connection));
-	// 	}
-	//
-	// 	while ($row = mysqli_fetch_assoc($result))
-	// 	{
-	// 		$tags[$row['ITEM_ID']][] = new Tag($row['ID'], $row['TITLE'],);
-	// 	}
-	//
-	// 	return $tags;
-	// }
 	public function getByItemsIds(array $itemsIds): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -221,6 +221,7 @@ class TagRepository extends Repository
 				$tags[$itemsId] = [];
 			}
 		}
+
 		return $tags;
 	}
 
