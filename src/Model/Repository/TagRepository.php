@@ -4,10 +4,14 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Entity;
+use N_ONE\Core\Exceptions\DatabaseException;
 use RuntimeException;
 
 class TagRepository extends Repository
 {
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -23,7 +27,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -34,11 +38,6 @@ class TagRepository extends Repository
 				$row['PARENT_ID'],
 				null,
 			);
-		}
-
-		if (empty($tags))
-		{
-			throw new RuntimeException("Items not found");
 		}
 
 		return $tags;
@@ -78,7 +77,10 @@ class TagRepository extends Repository
 	//
 	// 	return $tag;
 	// }
-	public function getById(int $id): Tag
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getById(int $id): Tag|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -94,7 +96,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$tag = null;
@@ -108,15 +110,13 @@ class TagRepository extends Repository
 			);
 		}
 
-		if ($tag === null)
-		{
-			throw new RuntimeException("Item with id $id not found");
-		}
-
 		return $tag;
 	}
 
-	public function getByTitle(string $title): Tag
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getByTitle(string $title): Tag|null
 	{
 		$connection = $this->dbConnection->getConnection();
 		$title = mysqli_real_escape_string($connection, $title);
@@ -133,7 +133,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$tag = null;
@@ -147,16 +147,13 @@ class TagRepository extends Repository
 			);
 		}
 
-		if ($tag === null)
-		{
-			throw new RuntimeException("Item with title $title not found");
-		}
-
 		return $tag;
 	}
 
 	/**
 	 * @param int[] $itemsIds
+	 *
+	 * @throws DatabaseException
 	 */
 	// public function getByItemsIds(array $itemsIds): array
 	// {
@@ -204,7 +201,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))

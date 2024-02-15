@@ -2,9 +2,6 @@
 
 namespace N_ONE\App\Model;
 
-use ReflectionClass;
-use ReflectionProperty;
-
 class Tag extends Entity
 {
 	public function __construct(
@@ -35,7 +32,7 @@ class Tag extends Entity
 		$this->parentId = $parentId;
 	}
 
-	public function getClassname()
+	public function getClassname(): string
 	{
 		$array = explode('\\', __CLASS__);
 

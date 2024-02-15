@@ -2,9 +2,9 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\DbConnector\DbConnector;
+use N_ONE\Core\Exceptions\DatabaseException;
 
 abstract class Repository
 {
@@ -39,6 +39,9 @@ abstract class Repository
 	 */
 	abstract public function getList(array $filter = null): array;
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function delete(string $entities, int $entityId): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -53,7 +56,7 @@ abstract class Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

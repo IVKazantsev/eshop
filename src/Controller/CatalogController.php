@@ -2,9 +2,9 @@
 
 namespace N_ONE\App\Controller;
 
-use Exception;
 use N_ONE\App\Model\Service\PaginationService;
 use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
@@ -19,29 +19,30 @@ class CatalogController extends BaseController
 				'pageNumber' => $pageNumber,
 			];
 
-			$cars = $this->itemRepository->getList($filter);
-
-			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
-			$nextPageUri = PaginationService::getNextPageUri(count($cars), $pageNumber);
-
-			if (count($cars) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
+			$items = $this->itemRepository->getList($filter);
+			if (empty($items))
 			{
-				array_pop($cars);
+				$content = TemplateEngine::renderPublicError(':(', 'Товары не найдены');
+
+				return $this->renderPublicView($content, $SearchRequest);
+			}
+			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
+			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber);
+
+			if (count($items) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
+			{
+				array_pop($items);
 			}
 
 			$content = TemplateEngine::render('pages/catalogPage', [
-				'cars' => $cars,
+				'cars' => $items,
 				'previousPageUri' => $previousPageUri,
 				'nextPageUri' => $nextPageUri,
 			]);
 		}
-
-		catch (Exception)
+		catch (DatabaseException)
 		{
-			$content = TemplateEngine::render('pages/errorPage', [
-				'errorCode' => ':(',
-				'errorMessage' => 'Товары не найдены',
-			]);
+			$content = TemplateEngine::renderPublicError(':(', 'Something went wrong');
 		}
 
 		return $this->renderPublicView($content, $SearchRequest);

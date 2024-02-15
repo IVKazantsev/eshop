@@ -8,7 +8,7 @@ class PaginationService
 {
 	public static function getNextPageUri(int $numCars, ?int $pageNumber): string|null
 	{
-		if ($numCars == Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
+		if ($numCars === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
 		{
 			$currentUrl = $_SERVER['REQUEST_URI'];
 			$newPageNumber = ($pageNumber + 1);

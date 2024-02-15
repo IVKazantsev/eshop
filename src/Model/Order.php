@@ -2,7 +2,7 @@
 
 namespace N_ONE\App\Model;
 
-use N_ONE\Core\Configurator\Configurator;
+// use N_ONE\Core\Configurator\Configurator;
 
 class Order extends Entity
 {
@@ -28,11 +28,11 @@ class Order extends Entity
 	{
 		$this->dateCreate = date('Y-m-d H:i:s', $time);
 
-		$hashString = Configurator::option('ORDER_HASH_PREFIX') . $this->userId . $this->itemId . $this->dateCreate;
-		$this->number = hash(Configurator::option('ORDER_HASH_ALGO'), $hashString);
+		// $hashString = Configurator::option('ORDER_HASH_PREFIX') . $this->userId . $this->itemId . $this->dateCreate;
+		// $this->number = hash(Configurator::option('ORDER_HASH_ALGO'), $hashString);
 	}
 
-	public function getClassname()
+	public function getClassname(): string
 	{
 		$array = explode('\\', __CLASS__);
 

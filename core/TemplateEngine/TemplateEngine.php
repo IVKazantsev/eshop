@@ -2,15 +2,26 @@
 
 namespace N_ONE\Core\TemplateEngine;
 
-use N_ONE\App\Model\Entity;
 use N_ONE\Core\Configurator\Configurator;
 use RuntimeException;
 
 class TemplateEngine
 {
-	public static function renderError(int $errorCode, string $errorMessage): string
+	public static function renderPublicError(int|string $errorCode, string $errorMessage): string
 	{
-		$errorViewFile = 'pages/errorPage';
+		$errorViewFile = Configurator::option("PUBLIC_ERROR_PAGE");
+
+		$variables = [
+			'errorCode' => $errorCode,
+			'errorMessage' => $errorMessage,
+		];
+
+		return self::render($errorViewFile, $variables);
+	}
+
+	public static function renderAdminError(int|string $errorCode, string $errorMessage): string
+	{
+		$errorViewFile = Configurator::option("ADMIN_ERROR_PAGE");
 
 		$variables = [
 			'errorCode' => $errorCode,

@@ -4,22 +4,14 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
-use N_ONE\Core\DbConnector\DbConnector;
-use RuntimeException;
+use N_ONE\Core\Exceptions\DatabaseException;
 
 class OrderRepository extends Repository
 {
 
-	public function __construct(
-		DbConnector    $dbConnection,
-		private readonly UserRepository $userRepository,
-		private readonly ItemRepository $itemRepository
-	)
-	{
-		parent::__construct($dbConnection);
-
-	}
-
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -47,7 +39,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -64,32 +56,13 @@ class OrderRepository extends Repository
 			$orders[] = $order;
 		}
 
-		if (empty($orders))
-		{
-			throw new RuntimeException("Items not found");
-		}
-
-		$itemsIds = array_map(static function($order) {
-			return $order->getItemId();
-		}, $orders);
-		$usersIds = array_map(static function($user) {
-			return $user->getUserId();
-		}, $orders);
-
-		$items = $this->itemRepository->getByIds($itemsIds);
-		$users = $this->userRepository->getByIds($usersIds);
-
-		$ordersCount = count($orders);
-		for ($i = 0; $i < $ordersCount; $i++)
-		{
-			// $orders[$i]->setItem($items[$i]);
-			// $orders[$i]->setUser($users[$i]);
-		}
-
 		return $orders;
 	}
 
-	public function getById(int $id): Order
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getById(int $id): Order|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -105,7 +78,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$order = null;
@@ -121,14 +94,12 @@ class OrderRepository extends Repository
 			);
 		}
 
-		if ($order === null)
-		{
-			throw new RuntimeException("Item not found");
-		}
-
 		return $order;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function add(Order|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -151,12 +122,15 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return mysqli_insert_id($connection);
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Order|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -181,7 +155,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

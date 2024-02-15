@@ -2,11 +2,12 @@
 
 namespace N_ONE\App\Controller;
 
-use Exception;
 use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Service\ImageService;
 use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Exceptions\ValidateException;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class ImageController extends BaseController
@@ -18,7 +19,11 @@ class ImageController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
-	public function addImage($files, $post, $itemId, $isMain)
+	/**
+	 * @throws ValidateException
+	 * @throws DatabaseException
+	 */
+	public function addImage($files, $post, $itemId, $isMain): string
 	{
 		if (!isset($post) || !ValidationService::validateImage($files))
 		{
@@ -45,9 +50,7 @@ class ImageController extends BaseController
 			unlink($targetFile);
 			return "The file ". basename($files["image"]["name"]). " has been uploaded.";
 		}
-		else
-		{
-			return "Sorry, there was an error uploading your file.";
-		}
+
+		return "Sorry, there was an error uploading your file.";
 	}
 }

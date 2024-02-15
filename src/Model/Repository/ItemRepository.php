@@ -2,18 +2,18 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use mysqli;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
+use N_ONE\Core\Exceptions\DatabaseException;
 
 class ItemRepository extends Repository
 {
 
 	public function __construct(
-		DbConnector     $dbConnection,
+		DbConnector                      $dbConnection,
 		private readonly TagRepository   $tagRepository,
 		private readonly ImageRepository $imageRepository
 	)
@@ -22,7 +22,10 @@ class ItemRepository extends Repository
 
 	}
 
-	public function getById(int $id): ?Item
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getById(int $id): Item|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -37,9 +40,10 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error());
+			throw new DatabaseException(mysqli_connect_error());
 		}
 
+		$item = null;
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$item = new Item(
@@ -55,14 +59,12 @@ class ItemRepository extends Repository
 			$item->setId($id);
 		}
 
-		if (empty($item))
-		{
-			throw new Exception("Item with id {$id} not found");
-		}
-
 		return $item;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -80,12 +82,12 @@ class ItemRepository extends Repository
 			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
 			FROM N_ONE_ITEMS i
 			$whereQueryBlock
-			LIMIT {$currentLimit} OFFSET {$offset};"
+			LIMIT $currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error());
+			throw new DatabaseException(mysqli_connect_error());
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -96,20 +98,19 @@ class ItemRepository extends Repository
 
 			// $items[count($items) - 1]->setId($row['ID']);
 		}
-
 		if (empty($items))
 		{
-			throw new Exception("Items not found");
+			return $items;
 		}
 
-		$itemsIds = array_map(function($item) {
+		$itemsIds = array_map(static function($item) {
 			return $item->getId();
 		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as &$item)
+		foreach ($items as $item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
@@ -151,6 +152,9 @@ class ItemRepository extends Repository
 		return $whereQueryBlock;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getByIds(array $ids): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -167,7 +171,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -177,19 +181,14 @@ class ItemRepository extends Repository
 			);
 		}
 
-		if (empty($items))
-		{
-			throw new Exception("Items not found");
-		}
-
-		$itemsIds = array_map(function($item) {
+		$itemsIds = array_map(static function($item) {
 			return $item->getId();
 		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as &$item)
+		foreach ($items as $item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
@@ -198,6 +197,9 @@ class ItemRepository extends Repository
 		return $items;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function add(Item|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -214,25 +216,25 @@ class ItemRepository extends Repository
 			"
 		INSERT INTO N_ONE_ITEMS (ID, TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
 		VALUES (
-			{$itemId},
-			'{$title}',
-			{$isActive},
-			{$price},
-			'{$description}',
+			$itemId,
+			'$title',
+			$isActive,
+			$price,
+			'$description',
 			{$sortOrder}
 		);"
 		);
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$itemTags = "";
 
 		foreach ($tags as $tag)
 		{
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
+			$itemTags .= '(' . $itemId . ', ' . $tag->getId() . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
 
@@ -244,12 +246,15 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Item|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -265,35 +270,35 @@ class ItemRepository extends Repository
 			$connection,
 			"
 		UPDATE N_ONE_ITEMS 
-		SET TITLE = '{$title}', 
-			IS_ACTIVE = {$isActive}, 
-			PRICE = {$price}, 
-			DESCRIPTION = '{$description}', 
+		SET TITLE = '$title', 
+			IS_ACTIVE = $isActive, 
+			PRICE = $price, 
+			DESCRIPTION = '$description', 
 			SORT_ORDER = {$sortOrder}
-		WHERE ID = {$itemId}"
+		WHERE ID = $itemId"
 		);
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$result = mysqli_query(
 			$connection,
 			"
-		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}"
+		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = $itemId"
 		);
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$itemTags = "";
 
 		foreach ($tags as $tag)
 		{
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
+			$itemTags .= '(' . $itemId . ', ' . $tag->getId() . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
 
@@ -302,7 +307,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

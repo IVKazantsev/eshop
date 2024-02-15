@@ -2,10 +2,13 @@
 
 namespace N_ONE\Core\Configurator;
 
-use RuntimeException;
+use http\Exception\InvalidArgumentException;
 
 class Configurator
 {
+	/**
+	 * @throws InvalidArgumentException
+	 */
 	public static function option(string $name, $defaultValue = null)
 	{
 		static $config = null;
@@ -35,6 +38,6 @@ class Configurator
 			return $defaultValue;
 		}
 
-		throw new RuntimeException("Configuration option $name not found");
+		throw new InvalidArgumentException("There is no configuration option $name");
 	}
 }

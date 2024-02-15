@@ -3,17 +3,20 @@
 namespace N_ONE\App\Controller;
 
 use Exception;
+use InvalidArgumentException;
 use N_ONE\App\Model\Item;
-use N_ONE\App\Model\Repository\UserRepository;
-use N_ONE\App\Model\User;
+use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Exceptions\LoginException;
+use N_ONE\Core\Exceptions\ValidateException;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
+use N_ONE\App\Model\Service\ValidationService;
 
 class AdminController extends BaseController
 {
 	public static function displayLoginError(): void
 	{
-		if (session_status() == PHP_SESSION_NONE)
+		if (session_status() === PHP_SESSION_NONE)
 		{
 			session_start();
 		}
@@ -28,40 +31,43 @@ class AdminController extends BaseController
 	{
 		$trimmedEmail = filter_var(trim($email), FILTER_SANITIZE_EMAIL);
 		$trimmedPassword = trim($password);
-		if (session_status() == PHP_SESSION_NONE)
+		if (session_status() === PHP_SESSION_NONE)
 		{
 			session_start();
 		}
 
-		if (empty($trimmedEmail) || empty($trimmedPassword))
-		{
-			$_SESSION['login_error'] = 'Please enter both email and password.';
-			Router::redirect('/login');
-			exit();
-		}
 		try
 		{
+			if (empty($trimmedEmail) || empty($trimmedPassword))
+			{
+				$_SESSION['login_error'] = 'Please enter both email and password.';
+				throw new LoginException();
+			}
+
 			$user = $this->userRepository->getByEmail($trimmedEmail);
+			if (!$user)
+			{
+				throw new LoginException();
+			}
 
+			if ($user->getRoleId() !== 1)
+			{
+				$_SESSION['login_error'] = 'Insufficient rights';
+				throw new LoginException();
+			}
+
+			if ($trimmedPassword !== $user->getPass())
+			{
+				$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
+				throw new LoginException();
+			}
 		}
-		catch (\RuntimeException)
+		catch (DatabaseException|LoginException|Exception)
 		{
-
-			$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
-			Router::redirect('/login');
-			exit(401);
-		}
-
-		if ($user->getRoleId() !== 1)
-		{
-			$_SESSION['login_error'] = 'Insufficient rights';
-			Router::redirect('/login');
-			exit(401);
-		}
-
-		if ($trimmedPassword !== $user->getPass())
-		{
-			$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
+			if (!$_SESSION['login_error'])
+			{
+				$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
+			}
 			Router::redirect('/login');
 			exit(401);
 		}
@@ -74,21 +80,24 @@ class AdminController extends BaseController
 
 	public function renderEditPage(string $entityToEdit, string $itemId): string
 	{
-		$repository = $this->repositoryFactory->createRepository($entityToEdit);
 		try
 		{
+			$repository = $this->repositoryFactory->createRepository($entityToEdit);
 			$item = $repository->getById($itemId);
+			if ($item === null)
+			{
+				$content = TemplateEngine::renderAdminError(':(', 'Данный товар не найден');
+
+				return $this->renderAdminView($content);
+			}
 
 			$content = TemplateEngine::render('pages/adminEditPage', [
 				'item' => $item,
 			]);
 		}
-		catch (Exception)
+		catch (InvalidArgumentException|Exception)
 		{
-			$content = TemplateEngine::render('pages/errorPage', [
-				'errorCode' => ':(',
-				'errorMessage' => 'Что-то пошло не так',
-			]);
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
 
 		return $this->renderAdminView($content);
@@ -98,6 +107,7 @@ class AdminController extends BaseController
 	public function renderLoginPage(string $view, array $params): string
 	{
 		static::displayLoginError();
+
 		return TemplateEngine::render("pages/$view", $params);
 	}
 
@@ -113,10 +123,7 @@ class AdminController extends BaseController
 		}
 		catch (Exception)
 		{
-			$content = TemplateEngine::render('pages/errorPage', [
-				'errorCode' => ':(',
-				'errorMessage' => 'Товары не найдены',
-			]);
+			$content = TemplateEngine::renderAdminError(':(', 'Товары не найдены');
 		}
 
 		return $this->renderAdminView($content);
@@ -124,7 +131,7 @@ class AdminController extends BaseController
 
 	public function checkIfLoggedIn(): bool
 	{
-		if (session_status() == PHP_SESSION_NONE)
+		if (session_status() === PHP_SESSION_NONE)
 		{
 			session_start();
 		}
@@ -142,23 +149,24 @@ class AdminController extends BaseController
 		{
 			$repository = $this->repositoryFactory->createRepository($entityToDisplay);
 			$items = $repository->getList();
+			if (empty($items))
+			{
+				$content = TemplateEngine::renderAdminError(':(', 'Товары не найдены');
+
+				return $this->renderAdminView($content);
+			}
 			$content = TemplateEngine::render('pages/adminItemsPage', [
 				'items' => $items,
 			]);
 		}
-		catch (\InvalidArgumentException)
+		catch (InvalidArgumentException)
 		{
-			$content = TemplateEngine::render('pages/errorPage', [
-				'errorCode' => ':(',
-				'errorMessage' => 'Что-то пошло не так',
-			]);
+			$content = TemplateEngine::renderAdminError('404', 'Страница не найдена');
 		}
 		catch (Exception)
 		{
-			$content = TemplateEngine::render('pages/errorPage', [
-				'errorCode' => ':(',
-				'errorMessage' => 'Что-то пошло не так',
-			]);
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+
 		}
 
 		return $this->renderAdminView($content);
@@ -166,28 +174,16 @@ class AdminController extends BaseController
 
 	public function updateItem(string $itemId): string
 	{
-		$title = trim($_POST['title']);
-		$price = trim($_POST['price']);
-		$description = trim($_POST['description']);
-		$driveType = trim($_POST['drive-type']);
-		$transmissionType = trim($_POST['transmission-type']);
-		$fuelType = trim($_POST['fuel-type']);
-		$engineType = trim($_POST['engine-type']);
-		if (
-			!($title)
-			|| !($price)
-			|| !($description)
-			|| !($driveType)
-			|| !($transmissionType)
-			|| !($fuelType)
-			|| !($engineType)
-		)
-		{
-			return TemplateEngine::renderError(404, "Something went wrong");
-		}
-
 		try
 		{
+			$title = ValidationService::validateEntryField($_POST['title']);
+			$price = ValidationService::validateEntryField($_POST['price']);
+			$description = ValidationService::validateEntryField($_POST['description']);
+			$driveType = ValidationService::validateEntryField($_POST['drive-type']);
+			$transmissionType = ValidationService::validateEntryField($_POST['transmission-type']);
+			$fuelType = ValidationService::validateEntryField($_POST['fuel-type']);
+			$engineType = ValidationService::validateEntryField($_POST['engine-type']);
+
 			$driveType = $this->tagRepository->getByTitle($driveType);
 			$transmissionType = $this->tagRepository->getByTitle($transmissionType);
 			$fuelType = $this->tagRepository->getByTitle($fuelType);
@@ -196,11 +192,13 @@ class AdminController extends BaseController
 			$item = new Item($itemId, $title, 1, $price, $description, $tags, []);
 			$this->itemRepository->update($item);
 		}
-		catch (Exception)
+		catch (ValidateException $e)
 		{
-			http_response_code(404);
-
-			return TemplateEngine::renderError(404, "Page not found");
+			return TemplateEngine::renderAdminError(400, $e->getMessage());
+		}
+		catch (DatabaseException)
+		{
+			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderSuccessEditPage();
@@ -256,18 +254,16 @@ class AdminController extends BaseController
 	{
 		if (!$entityId)
 		{
-			return TemplateEngine::renderError(404, "Something went wrong");
+			return TemplateEngine::renderAdminError(404, "Страница не найдена");
 		}
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entities);
 			$repository->delete($entities, $entityId);
 		}
-		catch (Exception)
+		catch (DatabaseException|InvalidArgumentException)
 		{
-			http_response_code(404);
-			echo TemplateEngine::renderError(404, "Page not found");
-			exit;
+			return TemplateEngine::renderAdminError(":(", "Что-то пошло не так");
 		}
 
 		return $this->renderSuccessDeletePage();

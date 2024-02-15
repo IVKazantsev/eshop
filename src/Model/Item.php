@@ -56,7 +56,7 @@ class Item extends Entity
 		return ['isActive', 'tags', 'images'];
 	}
 
-	public function getClassname()
+	public function getClassname(): string
 	{
 		$array = explode('\\', __CLASS__);
 
