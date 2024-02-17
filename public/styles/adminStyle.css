@@ -347,6 +347,10 @@ td {
 
 /*Стили для формы добавления картинок*/
 
+.add-images-form {
+	margin: 20px;
+}
+
 .image-form {
 	display: flex;
 	flex-direction: column;
@@ -365,7 +369,13 @@ td {
 
 /*Стили для формы удаления картинок*/
 
+.delete-images-form {
+	margin: 20px;
+	width: 270px;
+}
+
 .image-grid {
+	width: 270px;
 	margin: 20px;
 	display: flex;
 	flex-wrap: wrap;
@@ -373,7 +383,7 @@ td {
 }
 
 .image-item {
-	width: calc(33.33% - 10px); /* Ширина элемента с учетом промежутков */
+	width: 100px; /* Ширина элемента с учетом промежутков */
 	margin-bottom: 20px; /* Промежуток между элементами */
 	position: relative;
 }

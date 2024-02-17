@@ -73,13 +73,10 @@ class ValidationService
 		// Проверка наличия файла
 		if (isset($image["image"]))
 		{
-
-			throw new FileException("image $image");
-		}
-
-		if (!getimagesize($image["image"]["tmp_name"][$i]))
-		{
-			throw new Exception();
+			if (!getimagesize($image["image"]["tmp_name"][$i]))
+			{
+				throw new FileException("image ");
+			}
 		}
 
 		// Проверка размера файла

@@ -16,19 +16,22 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 //
 // die();
 ?>
+<div class="delete-images-form">
+<!--	<form action="/deleteImages" method="post">-->
+	<p>выбоор фотографий для удаления</p>
+		<div class="image-grid">
+			<!--		<input type="hidden" name="jsonData" value="--><?php //= htmlspecialchars($jsonData) ?><!--">-->
+			<?php foreach ($images as $image): ?>
+				<label class="image-item">
+					<input type="checkbox" name="imageIds[]" value="<?= $image->getId() ?>">
+					<img src="<?= $imagesPath . $image->getPath() ?>" alt="Изображение">
+				</label>
+			<?php endforeach; ?>
+		</div>
+<!--		<button class="submit-delete-button" type="submit">Submit</button>-->
+<!--	</form>-->
+</div>
 
-<form action="/deleteImages" method="post">
-	<div class="image-grid">
-<!--		<input type="hidden" name="jsonData" value="--><?php //= htmlspecialchars($jsonData) ?><!--">-->
-		<?php foreach ($images as $image): ?>
-			<label class="image-item">
-				<input type="checkbox" name="imageIds[]" value="<?= $image->getId() ?>">
-				<img src="<?= $imagesPath . $image->getPath() ?>" alt="Изображение">
-			</label>
-		<?php endforeach; ?>
-	</div>
-	<button class="submit-delete-button" type="submit">Submit</button>
-</form>
 
 
 

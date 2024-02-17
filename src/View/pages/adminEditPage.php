@@ -7,39 +7,31 @@ use N_ONE\App\Model\Item;
  * @var Entity $item
  * @var array $statuses
  * @var array $parentTags
- * @var string $additionalSection
+ * @var array $additionalSection
  */
 $fields = array_flip($item->getFieldNames(true));
 $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
 // var_dump($item->getParentId());
 ?>
 <div class="edit-form-container">
-	<form action="" class="edit-form" method="post">
+	<form action="" class="edit-form" method="post" enctype="multipart/form-data">
 		<div class="form-section">
 			<p>ID сущности: <?= $item->getId() ?></p>
-			<?php foreach (
-				$fields
+			<?php foreach ($fields as $field => $value): ?>
 
-				as $field => $value
-			): ?>
-
-				<?php if (
-					in_array($field, ['tags', 'images', 'id', 'dateCreate'])
-				): {
-					continue;
-				} endif ?>
+				<?php if (in_array($field, ['tags', 'images', 'id', 'dateCreate', 'attributes'])): {continue;} endif ?>
 
 				<?php if ($field === 'status'): ?>
 					<label for="<?= $field ?>">
 						<?= $field ?>:
 						<select id="statusSelect" name="<?= $field ?>">
 							<?php foreach ($statuses as $statusId => $status): ?>
-
 								<option value="<?= $statusId ?>"><?= $status ?></option>
 							<?php endforeach; ?>
 						</select>
 					</label>
 					<?php continue; endif; ?>
+
 				<?php if ($field === 'parentId'): ?>
 					<?php if (!$item->getParentId()): ?>
 						<label hidden for="<?= $field ?>">
@@ -56,8 +48,7 @@ $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
 						</label>
 					<?php endif; ?>
 
-					<?php continue;
-				endif; ?>
+					<?php continue; endif; ?>
 				<?php if ($field === 'isActive'): ?>
 					<label class="checkbox-label" for="<?= $field ?>">
 						<?= $field ?>:
@@ -91,7 +82,10 @@ $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
 			<?php endforeach; ?>
 
 		</div>
-		<?php echo $additionalSection ?? '' ?>
+
+		<?php foreach ($additionalSection as $section): ?>
+			<?= $section?>
+		<?php endforeach; ?>
 		<div class="form-section">
 
 			<button class="submit-button" type="submit">Сохранить</button>

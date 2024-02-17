@@ -4,7 +4,10 @@ namespace N_ONE\App\Controller;
 
 use Exception;
 use InvalidArgumentException;
+use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Item;
+use N_ONE\App\Model\Service\ImageService;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Exceptions\LoginException;
 use N_ONE\Core\Exceptions\ValidateException;
@@ -117,9 +120,23 @@ class AdminController extends BaseController
 						'childrenTags' => $childrenTags,
 						'itemTags' => $itemTags,
 					]);
+
+					$images = $this->imageRepository->getList([$itemId]);
+					$addImagesSection = TemplateEngine::render('pages/addImageForm', [
+						'itemId' => $itemId,
+					]);
+					$deleteImagesSection = TemplateEngine::render('pages/deleteImageForm', [
+						'images' => $images[$itemId],
+					]);
+
+
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'item' => $item,
-						'additionalSection' => $tagsSection,
+						'additionalSection' => [
+							$tagsSection,
+							$addImagesSection,
+							$deleteImagesSection
+						],
 					]);
 					break;
 				}
@@ -235,9 +252,14 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
+	/**
+	 * @throws ValidateException
+	 * @throws DatabaseException
+	 */
 	public function updateItem(string $entityType, string $itemId): string
 	{
 		$fields = $_POST;
+
 
 		// foreach ($fields as $field)
 		// {
@@ -260,6 +282,15 @@ class AdminController extends BaseController
 		}
 		if ($entityType === 'items')
 		{
+			// if (($_FILES["image"]))
+			// {
+			// 	$this->addBaseImages($_FILES, $itemId);
+			// }
+			// if ($fields['imageIds'])
+			// {
+			// 	$this->deleteImages($fields['imageIds']);
+			// }
+
 			$tags = [];
 			foreach ($fields as $field => $value)
 			{
@@ -279,6 +310,7 @@ class AdminController extends BaseController
 			}
 			$fields['tags'] = $tags;
 			$fields['images'] = [];
+			$fields['attributes'] = [];
 		}
 		// foreach ($fields as $field => $value)
 		// {
@@ -385,4 +417,60 @@ class AdminController extends BaseController
 
 		return $this->renderAdminView($successDeletePage);
 	}
+
+	/**
+	 * @throws DatabaseException
+	 */
+	public function deleteImages(array $imagesIds): bool
+	{
+		$imagesIds = array_map('intval', $imagesIds);
+		$images = $this->imageRepository->getList($imagesIds, true);
+		$path = ROOT . '/public' . Configurator::option('IMAGES_PATH');
+
+		$this->imageRepository->permanentDeleteByIds($imagesIds);
+
+		foreach ($imagesIds as $id)
+		{
+			unlink($path . $images[$id][0]->getPath());
+		}
+
+		return true;
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws DatabaseException
+	 */
+	public function addBaseImages($files, $itemId): bool
+	{
+		$fileCount = count($files['image']['name']);
+
+		for ($i = 0; $i < $fileCount; $i++)
+		{
+			ValidationService::validateImage($files, $i);
+
+			$targetDir = ROOT . '/public' . Configurator::option('IMAGES_PATH') . "$itemId/"; // директория для сохранения загруженных файлов
+			$targetFile = $targetDir . basename($files["image"]["name"][$i]);
+			$file_extension = pathinfo($files['image']['name'][$i], PATHINFO_EXTENSION);
+
+			$fullSizeImageId = $this->imageRepository->add(new Image(null, $itemId,  false, 1, 1200, 900, $file_extension));
+			$previewImageId = $this->imageRepository->add(new Image(null, $itemId,  false, 2, 640, 480, $file_extension));
+
+			$finalFullSizePath = $targetDir . $fullSizeImageId . "_1200_900_fullsize_base" . ".$file_extension";
+			$finalPreviewPath = $targetDir . $previewImageId . '_640_480_preview_base' . ".$file_extension";
+			// Попытка загрузки файла на сервер
+			if (move_uploaded_file($files["image"]["tmp_name"][$i], $targetFile))
+			{
+				ImageService::resizeImage($targetFile, $finalFullSizePath, 1200, 900);
+				ImageService::resizeImage($targetFile, $finalPreviewPath, 640, 480);
+				unlink($targetFile);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 }
