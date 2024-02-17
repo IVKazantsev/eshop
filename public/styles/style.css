@@ -101,6 +101,7 @@ img {
 	border-top: none;
 	border-bottom-left-radius: 7px;
 	border-bottom-right-radius: 7px;
+	padding-bottom: 25px;
 }
 .child-tags {
 	padding-left: 30px;
@@ -283,6 +284,21 @@ footer {
 .tag-link:visited {
 	color: #000;
 }
+
+/* для dual range slider */
+
+.num-input {
+	display: flex;
+}
+.field input {
+	width: 70%;
+	margin-left: 10px;
+	text-align: center;
+}
+
+
+
+
 
 
 

@@ -8,21 +8,20 @@ use N_ONE\Core\Exceptions\DatabaseException;
 
 class ImageRepository extends Repository
 {
-
 	/**
 	 * @throws DatabaseException
 	 */
-	public function getList(array $filter = null): array
+	public function getList(array $filter = null, bool $isImageId = null): array
 	{
 		$images = [];
 		$connection = $this->dbConnection->getConnection();
-
+		$field = ($isImageId === null) ? 'item_id' : 'id';
 		$result = mysqli_query(
 			$connection,
 			"
 		SELECT id, item_id, height, width, is_main, type, extension
 		FROM N_ONE_IMAGES
-		WHERE item_id IN (" . implode(',', $filter) . ");
+		WHERE $field IN (" . implode(',', $filter) . ");
 		"
 		);
 
@@ -33,7 +32,7 @@ class ImageRepository extends Repository
 
 		while ($row = mysqli_fetch_assoc($result))
 		{
-			$images[$row['item_id']][] = new Image(
+			$images[$row[$field]][] = new Image(
 				$row['id'],
 				$row['item_id'],
 				$row['is_main'],
@@ -156,4 +155,21 @@ class ImageRepository extends Repository
 
 		return true;
 	}
+	public function permanentDeleteByIds(array $entityId): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+
+		$result = mysqli_query(
+			$connection,
+			"DELETE FROM N_ONE_IMAGES WHERE ID IN (" . implode(',', $entityId) . ");"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		return true;
+	}
+
 }

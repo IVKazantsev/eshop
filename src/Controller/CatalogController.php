@@ -9,7 +9,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(?int $pageNumber, ?string $carsTag, ?string $SearchRequest): string
+	public function renderCatalog(?int $pageNumber, ?string $carsTag, ?string $SearchRequest, ?string $range): string
 	{
 		try
 		{
@@ -17,17 +17,19 @@ class CatalogController extends BaseController
 				'tag' => $carsTag,
 				'title' => $SearchRequest,
 				'pageNumber' => $pageNumber,
+				'range' => $range,
 			];
 
 			$items = $this->itemRepository->getList($filter);
+			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
+			$nextPageUri = PaginationService::getNextPageUri(count($cars), $pageNumber);
+
 			if (empty($items))
 			{
 				$content = TemplateEngine::renderPublicError(':(', 'Товары не найдены');
 
 				return $this->renderPublicView($content, $SearchRequest);
 			}
-			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
-			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber);
 
 			if (count($items) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
 			{

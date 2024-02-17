@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Model;
 
+use Exception;
 use RuntimeException;
 
 class Item extends Entity
@@ -9,6 +10,7 @@ class Item extends Entity
 	/**
 	 * @param Tag[] $tags
 	 * @param Image[] $images
+	 * @param Attribute[] $attributes
 	 */
 	public function __construct(
 		protected int|null $id,
@@ -18,9 +20,20 @@ class Item extends Entity
 		private string     $description,
 		private int        $sortOrder,
 		private array      $tags,
+		private array      $attributes,
 		private array      $images,
 	)
 	{
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+
+	public function setAttributes(array $attributes): void
+	{
+		$this->attributes = $attributes;
 	}
 
 	public function getPreviewImage(): Image
@@ -32,7 +45,14 @@ class Item extends Entity
 				return $image;
 			}
 		}
-		throw new RuntimeException("Preview image for Item with id {$this->getId()} not found");
+		foreach ($this->images as $image)
+		{
+			if ($image->getType() === 2)
+			{
+				return $image;
+			}
+		}
+		throw new Exception("Preview image for Item with id {$this->getId()} not found");
 	}
 
 	public function getFullSizeImages(): array
@@ -47,7 +67,7 @@ class Item extends Entity
 		}
 		if (empty($images))
 		{
-			throw new RuntimeException("FullSize image for Item with id {$this->getId()} not found");
+			throw new Exception("FullSize image for Item with id {$this->getId()} not found");
 		}
 
 		return $images;
@@ -55,7 +75,7 @@ class Item extends Entity
 
 	public function getExcludedFields(): array
 	{
-		return ['isActive', 'tags', 'images'];
+		return ['isActive', 'tags', 'images', 'attributes'];
 	}
 
 	public function getClassname(): string

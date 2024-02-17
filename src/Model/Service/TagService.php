@@ -35,4 +35,38 @@ class TagService
 
 		return $groupedTags;
 	}
+
+	public static function reformatRangeTag(string $range)
+	{
+		$parts = explode(":", $range);
+
+		// Проверка корректности формата
+		if (count($parts) == 2)
+		{
+			// Извлечение переменных
+			$idVar = (int)$parts[0];
+			$intVars = explode(",", $parts[1]);
+
+			// Проверка корректности формата для целых чисел
+			if (count($intVars) == 2)
+			{
+				// Извлечение целых чисел
+				$intVar1 = (int)$intVars[0];
+				$intVar2 = (int)$intVars[1];
+
+				// Возвращение массива значений
+				return array($idVar, $intVar1, $intVar2);
+			}
+			else
+			{
+				// Некорректный формат для целых чисел
+				return array(null, null, null);
+			}
+		}
+		else
+		{
+			// Некорректный формат для диапазона
+			return array(null, null, null);
+		}
+	}
 }

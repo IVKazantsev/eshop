@@ -33,7 +33,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID'], null,
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID']
 			);
 		}
 
@@ -86,7 +88,7 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID, it.VALUE
+		SELECT t.ID, t.TITLE, t.PARENT_ID
 		FROM N_ONE_TAGS t
 		LEFT JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE t.ID = $id;
@@ -102,7 +104,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID'], $row['VALUE']
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID']
 			);
 		}
 
@@ -120,9 +124,8 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID, it.VALUE
+		SELECT t.ID, t.TITLE, t.PARENT_ID
 		FROM N_ONE_TAGS t
-		join bitcar.N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE t.TITLE = '$title'
 		"
 		);
@@ -136,7 +139,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID'], $row['VALUE']
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID']
 			);
 		}
 
@@ -152,7 +157,7 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT it.ITEM_ID, t.ID, t.TITLE, t.PARENT_ID, it.VALUE
+		SELECT it.ITEM_ID, t.ID, t.TITLE, t.PARENT_ID
 		FROM N_ONE_TAGS t 
 		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE it.ITEM_ID IN ($itemsIdsString);
@@ -167,7 +172,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID'], $row['VALUE']
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID'],
 			);
 		}
 

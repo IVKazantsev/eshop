@@ -4,12 +4,15 @@
  * @var array $cars
  * @var string $content
  * @var Tag[] $tags
+ * @var Attribute[] $attributes
  * @var string $currentSearchRequest
  */
 
 use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\Tag;
+use N_ONE\App\Model\Attribute;
 use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
@@ -38,22 +41,26 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 
 			<ul class="tags">
 				<?php foreach ($tags[""] as $parentTag): ?>
-					<li class="tag-item"><?= $parentTag->getTitle() ?></li>
+					<li class="tag-item">
+						<?= $parentTag->getTitle() ?>
+					</li>
 					<ul class="child-tags">
-						<?php if (empty($tags[$parentTag->getId()])): ?>
-
-						<?php else: ?>
-							<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
-								<li class="tag-item">
-									<a
-										class="tag-link"
-										href="<?= '/?tag=' . $childTag->getTitle() ?>">
-										<?= $childTag->getTitle() ?>
-									</a>
-								</li>
-							<?php endforeach; ?>
-						<?php endif; ?>
+						<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
+							<li class="tag-item">
+								<a
+									class="tag-link"
+									href="<?= '/?tag=' . $childTag->getTitle() ?>"
+								>
+									<?= $childTag->getTitle() ?>
+								</a>
+							</li>
+						<?php endforeach; ?>
 					</ul>
+				<?php endforeach; ?>
+				<?php foreach ($attributes as $attribute): ?>
+					<li class="tag-item">
+						<?= $attribute->getTitle() ?>
+					</li>
 				<?php endforeach; ?>
 			</ul>
 

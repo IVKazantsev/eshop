@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Controller;
 
+use N_ONE\App\Model\Repository\AttributeRepository;
 use N_ONE\App\Model\Repository\ImageRepository;
 use N_ONE\App\Model\Repository\ItemRepository;
 use N_ONE\App\Model\Repository\OrderRepository;
@@ -15,6 +16,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 abstract class BaseController
 {
 	public function __construct(
+
 		protected TagRepository     $tagRepository,
 		protected ImageRepository   $imageRepository,
 		protected ItemRepository    $itemRepository,
@@ -30,6 +32,7 @@ abstract class BaseController
 		try
 		{
 			$tags = TagService::reformatTags($this->tagRepository->getList());
+			$attributes = $this->attributeRepository->getList();
 		}
 		catch (DatabaseException)
 		{
@@ -38,6 +41,7 @@ abstract class BaseController
 
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
+			'attributes' =>$attributes,
 			'content' => $content,
 			'currentSearchRequest' => $currentSearchRequest,
 		]);

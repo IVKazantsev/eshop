@@ -59,29 +59,31 @@ class ValidationService
 		return htmlspecialchars($value, ENT_QUOTES);
 	}
 
+
 	/**
 	 * @throws ValidateException
 	 * @throws Exception
 	 */
-	public static function validateImage($image): bool
+	public static function validateImage($image, int $i = 0): bool
 	{
 		$allowed_formats = ["jpg", "png", "jpeg",];
 		$allowed_mime_types = ['image/jpeg', 'image/png', 'image/jpg'];// Разрешенные форматы файлов
-		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"]), PATHINFO_EXTENSION));
+		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]),PATHINFO_EXTENSION));
 
 		// Проверка наличия файла
 		if (isset($image["image"]))
 		{
+
 			throw new FileException("image $image");
 		}
 
-		if (!getimagesize($image["image"]["tmp_name"]))
+		if (!getimagesize($image["image"]["tmp_name"][$i]))
 		{
 			throw new Exception();
 		}
 
 		// Проверка размера файла
-		if ($image["image"]["size"] > 500000)
+		if ($image["image"]["size"][$i] > 500000)
 		{
 			throw new ValidateException("image $image");
 		}
@@ -91,7 +93,7 @@ class ValidationService
 			throw new ValidateException("image $image");
 		}
 
-		$file_info = @getimagesize($image["image"]["tmp_name"]);
+		$file_info = @getimagesize($image["image"]["tmp_name"][$i]);
 		if ($file_info === false)
 		{
 			// Файл не является изображением

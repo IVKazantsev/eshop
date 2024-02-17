@@ -24,6 +24,7 @@ $priceString = PriceFormatService::formatPrice($car->getPrice())
 			<p class="car-year">2024</p>
 			<?= TemplateEngine::render('components/tags', [
 				'tags' => $car->getTags(),
+				'attributes' => $car->getAttributes(),
 			]) ?>
 			<p class="price"><?= $priceString ?> </p>
 		</div>
