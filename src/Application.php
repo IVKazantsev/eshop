@@ -28,17 +28,12 @@ class Application
 		if (!$route)
 		{
 			http_response_code(404);
-			echo(TemplateEngine::renderError(404, "Page not found"));
+			echo(TemplateEngine::renderAdminError(404, "Page not found"));
 			exit;
 		}
 		$action = $route->action;
 		$variables = $route->getVariables();
 		echo $action(...$variables);
-	}
-
-	private static function setDI($di): void
-	{
-		self::$di = $di;
 	}
 
 	public static function getDI(): DependencyInjection
@@ -51,5 +46,10 @@ class Application
 		}
 
 		return self::$di;
+	}
+
+	private static function setDI($di): void
+	{
+		self::$di = $di;
 	}
 }

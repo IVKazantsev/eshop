@@ -5,12 +5,13 @@ namespace N_ONE\App\Model;
 class Tag extends Entity
 {
 	public function __construct(
-		protected int|null $id,
-		private string     $title,
-		private int|null   $parentId,
-		private int|null   $value
+		protected int|null      $id,
+		private string          $title,
+		private int|null        $parentId,
+		private int|string|null $value
 	)
-	{}
+	{
+	}
 
 	public function getValue(): ?int
 	{

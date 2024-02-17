@@ -16,10 +16,12 @@ class Item extends Entity
 		private bool       $isActive,
 		private int        $price,
 		private string     $description,
+		private int        $sortOrder,
 		private array      $tags,
 		private array      $images,
-		private int        $sortOrder = 0
-	){}
+	)
+	{
+	}
 
 	public function getPreviewImage(): Image
 	{

@@ -5,79 +5,98 @@ use N_ONE\App\Model\Item;
 
 /**
  * @var Entity $item
+ * @var array $statuses
+ * @var array $parentTags
+ * @var string $additionalSection
  */
 $fields = array_flip($item->getFieldNames(true));
-// var_dump($item->getField('tags')[0]->getTitle());
+$scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
+// var_dump($item->getParentId());
 ?>
 <div class="edit-form-container">
 	<form action="" class="edit-form" method="post">
 		<div class="form-section">
 			<p>ID сущности: <?= $item->getId() ?></p>
-			<?php foreach ($fields as $field => $value): ?>
-				<?php if ($field === 'tags' || $field === 'images' || $field === 'id' || $field === 'dateCreate'): {
+			<?php foreach (
+				$fields
+
+				as $field => $value
+			): ?>
+
+				<?php if (
+					in_array($field, ['tags', 'images', 'id', 'dateCreate'])
+				): {
 					continue;
 				} endif ?>
+
+				<?php if ($field === 'status'): ?>
+					<label for="<?= $field ?>">
+						<?= $field ?>:
+						<select id="statusSelect" name="<?= $field ?>">
+							<?php foreach ($statuses as $statusId => $status): ?>
+
+								<option value="<?= $statusId ?>"><?= $status ?></option>
+							<?php endforeach; ?>
+						</select>
+					</label>
+					<?php continue; endif; ?>
+				<?php if ($field === 'parentId'): ?>
+					<?php if (!$item->getParentId()): ?>
+						<label hidden for="<?= $field ?>">
+							<input type="hidden" name="<?= $field ?>" value="">
+						</label>
+					<?php else: ?>
+						<label for="<?= $field ?>">
+							<?= $field ?>:
+							<select id="statusSelect" name="<?= $field ?>">
+								<?php foreach ($parentTags as $parentTag): ?>
+									<option value="<?= $parentTag->getId() ?>"><?= $parentTag->getTitle() ?></option>
+								<?php endforeach; ?>
+							</select>
+						</label>
+					<?php endif; ?>
+
+					<?php continue;
+				endif; ?>
+				<?php if ($field === 'isActive'): ?>
+					<label class="checkbox-label" for="<?= $field ?>">
+						<?= $field ?>:
+						<input type="hidden"
+							   name="<?= $field ?>"
+							   value="0"
+						/>
+						<input id="<?= $field ?>"
+							   type="checkbox"
+							   name="<?= $field ?>"
+							   value="1"
+							<?= $item->getField($field) ? 'checked' : '' ?>
+						/>
+					</label>
+					<?php continue; endif; ?>
+
+
+				<?php if ($field === 'statusId'): ?>
+					<label for="<?= $field ?>">
+						<?= $field ?>:
+						<input readonly id="<?= $field ?>" type="text" name="<?= $field ?>" value="<?= $item->getField(
+							$field
+						) ?>">
+					</label>
+					<?php continue; endif; ?>
 				<label for="<?= $field ?>">
 					<?= $field ?>:
-					<input type="text" name="<?= $field ?>" value="<?= $item->getField($field) ?>">
+					<input id="<?= $field ?>" type="text" name="<?= $field ?>" value="<?= $item->getField($field) ?>">
 				</label>
-			<?php endforeach; ?>
-		</div>
-		<div class="form-section">
-			<?php if ($item instanceof Item): ?>
-				<p>Теги:</p>
-				<div class="tag-group">
-					<p>Тип привода:</p>
-					<label for="drive-type">
-						<input type="radio" name="drive-type" value="Передний">
-						Передний
-					</label>
-					<label for="drive-type">
-						<input type="radio" name="drive-type" value="Задний">
-						Задний
-					</label>
-					<label for="drive-type">
-						<input type="radio" name="drive-type" value="Полный">
-						Полный
-					</label>
-				</div>
-				<div class="tag-group">
-					<p>Коробка передач:</p>
-					<label for="transmission-type">
-						<input type="radio" name="transmission-type" value="МКПП">
-						МКПП
-					</label>
-					<label for="transmission-type">
-						<input type="radio" name="transmission-type" value="АКПП">
-						АКПП
-					</label>
-				</div>
-				<div class="tag-group">
-					<p>Тип топлива:</p>
-					<label for="fuel-type">
-						<input type="radio" name="fuel-type" value="Бензин">
-						Бензин
-					</label>
-					<label for="fuel-type">
-						<input type="radio" name="fuel-type" value="Дизель">
-						Дизель
-					</label>
-				</div>
 
-				<div class="tag-group">
-					<p>Тип двигателя:</p>
-					<label for="engine-type">
-						<input type="radio" name="engine-type" value="Турбированный">
-						Турбированный
-					</label>
-					<label for="engine-type">
-						<input type="radio" name="engine-type" value="Атмосферный">
-						Атмосферный
-					</label>
-				</div>
-			<?php endif; ?>
+			<?php endforeach; ?>
+
+		</div>
+		<?php echo $additionalSection ?? '' ?>
+		<div class="form-section">
+
 			<button class="submit-button" type="submit">Сохранить</button>
 
 		</div>
 	</form>
 </div>
+<script src='/js/statusChange.js'></script>
