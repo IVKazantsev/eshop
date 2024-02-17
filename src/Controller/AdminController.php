@@ -4,6 +4,7 @@ namespace N_ONE\App\Controller;
 
 use Exception;
 use InvalidArgumentException;
+use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Item;
 use N_ONE\App\Model\Service\ImageService;
@@ -102,6 +103,8 @@ class AdminController extends BaseController
 				case Item::class:
 				{
 					$parentTags = $this->tagRepository->getParentTags();
+					$attributes = $this->attributeRepository->getList();
+					$itemAttributes = $item->getAttributes();
 					$itemTags = [];
 					$childrenTags = [];
 					foreach ($parentTags as $parentTag)
@@ -120,6 +123,10 @@ class AdminController extends BaseController
 						'childrenTags' => $childrenTags,
 						'itemTags' => $itemTags,
 					]);
+					$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
+						'attributes' => $attributes,
+						'itemAttributes' => $itemAttributes,
+					]);
 
 					$images = $this->imageRepository->getList([$itemId]);
 					$addImagesSection = TemplateEngine::render('pages/addImageForm', [
@@ -129,14 +136,16 @@ class AdminController extends BaseController
 						'images' => $images[$itemId],
 					]);
 
+					$additionalSections = [
+						$tagsSection,
+						$attributesSection,
+						$addImagesSection,
+						$deleteImagesSection,
+					];
 
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'item' => $item,
-						'additionalSection' => [
-							$tagsSection,
-							$addImagesSection,
-							$deleteImagesSection
-						],
+						'additionalSections' => $additionalSections,
 					]);
 					break;
 				}
@@ -150,6 +159,7 @@ class AdminController extends BaseController
 					break;
 
 				}
+				case Attribute::class:
 				case User::class:
 				{
 					$content = TemplateEngine::render('pages/adminEditPage', [
@@ -260,7 +270,6 @@ class AdminController extends BaseController
 	{
 		$fields = $_POST;
 
-
 		// foreach ($fields as $field)
 		// {
 		// 	$fields[$field] = ValidationService::validateEntryField($field);
@@ -272,7 +281,7 @@ class AdminController extends BaseController
 		{
 			foreach ($fields as $field => $value)
 			{
-				if (($field === 'value' || $field === 'parentId') && $value === '')
+				if ($field === 'parentId' && $value === '')
 				{
 					$fields[$field] = null;
 					continue;
@@ -280,18 +289,17 @@ class AdminController extends BaseController
 				$fields[$field] = ValidationService::validateEntryField($value);
 			}
 		}
+		if ($entityType === 'attributes')
+		{
+			$fields['value'] = null;
+			foreach ($fields as $field => $value)
+			{
+				// $fields[$field] = ValidationService::validateEntryField($value);
+			}
+		}
 		if ($entityType === 'items')
 		{
-			// if (($_FILES["image"]))
-			// {
-			// 	$this->addBaseImages($_FILES, $itemId);
-			// }
-			// if ($fields['imageIds'])
-			// {
-			// 	$this->deleteImages($fields['imageIds']);
-			// }
-
-			$tags = [];
+			// $tags = [];
 			foreach ($fields as $field => $value)
 			{
 				if (
@@ -301,16 +309,9 @@ class AdminController extends BaseController
 				{
 					continue;
 				}
-				if (is_numeric($field))
-				{
-					$tags[] = new Tag($value, '', $field, null);
-					unset($fields[$field]);
-				}
-
 			}
-			$fields['tags'] = $tags;
+			// $fields['tags'] = $tags;
 			$fields['images'] = [];
-			$fields['attributes'] = [];
 		}
 		// foreach ($fields as $field => $value)
 		// {

@@ -7,11 +7,11 @@ use N_ONE\App\Model\Item;
  * @var Entity $item
  * @var array $statuses
  * @var array $parentTags
- * @var array $additionalSection
+ * @var array $additionalSections
  */
 $fields = array_flip($item->getFieldNames(true));
 $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
-// var_dump($item->getParentId());
+
 ?>
 <div class="edit-form-container">
 	<form action="" class="edit-form" method="post" enctype="multipart/form-data">
@@ -82,10 +82,18 @@ $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
 			<?php endforeach; ?>
 
 		</div>
-
-		<?php foreach ($additionalSection as $section): ?>
-			<?= $section?>
-		<?php endforeach; ?>
+		<?php if (!empty($additionalSections))
+		{
+			foreach ($additionalSections as $section)
+			{
+				echo $section;
+			}
+		}
+		else
+		{
+			echo '';
+		}
+		?>
 		<div class="form-section">
 
 			<button class="submit-button" type="submit">Сохранить</button>

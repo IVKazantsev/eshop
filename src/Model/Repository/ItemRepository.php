@@ -14,9 +14,9 @@ class ItemRepository extends Repository
 {
 
 	public function __construct(
-		DbConnector                      $dbConnection,
-		private readonly TagRepository   $tagRepository,
-		private readonly ImageRepository $imageRepository,
+		DbConnector                          $dbConnection,
+		private readonly TagRepository       $tagRepository,
+		private readonly ImageRepository     $imageRepository,
 		private readonly AttributeRepository $attributeRepository
 	)
 	{
@@ -141,7 +141,7 @@ class ItemRepository extends Repository
 		$whereQueryBlock = "WHERE i.IS_ACTIVE = 1";
 		if ($range !== null)
 		{
-			list($attributeId, $from, $to) = TagService::reformatRangeTag($range);
+			[$attributeId, $from, $to] = TagService::reformatRangeTag($range);
 			$whereQueryBlock = "
 			JOIN N_ONE_ITEMS_ATTRIBUTES ia on i.ID = ia.ITEM_ID
 			WHERE ia.ATTRIBUTE_ID = $attributeId and (ia.VALUE BETWEEN $from and $to) and i.IS_ACTIVE = 1
@@ -296,7 +296,7 @@ class ItemRepository extends Repository
 		$description = mysqli_real_escape_string($connection, $entity->getDescription());
 		$sortOrder = $entity->getSortOrder();
 		$tags = $entity->getTags();
-
+		$attributes = $entity->getAttributes();
 		$result = mysqli_query(
 			$connection,
 			"
@@ -314,6 +314,14 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
+		$this->updateItemTags($connection, $itemId, $tags);
+		$this->updateItemAttributes($connection, $itemId, $attributes);
+
+		return true;
+	}
+
+	private function updateItemTags(bool|mysqli $connection, int $itemId, array $tags): void
+	{
 		$result = mysqli_query(
 			$connection,
 			"
@@ -324,13 +332,14 @@ class ItemRepository extends Repository
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
-
+		// var_dump($tags);
 		$itemTags = "";
 		foreach ($tags as $tag)
 		{
-
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
+			// var_dump($tag);
+			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag . '),';
 		}
+		// exit();
 		$itemTags = substr($itemTags, 0, -1);
 
 		$sql = "INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";";
@@ -340,7 +349,37 @@ class ItemRepository extends Repository
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
+	}
 
-		return true;
+	private function updateItemAttributes(bool|mysqli $connection, int $itemId, array $attributes): void
+	{
+		$result = mysqli_query(
+			$connection,
+			"
+			DELETE FROM N_ONE_ITEMS_ATTRIBUTES WHERE ITEM_ID = {$itemId}"
+		);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+		$itemAttributes = "";
+		foreach ($attributes as $attributeId => $attribute)
+		{
+			if (!trim($attribute))
+			{
+				$attribute = 'null';
+			}
+			$itemAttributes = $itemAttributes . '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
+		}
+		$itemAttributes = substr($itemAttributes, 0, -1);
+		var_dump($itemAttributes);
+		$sql = "INSERT INTO N_ONE_ITEMS_ATTRIBUTES (ITEM_ID, ATTRIBUTE_ID, VALUE) VALUES " . $itemAttributes . ";";
+		$result = mysqli_query($connection, $sql);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
 	}
 }

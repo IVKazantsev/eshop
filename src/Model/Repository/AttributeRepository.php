@@ -30,9 +30,7 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attributes[] = new Attribute(
-				$row['ID'],
-				$row['TITLE'],
-				null
+				$row['ID'], $row['TITLE'], null
 			);
 		}
 
@@ -44,40 +42,6 @@ class AttributeRepository extends Repository
 		return $attributes;
 	}
 
-
-	// public function getById(int $id): Tag
-	// {
-	// 	$connection = $this->dbConnection->getConnection();
-	//
-	// 	$result = mysqli_query(
-	// 		$connection,
-	// 		"
-	// 	SELECT t.ID, t.TITLE
-	// 	FROM N_ONE_TAGS t
-	// 	WHERE t.ID = $id;
-	// 	"
-	// 	);
-	//
-	// 	if (!$result)
-	// 	{
-	// 		throw new RuntimeException(mysqli_error($connection));
-	// 	}
-	//
-	// 	$tag = null;
-	// 	while ($row = mysqli_fetch_assoc($result))
-	// 	{
-	// 		$tag = new Tag(
-	// 			$row['ID'], $row['TITLE'],
-	// 		);
-	// 	}
-	//
-	// 	if ($tag === null)
-	// 	{
-	// 		throw new RuntimeException("Item with id $id not found");
-	// 	}
-	//
-	// 	return $tag;
-	// }
 	public function getById(int $id): Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -100,9 +64,7 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attribute = new Attribute(
-				$row['ID'],
-				$row['TITLE'],
-				null
+				$row['ID'], $row['TITLE'], null
 			);
 		}
 
@@ -137,9 +99,7 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attribute = new Attribute(
-				$row['ID'],
-				$row['TITLE'],
-				null
+				$row['ID'], $row['TITLE'], null
 			);
 		}
 
@@ -154,34 +114,7 @@ class AttributeRepository extends Repository
 	/**
 	 * @param int[] $itemsIds
 	 */
-	// public function getByItemsIds(array $itemsIds): array
-	// {
-	// 	$connection = $this->dbConnection->getConnection();
-	// 	$itemsIdsString = implode(',', $itemsIds);
-	// 	$tags = [];
-	//
-	// 	$result = mysqli_query(
-	// 		$connection,
-	// 		"
-	// 	SELECT it.ITEM_ID, t.TITLE
-	// 	FROM N_ONE_TAGS t
-	// 	JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-	// 	WHERE it.ITEM_ID IN ($itemsIdsString);
-	// "
-	// 	);
-	//
-	// 	if (!$result)
-	// 	{
-	// 		throw new RuntimeException(mysqli_error($connection));
-	// 	}
-	//
-	// 	while ($row = mysqli_fetch_assoc($result))
-	// 	{
-	// 		$tags[$row['ITEM_ID']][] = new Tag($row['ID'], $row['TITLE'],);
-	// 	}
-	//
-	// 	return $tags;
-	// }
+
 	public function getByItemsIds(array $itemsIds): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -206,19 +139,18 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attributes[$row['ITEM_ID']][] = new Attribute(
-				$row['ID'],
-				$row['TITLE'],
-				$row['VALUE'],
+				$row['ID'], $row['TITLE'], $row['VALUE'],
 			);
 		}
 
-		if(empty($attributes))
+		if (empty($attributes))
 		{
 			foreach ($itemsIds as $itemsId)
 			{
 				$attributes[$itemsId] = [];
 			}
 		}
+
 		return $attributes;
 	}
 
@@ -256,7 +188,7 @@ class AttributeRepository extends Repository
 			$connection,
 			"
 			UPDATE N_ONE_ATTRIBUTES 
-			SET TITLE = '$title',
+			SET TITLE = '$title'
 			WHERE ID = $attributeId
 			"
 		);

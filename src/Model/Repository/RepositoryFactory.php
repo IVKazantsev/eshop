@@ -16,6 +16,7 @@ class RepositoryFactory
 			'tags' => TagRepository::class,
 			'orders' => OrderRepository::class,
 			'users' => UserRepository::class,
+			'attributes' => AttributeRepository::class,
 		];
 	}
 

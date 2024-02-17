@@ -405,6 +405,7 @@ td {
 .image-item input[type="checkbox"]:checked + img {
 	border-color: blue; /* Пример стиля рамки при выборе изображения */
 }
+
 .submit-delete-button {
 	margin-left: 20px;
 }
@@ -415,3 +416,22 @@ td {
 	justify-content: flex-start;
 	margin-bottom: 12px;
 }
+
+.attribute {
+	display: flex;
+	/*justify-content: center;*/
+	/*flex-direction: column;*/
+	align-items: center;
+}
+
+/*.attribute-input {*/
+/*	height: 10px;*/
+/*}*/
+
+/*.attribute-container {*/
+/*	display: grid;*/
+/*	grid-template-columns: 150px 1fr;*/
+
+/*	!*grid-template-rows: 1fr;*!*/
+
+/*}*/

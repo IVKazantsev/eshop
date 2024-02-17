@@ -39,6 +39,7 @@ $iconsPath = Configurator\Configurator::option('ICONS_PATH');
 				<li class="tag-item"><a class="tag-link" href="/admin/tags">Теги</a></li>
 				<li class="tag-item"><a class="tag-link" href="/admin/orders">Заказы</a></li>
 				<li class="tag-item"><a class="tag-link" href="/admin/users">Пользователи</a></li>
+				<li class="tag-item"><a class="tag-link" href="/admin/attributes">Аттрибуты</a></li>
 			</ul>
 		</div>
 	</div>
