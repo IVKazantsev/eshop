@@ -24,5 +24,9 @@ return [
 	'HOST_NAME' => $_SERVER['HTTP_HOST'],
 
 	'ORDER_HASH_PREFIX' => 'BITCAR_ORD',
-	'ORDER_HASH_ALGO' => 'crc32'
+	'ORDER_HASH_ALGO' => 'crc32',
+	'SCRIPTS_PATH' => ROOT . '/js/',
+
+	'PUBLIC_ERROR_PAGE' => 'pages/publicErrorPage',
+	'ADMIN_ERROR_PAGE' => 'pages/adminErrorPage',
 ];

@@ -3,7 +3,6 @@
 namespace N_ONE\App\Model;
 
 use ReflectionClass;
-use ReflectionProperty;
 
 abstract class Entity
 {

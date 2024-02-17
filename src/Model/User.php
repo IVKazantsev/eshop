@@ -21,7 +21,7 @@ class User extends Entity
 		return ['pass'];
 	}
 
-	public function getClassname()
+	public function getClassname(): string
 	{
 		$array = explode('\\', __CLASS__);
 

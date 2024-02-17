@@ -2,7 +2,7 @@
 
 namespace N_ONE\Core\DependencyInjection;
 
-use Exception;
+use http\Exception\InvalidArgumentException;
 use ReflectionClass;
 
 class DependencyInjection
@@ -65,9 +65,6 @@ class DependencyInjection
 		}
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public function getComponent(string $serviceName)
 	{
 		if ($this->components[$serviceName])
@@ -75,7 +72,7 @@ class DependencyInjection
 			return $this->components[$serviceName]();
 		}
 
-		throw new Exception('Service is not found');
+		throw new InvalidArgumentException("There is no service $serviceName");
 
 	}
 }

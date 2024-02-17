@@ -4,11 +4,13 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
-use RuntimeException;
+use N_ONE\Core\Exceptions\DatabaseException;
 
 class ImageRepository extends Repository
 {
-
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null, bool $isImageId = null): array
 	{
 		$images = [];
@@ -25,7 +27,7 @@ class ImageRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -41,15 +43,13 @@ class ImageRepository extends Repository
 			);
 		}
 
-		if (empty($images))
-		{
-			throw new RuntimeException("Items not found");
-		}
-
 		return $images;
 	}
 
-	public function getById(int $id): Image
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getById(int $id): Image|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -64,7 +64,7 @@ class ImageRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$image = null;
@@ -81,13 +81,12 @@ class ImageRepository extends Repository
 			);
 		}
 
-		if ($image === null)
-		{
-			throw new RuntimeException("Item with id $id not found");
-		}
-
 		return $image;
 	}
+
+	/**
+	 * @throws DatabaseException
+	 */
 	public function add(Image|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -107,18 +106,22 @@ class ImageRepository extends Repository
 			$height,
 			$width,
 			$isMain,
-			{$type},
+			$type,
 			'$extension'
 		);"
 		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return mysqli_insert_id($connection);
 	}
+
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Image|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -139,7 +142,7 @@ class ImageRepository extends Repository
 			HEIGHT = $height,
 			WIDTH = $width,
 			IS_MAIN = $isMain,
-			TYPE = {$type},
+			TYPE = $type,
 			EXTENSION = '$extension'
 		where ID = $imageId;
 		"
@@ -147,7 +150,7 @@ class ImageRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

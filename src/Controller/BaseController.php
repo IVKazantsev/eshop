@@ -10,24 +10,35 @@ use N_ONE\App\Model\Repository\RepositoryFactory;
 use N_ONE\App\Model\Repository\TagRepository;
 use N_ONE\App\Model\Repository\UserRepository;
 use N_ONE\App\Model\Service\TagService;
+use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 abstract class BaseController
 {
 	public function __construct(
-		protected TagRepository       $tagRepository,
-		protected ImageRepository     $imageRepository,
-		protected ItemRepository      $itemRepository,
-		protected UserRepository      $userRepository,
-		protected OrderRepository     $orderRepository,
-		protected AttributeRepository $attributeRepository,
-		protected RepositoryFactory   $repositoryFactory
-	){}
+
+		protected TagRepository     $tagRepository,
+		protected ImageRepository   $imageRepository,
+		protected ItemRepository    $itemRepository,
+		protected UserRepository    $userRepository,
+		protected OrderRepository   $orderRepository,
+		protected RepositoryFactory $repositoryFactory
+	)
+	{
+	}
 
 	public function renderPublicView($content, string $currentSearchRequest = null): string
 	{
-		$tags = TagService::reformatTags($this->tagRepository->getList());
-		$attributes = $this->attributeRepository->getList();
+		try
+		{
+			$tags = TagService::reformatTags($this->tagRepository->getList());
+			$attributes = $this->attributeRepository->getList();
+		}
+		catch (DatabaseException)
+		{
+			return TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
+		}
+
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
 			'attributes' =>$attributes,
@@ -38,11 +49,19 @@ abstract class BaseController
 
 	public function renderAdminView($content): string
 	{
-		if (session_status() == PHP_SESSION_NONE)
+		if (session_status() === PHP_SESSION_NONE)
 		{
 			session_start();
 		}
-		$user = $this->userRepository->getById($_SESSION['user_id']);
+
+		try
+		{
+			$user = $this->userRepository->getById($_SESSION['user_id']);
+		}
+		catch (DatabaseException)
+		{
+			return TemplateEngine::renderAdminError(';(', "Что-то пошло не так");
+		}
 
 		return TemplateEngine::render('layouts/adminLayout', [
 			'user' => $user,

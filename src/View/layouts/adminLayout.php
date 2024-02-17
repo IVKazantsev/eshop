@@ -19,7 +19,7 @@ $iconsPath = Configurator\Configurator::option('ICONS_PATH');
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link rel="stylesheet" href="/styles/reset.css">
 	<link rel="stylesheet" href="/styles/adminStyle.css">
-	<title>Document</title>
+	<title>eshop | admin</title>
 </head>
 <body>
 <div class="container">

@@ -2,7 +2,7 @@
 
 namespace N_ONE\Core\Routing;
 
-use Exception;
+use http\Exception\InvalidArgumentException;
 use N_ONE\Core\Configurator\Configurator;
 
 class Router
@@ -39,11 +39,11 @@ class Router
 			{
 				return $action($route);
 			}
-			throw new Exception("Route not found");
+			throw new InvalidArgumentException("There is no route ");
 		});
 	}
 
-	public static function find(string $method, string $uri)
+	public static function find(string $method, string $uri): Route|null
 	{
 		[$path] = explode('?', $uri);
 		foreach (self::$routes as $route)

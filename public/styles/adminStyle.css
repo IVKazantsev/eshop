@@ -250,12 +250,20 @@ td {
 
 /* Input field styles */
 .form-section input[type="text"],
-.form-section textarea {
+	/*.form-section input[type="checkbox"],*/
+.form-section textarea,
+.form-section select {
+	display: block;
 	width: 100%; /* Full width of the parent section */
 	padding: 10px;
 	margin-bottom: 10px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
+}
+
+{
+	display: block
+;
 }
 
 /* Radio button group styles */
@@ -391,5 +399,9 @@ td {
 	margin-left: 20px;
 }
 
-
-
+/* что то от Леши */
+.checkbox-label {
+	display: flex;
+	justify-content: flex-start;
+	margin-bottom: 12px;
+}

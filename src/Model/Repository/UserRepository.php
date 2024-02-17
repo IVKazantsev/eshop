@@ -4,11 +4,13 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\User;
 use N_ONE\App\Model\Entity;
-use N_ONE\Core\DbConnector\DbConnector;
-use RuntimeException;
+use N_ONE\Core\Exceptions\DatabaseException;
 
 class UserRepository extends Repository
 {
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -25,7 +27,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -41,15 +43,13 @@ class UserRepository extends Repository
 			);
 		}
 
-		if (empty($users))
-		{
-			throw new RuntimeException("Items not found");
-		}
-
 		return $users;
 	}
 
-	public function getByEmail(string $email): User
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getByEmail(string $email): User|null
 	{
 		$connection = $this->dbConnection->getConnection();
 		$escapedEmail = mysqli_real_escape_string($connection, $email);
@@ -65,7 +65,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$user = null;
@@ -83,15 +83,13 @@ class UserRepository extends Repository
 			// $user->setId($row['ID']);
 		}
 
-		if ($user === null)
-		{
-			throw new RuntimeException("Item with id $email not found");
-		}
-
 		return $user;
 	}
 
-	public function getById(int $id): User
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getById(int $id): User|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -107,7 +105,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$user = null;
@@ -124,14 +122,12 @@ class UserRepository extends Repository
 			);
 		}
 
-		if ($user === null)
-		{
-			throw new RuntimeException("Item with id $id not found");
-		}
-
 		return $user;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getByNumber(string $phone): User|null
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -148,7 +144,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$user = null;
@@ -170,6 +166,9 @@ class UserRepository extends Repository
 		return $user;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getByIds(array $ids): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -187,7 +186,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -203,14 +202,12 @@ class UserRepository extends Repository
 			);
 		}
 
-		if (empty($users))
-		{
-			throw new RuntimeException("Items not found");
-		}
-
 		return $users;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function add(User|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -237,12 +234,15 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return mysqli_insert_id($connection);
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(User|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -269,7 +269,7 @@ class UserRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

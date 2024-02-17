@@ -2,7 +2,7 @@
 
 namespace N_ONE\App\Controller;
 
-use Exception;
+use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class DetailController extends BaseController
@@ -11,19 +11,25 @@ class DetailController extends BaseController
 	{
 		try
 		{
-			$car = $this->itemRepository->getById($carId);
+			$item = $this->itemRepository->getById($carId);
 		}
-		catch (Exception)
+		catch (DatabaseException)
+		{
+			$content = TemplateEngine::renderPublicError(':(', 'Something went wrong');
+			return $this->renderPublicView($content);
+		}
+
+		if ($item === null)
 		{
 			http_response_code(404);
-			echo TemplateEngine::renderError(404, "Page not found");
-			exit;
+			$content = TemplateEngine::renderPublicError(404, "Page not found");
+			return $this->renderPublicView($content);
 		}
 
-		$detailPage = TemplateEngine::render('pages/detailPage', [
-			'car' => $car,
+		$content = TemplateEngine::render('pages/detailPage', [
+			'car' => $item,
 		]);
 
-		return $this->renderPublicView($detailPage);
+		return $this->renderPublicView($content);
 	}
 }

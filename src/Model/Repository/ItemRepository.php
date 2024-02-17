@@ -2,19 +2,19 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use Exception;
 use mysqli;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
 use N_ONE\App\Model\Service\TagService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
+use N_ONE\Core\Exceptions\DatabaseException;
 
 class ItemRepository extends Repository
 {
 
 	public function __construct(
-		DbConnector     $dbConnection,
+		DbConnector                      $dbConnection,
 		private readonly TagRepository   $tagRepository,
 		private readonly ImageRepository $imageRepository,
 		private readonly AttributeRepository $attributeRepository
@@ -23,6 +23,9 @@ class ItemRepository extends Repository
 		parent::__construct($dbConnection);
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getById(int $id): ?Item
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -30,7 +33,7 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 		FROM N_ONE_ITEMS i
 		WHERE i.ID = $id;
 		"
@@ -38,7 +41,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error());
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -49,6 +52,7 @@ class ItemRepository extends Repository
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
 				$this->tagRepository->getByItemsIds([$row['ID']])[$row['ID']],
 				$this->attributeRepository->getByItemsIds([$row['ID']])[$row['ID']],
 				$this->imageRepository->getList([$row['ID']]) [$row['ID']]
@@ -59,7 +63,7 @@ class ItemRepository extends Repository
 
 		if (empty($item))
 		{
-			throw new Exception("Item with id {$id} not found");
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return $item;
@@ -80,7 +84,7 @@ class ItemRepository extends Repository
 
 		$result = mysqli_query(
 			$connection,
-			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 			FROM N_ONE_ITEMS i
 			$whereQueryBlock
 			LIMIT {$currentLimit} OFFSET {$offset};"
@@ -88,7 +92,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error());
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -99,9 +103,10 @@ class ItemRepository extends Repository
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
 				[],
 				[],
-				[],
+				[]
 			);
 
 			// $items[count($items) - 1]->setId($row['ID']);
@@ -109,7 +114,7 @@ class ItemRepository extends Repository
 
 		if (empty($items))
 		{
-			throw new Exception("Items not found");
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$itemsIds = array_map(function($item) {
@@ -180,7 +185,7 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 		FROM N_ONE_ITEMS i
 		WHERE i.ID IN (" . implode(',', $ids) . ");
 	"
@@ -188,7 +193,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_connect_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -199,6 +204,7 @@ class ItemRepository extends Repository
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
 				[],
 				[],
 				[]
@@ -207,7 +213,7 @@ class ItemRepository extends Repository
 
 		if (empty($items))
 		{
-			throw new Exception("Items not found");
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$itemsIds = array_map(function($item) {
@@ -255,7 +261,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$itemTags = "";
@@ -274,7 +280,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;
@@ -305,7 +311,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$result = mysqli_query(
@@ -316,13 +322,13 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$itemTags = "";
-
 		foreach ($tags as $tag)
 		{
+
 			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
@@ -332,7 +338,7 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new Exception(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

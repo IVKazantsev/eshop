@@ -3,9 +3,12 @@
 namespace N_ONE\App\Controller;
 
 use Exception;
+use http\Exception\InvalidArgumentException;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\User;
+use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Exceptions\ValidateException;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
@@ -21,7 +24,7 @@ class OrderController extends BaseController
 		catch (Exception)
 		{
 			http_response_code(404);
-			echo TemplateEngine::renderError(404, "Page not found");
+			echo TemplateEngine::renderPublicError(404, "Page not found");
 			exit;
 		}
 
@@ -32,31 +35,20 @@ class OrderController extends BaseController
 		return $this->renderPublicView($orderPage);
 	}
 
-	public function processOrder(string $carId): string
+	public function processOrder(string $itemId): string
 	{
-		$phone = trim(ValidationService::validatePhoneNumber($_POST['phone']));
-		$name = trim($_POST['name']);
-		$email = trim($_POST['email']);
-		$address = trim($_POST['address']);
-		if (!($phone) || !($name) || !($email) || !($address) || !(filter_var($email, FILTER_VALIDATE_EMAIL)))
-		{
-			return TemplateEngine::renderError(404, "Something went wrong");
-		}
-
 		try
 		{
-			$car = $this->itemRepository->getById($carId);
-			if (!$car)
-			{
-				throw new Exception();
-			}
 			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
+			$name = ValidationService::validateEntryField($_POST['name']);
+			$email = ValidationService::validateEmailAddress($_POST['email']);
+			$address = ValidationService::validateEntryField($_POST['address']);
 
-			if (!$phone)
+			$item = $this->itemRepository->getById($itemId);
+			if (!$item)
 			{
-				throw new Exception();
+				throw new InvalidArgumentException("There is no item with id $itemId");
 			}
-
 			$user = $this->userRepository->getByNumber($phone);
 
 			if (!$user)
@@ -71,14 +63,20 @@ class OrderController extends BaseController
 				$this->userRepository->update($updatedUser);
 			}
 
-			$order = new Order(null, $user->getId(), $carId, 1, 'обработка', $car->getPrice());
+			$order = new Order(null, $user->getId(), $itemId, 1, 'обработка', $item->getPrice());
 			$orderId = $this->orderRepository->add($order);
 		}
-		catch (Exception)
+		catch (ValidateException $e)
 		{
-			http_response_code(404);
-
-			return TemplateEngine::renderError(404, "Page not found");
+			return TemplateEngine::renderPublicError(400, $e->getMessage());
+		}
+		catch (InvalidArgumentException)
+		{
+			return TemplateEngine::renderPublicError(404, "Страница не найдена");
+		}
+		catch (DatabaseException)
+		{
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderSuccessOrderPage($orderId);

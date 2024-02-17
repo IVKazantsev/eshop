@@ -18,11 +18,13 @@ class Item extends Entity
 		private bool       $isActive,
 		private int        $price,
 		private string     $description,
+		private int        $sortOrder,
 		private array      $tags,
 		private array      $attributes,
 		private array      $images,
-		private int        $sortOrder = 0
-	){}
+	)
+	{
+	}
 
 	public function getAttributes(): array
 	{
@@ -76,7 +78,7 @@ class Item extends Entity
 		return ['isActive', 'tags', 'images', 'attributes'];
 	}
 
-	public function getClassname()
+	public function getClassname(): string
 	{
 		$array = explode('\\', __CLASS__);
 

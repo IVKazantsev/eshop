@@ -23,12 +23,11 @@ class RepositoryFactory
 	{
 		if (!array_key_exists($className, $this->repositoryMap))
 		{
-			throw new InvalidArgumentException("There is no repository registered with class {$className}");
+			throw new InvalidArgumentException("There is no repository registered with class $className");
 		}
 		$repositoryClass = $this->repositoryMap[$className];
-		$di = Application::getDI();
 
-		return $di->getComponent($this->getServiceName($repositoryClass));
+		return Application::getDI()->getComponent($this->getServiceName($repositoryClass));
 	}
 
 	public function getServiceName(string $className): string

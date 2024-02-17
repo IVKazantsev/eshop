@@ -70,11 +70,12 @@ Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Rout
 	return ($di->getComponent('adminController'))->renderEditPage($entityToEdit, $itemId);
 }));
 
-Router::post('/admin/items/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
-	$itemId = $route->getVariables()[0];
+Router::post('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
+	$entityToEdit = $route->getVariables()[0];
+	$itemId = $route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->updateItem($itemId);
+	return ($di->getComponent('adminController'))->updateItem($entityToEdit, $itemId);
 }));
 
 Router::get('/admin/edit/success', MiddleWare::adminMiddleware(function() {
@@ -105,7 +106,6 @@ Router::get('/admin/delete/success', MiddleWare::adminMiddleware(function() {
 	return ($di->getComponent('adminController'))->renderSuccessDeletePage();
 }));
 
-
 //роуты доступные всем
 Router::get('/login', function() {
 	$di = Application::getDI();
@@ -123,7 +123,6 @@ Router::get('/logout', function() {
 
 	return ($di->getComponent('adminController'))->logout();
 });
-
 
 // роуты для картинок
 
