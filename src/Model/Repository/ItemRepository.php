@@ -25,14 +25,14 @@ class ItemRepository extends Repository
 	/**
 	 * @throws DatabaseException
 	 */
-	public function getById(int $id): Item|null
+	public function getById(int $id): ?Item
 	{
 		$connection = $this->dbConnection->getConnection();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 		FROM N_ONE_ITEMS i
 		WHERE i.ID = $id;
 		"
@@ -40,10 +40,9 @@ class ItemRepository extends Repository
 
 		if (!$result)
 		{
-			throw new DatabaseException(mysqli_connect_error());
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$item = null;
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$item = new Item(
@@ -52,6 +51,7 @@ class ItemRepository extends Repository
 				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
 				$this->tagRepository->getByItemsIds([$row['ID']])[$row['ID']],
 				$this->imageRepository->getList([$row['ID']]) [$row['ID']]
 			);
@@ -59,12 +59,14 @@ class ItemRepository extends Repository
 			$item->setId($id);
 		}
 
+		if (empty($item))
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
 		return $item;
 	}
 
-	/**
-	 * @throws DatabaseException
-	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -79,38 +81,46 @@ class ItemRepository extends Repository
 
 		$result = mysqli_query(
 			$connection,
-			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 			FROM N_ONE_ITEMS i
 			$whereQueryBlock
-			LIMIT $currentLimit OFFSET $offset;"
+			LIMIT {$currentLimit} OFFSET {$offset};"
 		);
 
 		if (!$result)
 		{
-			throw new DatabaseException(mysqli_connect_error());
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], [],
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
+				[],
+				[],
 			);
 
 			// $items[count($items) - 1]->setId($row['ID']);
 		}
+
 		if (empty($items))
 		{
-			return $items;
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$itemsIds = array_map(static function($item) {
+		$itemsIds = array_map(function($item) {
 			return $item->getId();
 		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as $item)
+		foreach ($items as &$item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
@@ -152,9 +162,6 @@ class ItemRepository extends Repository
 		return $whereQueryBlock;
 	}
 
-	/**
-	 * @throws DatabaseException
-	 */
 	public function getByIds(array $ids): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -163,7 +170,7 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION
+		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 		FROM N_ONE_ITEMS i
 		WHERE i.ID IN (" . implode(',', $ids) . ");
 	"
@@ -177,18 +184,30 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
+				[],
+				[]
 			);
 		}
 
-		$itemsIds = array_map(static function($item) {
+		if (empty($items))
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		$itemsIds = array_map(function($item) {
 			return $item->getId();
 		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as $item)
+		foreach ($items as &$item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
@@ -197,9 +216,6 @@ class ItemRepository extends Repository
 		return $items;
 	}
 
-	/**
-	 * @throws DatabaseException
-	 */
 	public function add(Item|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -216,11 +232,11 @@ class ItemRepository extends Repository
 			"
 		INSERT INTO N_ONE_ITEMS (ID, TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
 		VALUES (
-			$itemId,
-			'$title',
-			$isActive,
-			$price,
-			'$description',
+			{$itemId},
+			'{$title}',
+			{$isActive},
+			{$price},
+			'{$description}',
 			{$sortOrder}
 		);"
 		);
@@ -234,7 +250,7 @@ class ItemRepository extends Repository
 
 		foreach ($tags as $tag)
 		{
-			$itemTags .= '(' . $itemId . ', ' . $tag->getId() . '),';
+			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
 
@@ -252,9 +268,6 @@ class ItemRepository extends Repository
 		return true;
 	}
 
-	/**
-	 * @throws DatabaseException
-	 */
 	public function update(Item|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -270,12 +283,12 @@ class ItemRepository extends Repository
 			$connection,
 			"
 		UPDATE N_ONE_ITEMS 
-		SET TITLE = '$title', 
-			IS_ACTIVE = $isActive, 
-			PRICE = $price, 
-			DESCRIPTION = '$description', 
+		SET TITLE = '{$title}', 
+			IS_ACTIVE = {$isActive}, 
+			PRICE = {$price}, 
+			DESCRIPTION = '{$description}', 
 			SORT_ORDER = {$sortOrder}
-		WHERE ID = $itemId"
+		WHERE ID = {$itemId}"
 		);
 
 		if (!$result)
@@ -286,7 +299,7 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = $itemId"
+		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}"
 		);
 
 		if (!$result)
@@ -295,10 +308,10 @@ class ItemRepository extends Repository
 		}
 
 		$itemTags = "";
-
 		foreach ($tags as $tag)
 		{
-			$itemTags .= '(' . $itemId . ', ' . $tag->getId() . '),';
+
+			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
 

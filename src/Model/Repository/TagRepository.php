@@ -55,7 +55,7 @@ class TagRepository extends Repository
 			"
 		SELECT t.ID, t.TITLE 
 		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID IS NULL
+		WHERE t.PARENT_ID IS NULL AND t.IS_ACTIVE != 0;
 		"
 		);
 
@@ -79,40 +79,6 @@ class TagRepository extends Repository
 		return $tags;
 	}
 
-	public function getByParentId(int $id): array
-	{
-		$connection = $this->dbConnection->getConnection();
-		$tags = [];
-
-		$result = mysqli_query(
-			$connection,
-			"
-		SELECT t.ID, t.TITLE
-		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID = $id;
-		"
-		);
-
-		if (!$result)
-		{
-			throw new RuntimeException(mysqli_error($connection));
-		}
-
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $id, null,
-			);
-		}
-
-		if (empty($tags))
-		{
-			throw new RuntimeException("Items not found");
-		}
-
-		return $tags;
-	}
-
 	public function getById(int $id): Tag
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -122,7 +88,7 @@ class TagRepository extends Repository
 			"
 		SELECT t.ID, t.TITLE, t.PARENT_ID, it.VALUE
 		FROM N_ONE_TAGS t
-		join N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
+		LEFT JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 		WHERE t.ID = $id;
 		"
 		);
@@ -136,10 +102,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID'],
-				$row['VALUE']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID'], $row['VALUE']
 			);
 		}
 
@@ -173,10 +136,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID'],
-				$row['VALUE']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID'], $row['VALUE']
 			);
 		}
 
@@ -207,14 +167,11 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID'],
-				$row['VALUE']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID'], $row['VALUE']
 			);
 		}
 
-		if(empty($tags))
+		if (empty($tags))
 		{
 			foreach ($itemsIds as $itemsId)
 			{
@@ -254,17 +211,54 @@ class TagRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tagId = $entity->getId();
+		$oldParentId = $this->getParentById($tagId);
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
-		$parentId = $entity->getParentId();
-		$result = mysqli_query(
-			$connection,
-			"
+
+		if ($oldParentId === null)
+		{
+			$result = mysqli_query(
+				$connection,
+				"
+		UPDATE N_ONE_TAGS 
+		SET 
+			TITLE = '$title',
+			PARENT_ID = null
+		WHERE ID = $tagId"
+			);
+		}
+		else
+		{
+			$parentId = $entity->getParentId();
+
+			$result = mysqli_query(
+				$connection,
+				"
 		UPDATE N_ONE_TAGS 
 		SET 
 			TITLE = '$title',
 			PARENT_ID = $parentId
 		WHERE ID = $tagId"
-		);
+			);
+			$countOfNewParentTags = $this->checkIfParentHasTags($parentId);
+			$countOfOldParentTags = $this->checkIfParentHasTags($oldParentId);
+
+			if ($countOfOldParentTags === 0)
+			{
+				$this->toggleParentTagIsActive($oldParentId, false);
+			}
+			elseif ($countOfOldParentTags === 1)
+			{
+				$this->toggleParentTagIsActive($oldParentId, true);
+			}
+			if ($countOfNewParentTags === 1)
+			{
+				$this->toggleParentTagIsActive($parentId, true);
+			}
+			elseif ($countOfNewParentTags === 0)
+			{
+				$this->toggleParentTagIsActive($parentId, false);
+			}
+		}
 
 		if (!$result)
 		{
@@ -272,5 +266,125 @@ class TagRepository extends Repository
 		}
 
 		return true;
+	}
+
+	public function getByParentId(int $id): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$tags = [];
+
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT t.ID, t.TITLE
+		FROM N_ONE_TAGS t
+		WHERE t.PARENT_ID = $id;
+		"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$tags[] = new Tag(
+				$row['ID'], $row['TITLE'], $id, null,
+			);
+		}
+
+		if (empty($tags))
+		{
+			throw new RuntimeException("Items not found");
+		}
+
+		return $tags;
+	}
+
+	private function toggleParentTagIsActive(int $parentId, bool $toggle): void
+	{
+		$connection = $this->dbConnection->getConnection();
+		$isActive = (int)$toggle;
+		$result = mysqli_query(
+			$connection,
+			"
+		UPDATE N_ONE_TAGS 
+		SET 
+			IS_ACTIVE = $isActive
+		WHERE ID = $parentId"
+		);
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+	}
+
+	private function checkIfParentHasTags(string $parentId)
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT t.ID
+		FROM N_ONE_TAGS t
+		WHERE t.PARENT_ID = '$parentId'
+		"
+		);
+
+		return mysqli_num_rows($result);
+	}
+
+	private function getParentById(int $id): ?int
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT t.PARENT_ID
+		FROM N_ONE_TAGS t
+		WHERE t.ID = $id;
+		"
+		);
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		return mysqli_fetch_assoc($result)['PARENT_ID'];
+	}
+
+	public function getAllParentTags(): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$tags = [];
+
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT t.ID, t.TITLE 
+		FROM N_ONE_TAGS t
+		WHERE t.PARENT_ID IS NULL;
+		"
+		);
+
+		if (!$result)
+		{
+			throw new RuntimeException(mysqli_error($connection));
+		}
+
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$tags[] = new Tag(
+				$row['ID'], $row['TITLE'], null, null,
+			);
+		}
+
+		if (empty($tags))
+		{
+			throw new RuntimeException("Items not found");
+		}
+
+		return $tags;
 	}
 }

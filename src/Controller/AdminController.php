@@ -113,17 +113,19 @@ class AdminController extends BaseController
 						$itemTags[$tag->getParentId()] = $tag->getId();
 
 					}
+					$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
+						'childrenTags' => $childrenTags,
+						'itemTags' => $itemTags,
+					]);
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'item' => $item,
-						'childrenTags' => $childrenTags,
-						'parentTags' => $parentTags,
-						'itemTags' => $itemTags,
+						'additionalSection' => $tagsSection,
 					]);
 					break;
 				}
 				case Tag::class:
 				{
-					$parentTags = $repository->getParentTags();
+					$parentTags = $repository->getAllParentTags();
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'item' => $item,
 						'parentTags' => $parentTags,
@@ -236,9 +238,11 @@ class AdminController extends BaseController
 	public function updateItem(string $entityType, string $itemId): string
 	{
 		$fields = $_POST;
-		foreach ($fields as $field){
-			$fields[$field] = ValidationService::validateEntryField($field);
-		}
+
+		// foreach ($fields as $field)
+		// {
+		// 	$fields[$field] = ValidationService::validateEntryField($field);
+		// }
 		$className = 'N_ONE\App\Model\\' . ucfirst(
 				substr_replace($entityType, '', -1)
 			); //Костыль на приведение названия типа сущности из URL к названию класса
@@ -246,23 +250,19 @@ class AdminController extends BaseController
 		{
 			foreach ($fields as $field => $value)
 			{
-				if ($field === 'value' && $value === '')
+				if (($field === 'value' || $field === 'parentId') && $value === '')
 				{
-					$fields[$field] = 'null';
+					$fields[$field] = null;
+					continue;
 				}
+				$fields[$field] = ValidationService::validateEntryField($value);
 			}
 		}
 		if ($entityType === 'items')
 		{
 			$tags = [];
-
 			foreach ($fields as $field => $value)
 			{
-				if (is_numeric($field))
-				{
-					$tags[] = new Tag($value, '', $field, null);
-					unset($fields[$field]);
-				}
 				if (
 					($field === 'isActive' || $field === 'sortOrder')
 					&& $value === '0'
@@ -270,19 +270,25 @@ class AdminController extends BaseController
 				{
 					continue;
 				}
-			}
+				if (is_numeric($field))
+				{
+					$tags[] = new Tag($value, '', $field, null);
+					unset($fields[$field]);
+				}
 
+			}
 			$fields['tags'] = $tags;
 			$fields['images'] = [];
 		}
-		foreach ($fields as $field => $value)
-		{
-			if (!trim($value))
-			{
-				return TemplateEngine::renderError(404, "Missing required field: {$field}");
-			}
-			$fields[$field] = trim($value);
-		}
+		// foreach ($fields as $field => $value)
+		// {
+		// 	if (!trim($value))
+		// 	{
+		// 		return TemplateEngine::renderAdminError(404, "Missing required field: {$field}");
+		// 	}
+		// 	$fields[$field] = trim($value);
+		// }
+
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityType);

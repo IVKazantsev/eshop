@@ -7,18 +7,21 @@ use N_ONE\App\Model\Item;
  * @var Entity $item
  * @var array $statuses
  * @var array $parentTags
- * @var array $childrenTags
- * @var array $itemTags
+ * @var string $additionalSection
  */
 $fields = array_flip($item->getFieldNames(true));
 $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
-
+// var_dump($item->getParentId());
 ?>
 <div class="edit-form-container">
 	<form action="" class="edit-form" method="post">
 		<div class="form-section">
 			<p>ID сущности: <?= $item->getId() ?></p>
-			<?php foreach ($fields as $field => $value): ?>
+			<?php foreach (
+				$fields
+
+				as $field => $value
+			): ?>
 
 				<?php if (
 					in_array($field, ['tags', 'images', 'id', 'dateCreate'])
@@ -38,30 +41,39 @@ $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
 					</label>
 					<?php continue; endif; ?>
 				<?php if ($field === 'parentId'): ?>
-					<label for="<?= $field ?>">
-						<?= $field ?>:
-						<select id="statusSelect" name="<?= $field ?>">
-							<?php foreach ($parentTags as $parentTag): ?>
-								<option value="<?= $parentTag->getId() ?>"><?= $parentTag->getTitle() ?></option>
-							<?php endforeach; ?>
-						</select>
-					</label>
-					<?php continue; endif; ?>
+					<?php if (!$item->getParentId()): ?>
+						<label hidden for="<?= $field ?>">
+							<input type="hidden" name="<?= $field ?>" value="">
+						</label>
+					<?php else: ?>
+						<label for="<?= $field ?>">
+							<?= $field ?>:
+							<select id="statusSelect" name="<?= $field ?>">
+								<?php foreach ($parentTags as $parentTag): ?>
+									<option value="<?= $parentTag->getId() ?>"><?= $parentTag->getTitle() ?></option>
+								<?php endforeach; ?>
+							</select>
+						</label>
+					<?php endif; ?>
+
+					<?php continue;
+				endif; ?>
 				<?php if ($field === 'isActive'): ?>
 					<label class="checkbox-label" for="<?= $field ?>">
 						<?= $field ?>:
+						<input type="hidden"
+							   name="<?= $field ?>"
+							   value="0"
+						/>
 						<input id="<?= $field ?>"
 							   type="checkbox"
 							   name="<?= $field ?>"
 							   value="1"
 							<?= $item->getField($field) ? 'checked' : '' ?>
-						>
-						<input type="hidden"
-							   name="<?= $field ?>"
-							   value="0"
-						>
+						/>
 					</label>
 					<?php continue; endif; ?>
+
 
 				<?php if ($field === 'statusId'): ?>
 					<label for="<?= $field ?>">
@@ -79,40 +91,12 @@ $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
 			<?php endforeach; ?>
 
 		</div>
+		<?php echo $additionalSection ?? '' ?>
 		<div class="form-section">
 
-			<?php if ($item instanceof Item): ?>
-				<p>Теги:</p>
-
-				<?php foreach ($childrenTags as $parentName => $childTag): ?>
-					<div class="tag-group">
-						<p><?= $parentName ?>:</p>
-
-						<?php foreach ($childTag as $tag): ?>
-							<label for="<?= $tag->getParentId() ?>">
-								<input <?= $itemTags[$tag->getParentId()] === $tag->getId() ? 'checked'
-									: '' ?> type="radio" name="<?= $tag->getParentId() ?>" value="<?= $tag->getId() ?>">
-								<?= $tag->getTitle() ?>
-							</label>
-
-						<?php endforeach; ?>
-
-					</div>
-
-				<?php endforeach; ?>
-
-			<?php endif; ?>
 			<button class="submit-button" type="submit">Сохранить</button>
 
 		</div>
 	</form>
 </div>
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-		const statusSelect = document.getElementById('statusSelect');
-		const statusIdInput = document.getElementById('statusId');
-		statusSelect.addEventListener('change', function() {
-			statusIdInput.value = this.value;
-		});
-	});
-</script>
+<script src='/js/statusChange.js'></script>
