@@ -22,7 +22,7 @@ class CatalogController extends BaseController
 
 			$items = $this->itemRepository->getList($filter);
 			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
-			$nextPageUri = PaginationService::getNextPageUri(count($cars), $pageNumber);
+			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber);
 
 			if (empty($items))
 			{

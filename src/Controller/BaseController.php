@@ -22,6 +22,7 @@ abstract class BaseController
 		protected ItemRepository    $itemRepository,
 		protected UserRepository    $userRepository,
 		protected OrderRepository   $orderRepository,
+		protected AttributeRepository $attributeRepository,
 		protected RepositoryFactory $repositoryFactory
 	)
 	{
