@@ -136,10 +136,10 @@ class ItemRepository extends Repository
 		$whereQueryBlock = "WHERE i.IS_ACTIVE = 1";
 		if ($range !== null)
 		{
-			list($tagId, $from, $to) = TagService::reformatRangeTag($range);
+			list($attributeId, $from, $to) = TagService::reformatRangeTag($range);
 			$whereQueryBlock = "
 			JOIN N_ONE_ITEMS_ATTRIBUTES ia on i.ID = ia.ITEM_ID
-			WHERE ia.TAG_ID = $tagId and (ia.VALUE BETWEEN $from and $to) and i.IS_ACTIVE = 1
+			WHERE ia.ATTRIBUTE_ID = $attributeId and (ia.VALUE BETWEEN $from and $to) and i.IS_ACTIVE = 1
 		";
 		}
 		elseif ($tag !== null && $title !== null)
