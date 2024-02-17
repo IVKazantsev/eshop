@@ -2,22 +2,23 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use N_ONE\App\Model\Tag;
+use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Entity;
 use RuntimeException;
 
-class TagRepository extends Repository
+class AttributeRepository extends Repository
 {
+
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$tags = [];
+		$attributes = [];
 
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID 
-		FROM N_ONE_TAGS t;
+		SELECT a.ID, a.TITLE
+		FROM N_ONE_ATTRIBUTES a;
 		"
 		);
 
@@ -28,19 +29,19 @@ class TagRepository extends Repository
 
 		while ($row = mysqli_fetch_assoc($result))
 		{
-			$tags[] = new Tag(
+			$attributes[] = new Attribute(
 				$row['ID'],
 				$row['TITLE'],
-				$row['PARENT_ID']
+				null
 			);
 		}
 
-		if (empty($tags))
+		if (empty($attributes))
 		{
 			throw new RuntimeException("Items not found");
 		}
 
-		return $tags;
+		return $attributes;
 	}
 
 
@@ -77,17 +78,17 @@ class TagRepository extends Repository
 	//
 	// 	return $tag;
 	// }
-	public function getById(int $id): Tag
+	public function getById(int $id): Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID
-		FROM N_ONE_TAGS t
-		WHERE t.ID = $id;
-		"
+			SELECT a.ID, a.TITLE 
+			FROM N_ONE_ATTRIBUTES a 
+			WHERE a.ID = $id;
+			"
 		);
 
 		if (!$result)
@@ -95,25 +96,25 @@ class TagRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		$tag = null;
+		$attribute = null;
 		while ($row = mysqli_fetch_assoc($result))
 		{
-			$tag = new Tag(
+			$attribute = new Attribute(
 				$row['ID'],
 				$row['TITLE'],
-				$row['PARENT_ID']
+				null
 			);
 		}
 
-		if ($tag === null)
+		if ($attribute === null)
 		{
 			throw new RuntimeException("Item with id $id not found");
 		}
 
-		return $tag;
+		return $attribute;
 	}
 
-	public function getByTitle(string $title): Tag
+	public function getByTitle(string $title): Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
 		$title = mysqli_real_escape_string($connection, $title);
@@ -121,10 +122,10 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID
-		FROM N_ONE_TAGS t
-		WHERE t.TITLE = '$title'
-		"
+			SELECT a.ID, a.TITLE, a.PARENT_ID
+			FROM N_ONE_ATTRIBUTES a
+			WHERE a.TITLE = '$title'
+			"
 		);
 
 		if (!$result)
@@ -132,22 +133,22 @@ class TagRepository extends Repository
 			throw new RuntimeException(mysqli_error($connection));
 		}
 
-		$tag = null;
+		$attribute = null;
 		while ($row = mysqli_fetch_assoc($result))
 		{
-			$tag = new Tag(
+			$attribute = new Attribute(
 				$row['ID'],
 				$row['TITLE'],
-				$row['PARENT_ID']
+				null
 			);
 		}
 
-		if ($tag === null)
+		if ($attribute === null)
 		{
 			throw new RuntimeException("Item with title $title not found");
 		}
 
-		return $tag;
+		return $attribute;
 	}
 
 	/**
@@ -185,16 +186,16 @@ class TagRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 		$itemsIdsString = implode(',', $itemsIds);
-		$tags = [];
+		$attributes = [];
 
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT it.ITEM_ID, t.ID, t.TITLE, t.PARENT_ID
-		FROM N_ONE_TAGS t 
-		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-		WHERE it.ITEM_ID IN ($itemsIdsString);
-	"
+			SELECT ia.ITEM_ID, a.ID, a.TITLE, ia.VALUE
+			FROM N_ONE_ATTRIBUTES a 
+			JOIN N_ONE_ITEMS_ATTRIBUTES ia on a.ID = ia.ATTRIBUTE_ID
+			WHERE ia.ITEM_ID IN ($itemsIdsString);
+			"
 		);
 
 		if (!$result)
@@ -204,38 +205,37 @@ class TagRepository extends Repository
 
 		while ($row = mysqli_fetch_assoc($result))
 		{
-			$tags[$row['ITEM_ID']][] = new Tag(
+			$attributes[$row['ITEM_ID']][] = new Attribute(
 				$row['ID'],
 				$row['TITLE'],
-				$row['PARENT_ID'],
+				$row['VALUE'],
 			);
 		}
 
-		if(empty($tags))
+		if(empty($attributes))
 		{
 			foreach ($itemsIds as $itemsId)
 			{
-				$tags[$itemsId] = [];
+				$attributes[$itemsId] = [];
 			}
 		}
-		return $tags;
+		return $attributes;
 	}
 
-	public function add(Tag|Entity $entity): int
+	public function add(Attribute|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
-		$tagId = $entity->getId();
+		$attributeId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
-		$parentId = $entity->getParentId();
+
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_TAGS (ID, TITLE, PARENT_ID)
-		VALUES (
-			$tagId,
-			'$title',
-			$parentId
-		);"
+			INSERT INTO N_ONE_ATTRIBUTES (ID, TITLE)
+			VALUES (
+				$attributeId,
+				'$title',
+			);"
 		);
 
 		if (!$result)
@@ -246,20 +246,19 @@ class TagRepository extends Repository
 		return true;
 	}
 
-	public function update(Tag|Entity $entity): bool
+	public function update(Attribute|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
-		$tagId = $entity->getId();
+		$attributeId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
-		$parentId = $entity->getParentId();
+
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_TAGS 
-		SET 
-			TITLE = '$title',
-			PARENT_ID = $parentId
-		WHERE ID = $tagId"
+			UPDATE N_ONE_ATTRIBUTES 
+			SET TITLE = '$title',
+			WHERE ID = $attributeId
+			"
 		);
 
 		if (!$result)

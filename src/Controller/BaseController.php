@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Controller;
 
+use N_ONE\App\Model\Repository\AttributeRepository;
 use N_ONE\App\Model\Repository\ImageRepository;
 use N_ONE\App\Model\Repository\ItemRepository;
 use N_ONE\App\Model\Repository\OrderRepository;
@@ -14,20 +15,22 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 abstract class BaseController
 {
 	public function __construct(
-		protected TagRepository     $tagRepository,
-		protected ImageRepository   $imageRepository,
-		protected ItemRepository    $itemRepository,
-		protected UserRepository    $userRepository,
-		protected OrderRepository   $orderRepository,
-		protected RepositoryFactory $repositoryFactory
+		protected TagRepository       $tagRepository,
+		protected ImageRepository     $imageRepository,
+		protected ItemRepository      $itemRepository,
+		protected UserRepository      $userRepository,
+		protected OrderRepository     $orderRepository,
+		protected AttributeRepository $attributeRepository,
+		protected RepositoryFactory   $repositoryFactory
 	){}
 
 	public function renderPublicView($content, string $currentSearchRequest = null): string
 	{
 		$tags = TagService::reformatTags($this->tagRepository->getList());
-
+		$attributes = $this->attributeRepository->getList();
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
+			'attributes' =>$attributes,
 			'content' => $content,
 			'currentSearchRequest' => $currentSearchRequest,
 		]);

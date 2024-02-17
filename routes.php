@@ -10,11 +10,13 @@ Router::get('/', function() {
 	$currentTag = $_GET['tag'] ?? null;
 	$currentSearchRequest = $_GET['SearchRequest'] ?? null;
 	$currentPageNumber = $_GET['page'] ?? null;
+	$currentRange = $_GET['range'] ?? null;
 
 	return ($di->getComponent('catalogController'))->renderCatalog(
 		$currentPageNumber,
 		$currentTag,
-		$currentSearchRequest
+		$currentSearchRequest,
+		$currentRange
 	);
 });
 
@@ -125,14 +127,29 @@ Router::get('/logout', function() {
 
 // роуты для картинок
 
-Router::get('/imageForm', function() {
+Router::get('/addImagesForm/:id', function(Route $route) {
 	$di = Application::getDI();
+	$itemId = $route->getVariables()[0];
 
-	return ($di->getComponent('imageController'))->renderImageForm();
+	return ($di->getComponent('imageController'))->renderAddImagesForm($itemId);
 });
 
-Router::post('/addImage', function() {
+Router::post('/addImages/:id', function(Route $route) {
+	$di = Application::getDI();
+	$itemId = $route->getVariables()[0];
+
+	return ($di->getComponent('imageController'))->addBaseImages($_FILES, $itemId);
+});
+
+Router::get('/deleteImageForm/:id', function(Route $route) {
+	$di = Application::getDI();
+	$itemId = $route->getVariables()[0];
+
+	return ($di->getComponent('imageController'))->renderDeleteImagesForm($itemId);
+});
+
+Router::post('/deleteImages', function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('imageController'))->addImage($_FILES, $_POST["submit"], 12, false);
+	return ($di->getComponent('imageController'))->deleteImages($_POST['imageIds']);
 });

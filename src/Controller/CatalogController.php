@@ -9,7 +9,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(?int $pageNumber, ?string $carsTag, ?string $SearchRequest): string
+	public function renderCatalog(?int $pageNumber, ?string $carsTag, ?string $SearchRequest, ?string $range): string
 	{
 		try
 		{
@@ -17,10 +17,10 @@ class CatalogController extends BaseController
 				'tag' => $carsTag,
 				'title' => $SearchRequest,
 				'pageNumber' => $pageNumber,
+				'range' => $range,
 			];
 
 			$cars = $this->itemRepository->getList($filter);
-
 			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
 			$nextPageUri = PaginationService::getNextPageUri(count($cars), $pageNumber);
 

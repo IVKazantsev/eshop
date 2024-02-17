@@ -8,7 +8,7 @@ class Image extends Entity
 	public function __construct(
 		protected int|null $id,
 		private int        $itemId,
-		private int        $isMain,
+		private bool       $isMain,
 		private int        $type,
 		private int        $height,
 		private int        $width,

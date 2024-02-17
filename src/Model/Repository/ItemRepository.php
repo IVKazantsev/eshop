@@ -6,6 +6,7 @@ use Exception;
 use mysqli;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
+use N_ONE\App\Model\Service\TagService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 
@@ -15,11 +16,11 @@ class ItemRepository extends Repository
 	public function __construct(
 		DbConnector     $dbConnection,
 		private readonly TagRepository   $tagRepository,
-		private readonly ImageRepository $imageRepository
+		private readonly ImageRepository $imageRepository,
+		private readonly AttributeRepository $attributeRepository
 	)
 	{
 		parent::__construct($dbConnection);
-
 	}
 
 	public function getById(int $id): ?Item
@@ -49,6 +50,7 @@ class ItemRepository extends Repository
 				$row['PRICE'],
 				$row['DESCRIPTION'],
 				$this->tagRepository->getByItemsIds([$row['ID']])[$row['ID']],
+				$this->attributeRepository->getByItemsIds([$row['ID']])[$row['ID']],
 				$this->imageRepository->getList([$row['ID']]) [$row['ID']]
 			);
 
@@ -71,8 +73,9 @@ class ItemRepository extends Repository
 		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
 		$tag = $filter['tag'] ?? null;
 		$title = $filter['title'] ?? null;
+		$range = $filter['range'] ?? null;
 
-		$whereQueryBlock = $this->getWhereQueryBlock($tag, $title, $connection);
+		$whereQueryBlock = $this->getWhereQueryBlock($tag, $title, $range, $connection);
 		$items = [];
 
 		$result = mysqli_query(
@@ -91,7 +94,14 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], [],
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				[],
+				[],
+				[],
 			);
 
 			// $items[count($items) - 1]->setId($row['ID']);
@@ -107,21 +117,32 @@ class ItemRepository extends Repository
 		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
 		foreach ($items as &$item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
+			$item->setAttributes($attributes[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
 		}
 
 		return $items;
 	}
 
-	private function getWhereQueryBlock(?string $tag, ?string $title, mysqli $connection): string
+	private function getWhereQueryBlock(?string $tag, ?string $title, ?string $range, mysqli $connection): string
 	{
+
 		$whereQueryBlock = "WHERE i.IS_ACTIVE = 1";
-		if ($tag !== null && $title !== null)
+		if ($range !== null)
+		{
+			list($tagId, $from, $to) = TagService::reformatRangeTag($range);
+			$whereQueryBlock = "
+			JOIN N_ONE_ITEMS_ATTRIBUTES ia on i.ID = ia.ITEM_ID
+			WHERE ia.TAG_ID = $tagId and (ia.VALUE BETWEEN $from and $to) and i.IS_ACTIVE = 1
+		";
+		}
+		elseif ($tag !== null && $title !== null)
 		{
 			$tagTitle = mysqli_real_escape_string($connection, $tag);
 			$itemTitle = mysqli_real_escape_string($connection, $title);
@@ -173,7 +194,14 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'], $row['TITLE'], $row['IS_ACTIVE'], $row['PRICE'], $row['DESCRIPTION'], [], []
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				[],
+				[],
+				[]
 			);
 		}
 
@@ -187,11 +215,13 @@ class ItemRepository extends Repository
 		}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
 		foreach ($items as &$item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
+			$item->setAttributes($attributes[$item->getId()] ?? []);
 			$item->setImages($images[$item->getId()] ?? []);
 		}
 
@@ -239,7 +269,7 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";"
+			INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";"
 		);
 
 		if (!$result)
@@ -281,7 +311,7 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}"
+			DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}"
 		);
 
 		if (!$result)

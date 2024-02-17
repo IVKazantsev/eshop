@@ -11,19 +11,8 @@ class Tag extends Entity
 		protected int|null $id,
 		private string     $title,
 		private int|null   $parentId,
-		private int|null   $value
 	)
 	{}
-
-	public function getValue(): ?int
-	{
-		return $this->value;
-	}
-
-	public function setValue(?int $value): void
-	{
-		$this->value = $value;
-	}
 
 	public function getParentId(): ?int
 	{

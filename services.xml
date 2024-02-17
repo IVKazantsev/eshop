@@ -6,6 +6,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
 		</class>
 	</service>
@@ -16,6 +17,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
 		</class>
 	</service>
@@ -26,6 +28,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
 		</class>
 	</service>
@@ -36,6 +39,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
 		</class>
 	</service>
@@ -46,6 +50,7 @@
 			<arg service="itemRepository"/>
 			<arg service="userRepository"/>
 			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
 		</class>
 	</service>
@@ -61,6 +66,12 @@
 			<arg service="dbConnector"/>
 			<arg service="tagRepository"/>
 			<arg service="imageRepository"/>
+			<arg service="attributeRepository"/>
+		</class>
+	</service>
+	<service name="attributeRepository">
+		<class name="\N_ONE\App\Model\Repository\AttributeRepository">
+			<arg service="dbConnector"/>
 		</class>
 	</service>
 	<service name="tagRepository">

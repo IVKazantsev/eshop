@@ -2,10 +2,14 @@
 
 /**
  * @var Tag[] $tags
+ * @var Attribute[] $attributes
  */
 
 use N_ONE\App\Model\Tag;
-$iconsPath = \N_ONE\Core\Configurator\Configurator::option('ICONS_PATH');
+use N_ONE\App\Model\Attribute;
+use N_ONE\Core\Configurator\Configurator;
+
+$iconsPath = Configurator::option('ICONS_PATH');
 ?>
 
 <ul class="car-details">
@@ -13,13 +17,17 @@ $iconsPath = \N_ONE\Core\Configurator\Configurator::option('ICONS_PATH');
 		<li class="detail-item">
 			<div class="car-spec">
 				<p>
-					<?php if ($tag->getValue() === null): ?>
-						<img src="<?= $iconsPath . $tag->getParentId() ?>.svg" alt="">
-						<?= $tag->getTitle() ?>
-					<?php else: ?>
-						<img src="<?= $iconsPath . $tag->getId() ?>.svg" alt="">
-						<?= $tag->getValue() ?>
-					<?php endif; ?>
+					<img src="<?= $iconsPath . $tag->getParentId() ?>.svg" alt="">
+					<?= $tag->getTitle() ?>
+				</p>
+			</div>
+		</li>
+	<?php endforeach; ?>
+	<?php foreach ($attributes as $attribute): ?>
+		<li class="detail-item">
+			<div class="car-spec">
+				<p>
+					<?= $attribute->getTitle() ?> : <?= $attribute->getValue() ?>
 				</p>
 			</div>
 		</li>

@@ -58,4 +58,9 @@ class ImageService
 
 		return true;
 	}
+
+	public static function changeMainImage()
+	{
+
+	}
 }
