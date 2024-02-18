@@ -58,8 +58,9 @@ Router::get('/admin', MiddleWare::adminMiddleware(function() {
 Router::get('/admin/:string', MiddleWare::adminMiddleware(function(Route $route) {
 	$di = Application::getDI();
 	$entityToEdit = $route->getVariables()[0];
+	$currentPageNumber = $_GET['page'] ?? null;
 
-	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit);
+	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit, $currentPageNumber);
 }));
 
 Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
@@ -125,30 +126,29 @@ Router::get('/logout', function() {
 });
 
 // роуты для картинок
-
-Router::get('/addImagesForm/:id', function(Route $route) {
-	$di = Application::getDI();
-	$itemId = $route->getVariables()[0];
-
-	return ($di->getComponent('imageController'))->renderAddImagesForm($itemId);
-});
-
-Router::post('/addImages/:id', function(Route $route) {
-	$di = Application::getDI();
-	$itemId = $route->getVariables()[0];
-
-	return ($di->getComponent('imageController'))->addBaseImages($_FILES, $itemId);
-});
-
-Router::get('/deleteImageForm/:id', function(Route $route) {
-	$di = Application::getDI();
-	$itemId = $route->getVariables()[0];
-
-	return ($di->getComponent('imageController'))->renderDeleteImagesForm($itemId);
-});
-
-Router::post('/deleteImages', function() {
-	$di = Application::getDI();
-
-	return ($di->getComponent('imageController'))->deleteImages($_POST['imageIds']);
-});
+// Router::get('/addImagesForm/:id', function(Route $route) {
+// 	$di = Application::getDI();
+// 	$itemId = $route->getVariables()[0];
+//
+// 	return ($di->getComponent('imageController'))->renderAddImagesForm($itemId);
+// });
+//
+// Router::post('/addImages/:id', function(Route $route) {
+// 	$di = Application::getDI();
+// 	$itemId = $route->getVariables()[0];
+//
+// 	return ($di->getComponent('imageController'))->addBaseImages($_FILES, $itemId);
+// });
+//
+// Router::get('/deleteImageForm/:id', function(Route $route) {
+// 	$di = Application::getDI();
+// 	$itemId = $route->getVariables()[0];
+//
+// 	return ($di->getComponent('imageController'))->renderDeleteImagesForm($itemId);
+// });
+//
+// Router::post('/deleteImages', function() {
+// 	$di = Application::getDI();
+//
+// 	return ($di->getComponent('imageController'))->deleteImages($_POST['imageIds']);
+// });

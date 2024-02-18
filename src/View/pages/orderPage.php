@@ -56,7 +56,12 @@ $priceString = number_format($priceString, 0, '', ' ');
 					<tr>
 						<td class="order-td order-car-info">
 							<div class="order-img-container">
-								<img class="order-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath() ?>" alt="image of a car">
+
+								<?php if($car->getImages()):?>
+									<img class="order-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath() ?>" alt="image of a car">
+								<?php else:?>
+									<img class="order-image" src="<?= $imagesPath . 'plugs/imageNotFound.jpeg' ?>" alt="image of a car">
+								<?php endif;?>
 							</div>
 							<div class="order-car-title">
 								<?= $car->getTitle() ?>

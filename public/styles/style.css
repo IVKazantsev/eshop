@@ -149,7 +149,7 @@ footer {
 	display: flex;
 	width: 30%;
 	min-width: 250px;
-	height: 500px;
+	height: auto;
 	background-color: white;
 	margin-bottom: 20px;
 	border: 1px solid #dcdcdc66;

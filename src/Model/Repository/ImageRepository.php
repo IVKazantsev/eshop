@@ -5,6 +5,7 @@ namespace N_ONE\App\Model\Repository;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
 use N_ONE\Core\Exceptions\DatabaseException;
+use RuntimeException;
 
 class ImageRepository extends Repository
 {
@@ -24,6 +25,7 @@ class ImageRepository extends Repository
 		WHERE $field IN (" . implode(',', $filter) . ");
 		"
 		);
+
 
 		if (!$result)
 		{

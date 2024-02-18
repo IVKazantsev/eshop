@@ -18,12 +18,17 @@ $priceString = PriceFormatService::formatPrice($car->getPrice())
 <div class="car-info">
 
 	<div class="car-image-gallery" id="slider">
-		<?php foreach ($car->getFullSizeImages() as $image): ?>
+		<?php if($car->getImages()):?>
+			<?php foreach ($car->getFullSizeImages() as $image): ?>
 			<div class="slide"><img src="<?= $imagesPath . $image->getPath() ?>" alt="Изображение"></div>
 		<?php endforeach; ?>
-		<script src="/js/slider.js"></script>
-		<button id="prev">&#10094</button>
-		<button id="next">&#10095</button>
+			<script src="/js/slider.js"></script>
+			<button id="prev">&#10094</button>
+			<button id="next">&#10095</button>
+		<?php else:?>
+			<div class="plug-image"><img src="<?= $imagesPath . 'plugs/imageNotFound.jpeg' ?>" alt="image of a car"></div>
+		<?php endif;?>
+
 	</div>
 
 
