@@ -13,20 +13,20 @@ class Item extends Entity
 	 * @param Attribute[] $attributes
 	 */
 	public function __construct(
-		protected int|null $id,
-		private string     $title,
-		private bool       $isActive,
-		private int        $price,
-		private string     $description,
-		private int        $sortOrder,
-		private array      $tags,
-		private array      $attributes,
-		private array      $images,
+		protected int|null  $id,
+		private string|null $title,
+		private bool|null   $isActive,
+		private int|null    $price,
+		private string|null $description,
+		private int|null    $sortOrder,
+		private array|null  $tags,
+		private array|null  $attributes,
+		private array|null  $images,
 	)
 	{
 	}
 
-	public function getAttributes(): array
+	public function getAttributes(): ?array
 	{
 		return $this->attributes;
 	}
@@ -52,6 +52,7 @@ class Item extends Entity
 				return $image;
 			}
 		}
+
 		return $this->images[0];
 	}
 

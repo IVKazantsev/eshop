@@ -6,15 +6,15 @@ namespace N_ONE\App\Model;
 
 class Order extends Entity
 {
-	private string $dateCreate;
+	private string|null $dateCreate;
 
 	public function __construct(
-		protected int|null $id,
-		private int        $userId,
-		private int        $itemId,
-		private int        $statusId,
-		private string     $status,
-		private int        $price,
+		protected int|null  $id,
+		private int|null    $userId,
+		private int|null    $itemId,
+		private int|null    $statusId,
+		private string|null $status,
+		private int|null    $price,
 	)
 	{
 	}

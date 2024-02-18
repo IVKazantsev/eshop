@@ -5,9 +5,9 @@ namespace N_ONE\App\Model;
 class Tag extends Entity
 {
 	public function __construct(
-		protected int|null $id,
-		private string     $title,
-		private int|null   $parentId,
+		protected int|null  $id,
+		private string|null $title,
+		private int|null    $parentId,
 	)
 	{
 	}

@@ -33,9 +33,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID']
 			);
 		}
 
@@ -104,9 +102,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID']
 			);
 		}
 
@@ -139,9 +135,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID']
 			);
 		}
 
@@ -172,9 +166,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID'],
+				$row['ID'], $row['TITLE'], $row['PARENT_ID'],
 			);
 		}
 
@@ -192,19 +184,34 @@ class TagRepository extends Repository
 	public function add(Tag|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
-		$tagId = $entity->getId();
+		// $tagId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 		$parentId = $entity->getParentId();
-		$result = mysqli_query(
-			$connection,
-			"
-		INSERT INTO N_ONE_TAGS (ID, TITLE, PARENT_ID)
+
+		if ($parentId)
+		{
+			$result = mysqli_query(
+				$connection,
+				"
+		INSERT INTO N_ONE_TAGS (TITLE, PARENT_ID)
 		VALUES (
-			$tagId,
 			'$title',
 			$parentId
 		);"
-		);
+			);
+		}
+		else
+		{
+			$result = mysqli_query(
+				$connection,
+				"
+		INSERT INTO N_ONE_TAGS (TITLE)
+		VALUES (
+			'$title'
+			
+		);"
+			);
+		}
 
 		if (!$result)
 		{

@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Item;
+use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Service\ImageService;
 use N_ONE\App\Model\Service\PaginationService;
 use N_ONE\Core\Configurator\Configurator;
@@ -271,6 +272,7 @@ class AdminController extends BaseController
 			if (empty($items))
 			{
 				$content = TemplateEngine::renderAdminError(':(', 'Сущности не найдены');
+
 				return $this->renderAdminView($content);
 			}
 
@@ -525,6 +527,211 @@ class AdminController extends BaseController
 		}
 
 		return true;
+	}
+
+	public function renderAddPage(string $entityToAdd)
+	{
+		$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
+		$className = 'N_ONE\App\Model\\' . ucfirst(
+				$entityToAdd
+			);//Костыль на приведение названия типа сущности из URL к названию класса
+
+		$item = ($className)::createDummyObject();
+		switch (get_class($item))
+		{
+			case Item::class:
+			{
+				$parentTags = $this->tagRepository->getParentTags();
+				$attributes = $this->attributeRepository->getList();
+				$itemAttributes = [];
+				// $itemAttributes = $item->getAttributes();
+				$itemTags = [];
+				$childrenTags = [];
+				$specificFields = [
+					'isActive' => TemplateEngine::render('components/editIsActive', [
+						'item' => $item,
+					]),
+					'description' => TemplateEngine::render('components/editItemDescription', [
+						'item' => $item,
+					]),
+				];
+				foreach ($parentTags as $parentTag)
+				{
+					$childrenTags[(string)($parentTag->getTitle())] = $this->tagRepository->getByParentId(
+						$parentTag->getId()
+					);
+
+				}
+				// foreach ($item->getTags() as $tag)
+				// {
+				// 	$itemTags[$tag->getParentId()] = $tag->getId();
+				//
+				// }
+				$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
+					'childrenTags' => $childrenTags,
+					'itemTags' => $itemTags,
+				]);
+				$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
+					'attributes' => $attributes,
+					// 'itemAttributes' => $itemAttributes,
+				]);
+
+				// $images = $this->imageRepository->getList([$itemId]);
+				// $addImagesSection = TemplateEngine::render('components/addImagesSection', [
+				// 	'itemId' => $itemId,
+				// ]);
+				$deleteImagesSection = TemplateEngine::render(
+					'components/deleteImagesSection', [// 'images' => $images[$itemId] ?? [],
+													]
+				);
+
+				$additionalSections = [
+					$tagsSection,
+					$attributesSection,
+					// $addImagesSection,
+					$deleteImagesSection,
+				];
+
+				$content = TemplateEngine::render('pages/adminEditPage', [
+					'item' => $item,
+					'specificFields' => $specificFields,
+					'additionalSections' => $additionalSections,
+				]);
+				break;
+			}
+			case Tag::class:
+			{
+				$parentTags = $repository->getAllParentTags();
+				$specificFields = [
+					'parentId' => TemplateEngine::render('components/editTagParentId', [
+						'item' => $item,
+						'parentTags' => $parentTags,
+					]),
+				];
+				$content = TemplateEngine::render('pages/adminEditPage', [
+					'item' => $item,
+					'specificFields' => $specificFields,
+				]);
+				break;
+
+			}
+			case Attribute::class:
+			case User::class:
+			{
+				$content = TemplateEngine::render('pages/adminEditPage', [
+					'item' => $item,
+				]);
+				break;
+
+			}
+			case Order::class:
+			{
+				$statuses = $this->orderRepository->getStatuses();
+				$specificFields = [
+					'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]),
+					'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['item' => $item]),
+				];
+				$content = TemplateEngine::render('pages/adminEditPage', [
+					'item' => $item,
+					'specificFields' => $specificFields,
+				]);
+				break;
+
+			}
+			default:
+			{
+				$content = TemplateEngine::render('pages/adminEditPage', []);
+				break;
+
+			}
+		}
+
+		return $this->renderAdminView($content);
+	}
+
+	public function addItem(string $entityToAdd): string
+	{
+
+		$fields = $_POST;
+		// foreach ($fields as $field)
+		// {
+		// 	$fields[$field] = ValidationService::validateEntryField($field);
+		// }
+		$className = 'N_ONE\App\Model\\' . ucfirst(
+				$entityToAdd
+			); //Костыль на приведение названия типа сущности из URL к названию класса
+
+		if ($entityToAdd === 'tag')
+		{
+			foreach ($fields as $field => $value)
+			{
+				$fields[$field] = ValidationService::validateEntryField($value);
+			}
+			if (!array_key_exists('parentId', $fields))
+			{
+				echo 'true';
+				$fields['parentId'] = null;
+			}
+		}
+		if ($entityToAdd === 'attribute')
+		{
+			$fields['value'] = null;
+			// foreach ($fields as $field => $value)
+			// {
+			// $fields[$field] = ValidationService::validateEntryField($value);
+			// }
+		}
+		if ($entityToAdd === 'item')
+		{
+			if (array_key_exists('imageIds', $fields))
+			{
+				$this->deleteImages($fields['imageIds']);
+			}
+			if ($_FILES['image']['size'][0] !== 0)
+			{
+				$this->addBaseImages($_FILES, $itemId);
+			}
+
+			foreach ($fields as $field => $value)
+			{
+				if (
+					($field === 'isActive' || $field === 'sortOrder')
+					&& $value === '0'
+				) //РАЗРЕШЕНИЕ НА ИСПОЛЬЗОВАНИЕ FALSY ДЛЯ УКАЗАННЫХ ПОЛЕЙ
+				{
+					continue;
+				}
+			}
+			// $fields['tags'] = $tags;
+			$fields['images'] = [];
+		}
+		// foreach ($fields as $field => $value)
+		// {
+		// 	if (!trim($value))
+		// 	{
+		// 		return TemplateEngine::renderAdminError(404, "Missing required field: {$field}");
+		// 	}
+		// 	$fields[$field] = trim($value);
+		// }
+
+		try
+		{
+			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
+			// var_dump(null, $fields);
+			// exit();
+			$item = new $className(null, ...array_values($fields));
+			$repository->add($item);
+		}
+		catch (ValidateException $e)
+		{
+			return TemplateEngine::renderAdminError(400, $e->getMessage());
+		}
+		catch (DatabaseException)
+		{
+			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+
+		return $this->renderSuccessEditPage();
 	}
 
 }

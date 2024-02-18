@@ -13,10 +13,18 @@
 			<label class="attribute" for="<?= $attribute->getTitle() ?>">
 				<?= $attribute->getTitle() ?>
 				<input class="attribute-input" type="text" name="attributes[<?= $attribute->getId() ?>]"
-					   value="<?= getAttributeValue(
-						   $attribute,
-						   $itemAttributes
-					   ) ?>">
+					<?php if (empty($itemAttributes))
+					{
+						echo "value={$attribute->getValue()}";
+					}
+					else
+					{
+						echo 'value=' . getAttributeValue(
+								$attribute,
+								$itemAttributes
+							);
+					} ?>>
+
 			</label>
 		<?php endforeach; ?>
 	</div>

@@ -78,6 +78,18 @@ Router::post('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Rou
 
 	return ($di->getComponent('adminController'))->updateItem($entityToEdit, $itemId);
 }));
+Router::get('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $route) {
+	$entityToEdit = $route->getVariables()[0];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderAddPage($entityToEdit);
+}));
+Router::post('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $route) {
+	$entityToAdd = $route->getVariables()[0];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->addItem($entityToAdd);
+}));
 
 Router::get('/admin/edit/success', MiddleWare::adminMiddleware(function() {
 	$di = Application::getDI();

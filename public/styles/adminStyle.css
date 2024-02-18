@@ -327,6 +327,7 @@ label input[type="text"] {
 	justify-content: center;
 }
 
+
 .confirm-delete-form, .success-delete-container, .success-update-container {
 	display: flex;
 	flex-direction: column;
@@ -464,6 +465,7 @@ label input[type="text"] {
 	margin-bottom: 50px;
 	width: 100%;
 }
+
 .pagination a {
 	text-decoration: none;
 	font-size: 50px;
@@ -473,6 +475,6 @@ label input[type="text"] {
 .pagination a:hover {
 	text-decoration: none;
 	font-size: 53px;
-	color: #666666;
+	color: #666;
 	transition: .3s;
 }

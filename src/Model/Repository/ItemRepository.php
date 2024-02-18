@@ -247,13 +247,14 @@ class ItemRepository extends Repository
 		$description = mysqli_real_escape_string($connection, $entity->getDescription());
 		$sortOrder = $entity->getSortOrder();
 		$tags = $entity->getTags();
+		$attributes = $entity->getAttributes();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ITEMS (ID, TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
+		INSERT INTO N_ONE_ITEMS ( TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
 		VALUES (
-			{$itemId},
+			
 			'{$title}',
 			{$isActive},
 			{$price},
@@ -266,25 +267,9 @@ class ItemRepository extends Repository
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
-
-		$itemTags = "";
-
-		foreach ($tags as $tag)
-		{
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag->getId() . '),';
-		}
-		$itemTags = substr($itemTags, 0, -1);
-
-		$result = mysqli_query(
-			$connection,
-			"
-			INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";"
-		);
-
-		if (!$result)
-		{
-			throw new DatabaseException(mysqli_error($connection));
-		}
+		$itemId = mysqli_insert_id($connection);
+		$this->addItemTags($connection, $itemId, $tags);
+		$this->addItemAttributes($connection, $itemId, $attributes);
 
 		return true;
 	}
@@ -335,11 +320,9 @@ class ItemRepository extends Repository
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
-		// var_dump($tags);
 		$itemTags = "";
 		foreach ($tags as $tag)
 		{
-			// var_dump($tag);
 			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag . '),';
 		}
 		// exit();
@@ -366,6 +349,49 @@ class ItemRepository extends Repository
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
+		$itemAttributes = "";
+		foreach ($attributes as $attributeId => $attribute)
+		{
+			if (!trim($attribute))
+			{
+				$attribute = 'null';
+			}
+			$itemAttributes = $itemAttributes . '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
+		}
+		$itemAttributes = substr($itemAttributes, 0, -1);
+		var_dump($itemAttributes);
+		$sql = "INSERT INTO N_ONE_ITEMS_ATTRIBUTES (ITEM_ID, ATTRIBUTE_ID, VALUE) VALUES " . $itemAttributes . ";";
+		$result = mysqli_query($connection, $sql);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+	}
+
+	private function addItemTags(bool|mysqli $connection, int $itemId, array $tags): void
+	{
+
+		$itemTags = "";
+		foreach ($tags as $tag)
+		{
+			// var_dump($tag);
+			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag . '),';
+		}
+		// exit();
+		$itemTags = substr($itemTags, 0, -1);
+
+		$sql = "INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";";
+		$result = mysqli_query($connection, $sql);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+	}
+
+	private function addItemAttributes(bool|mysqli $connection, int $itemId, array $attributes): void
+	{
 		$itemAttributes = "";
 		foreach ($attributes as $attributeId => $attribute)
 		{

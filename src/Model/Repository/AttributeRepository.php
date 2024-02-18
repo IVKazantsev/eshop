@@ -157,16 +157,14 @@ class AttributeRepository extends Repository
 	public function add(Attribute|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
-		$attributeId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 
 		$result = mysqli_query(
 			$connection,
 			"
-			INSERT INTO N_ONE_ATTRIBUTES (ID, TITLE)
-			VALUES (
-				$attributeId,
-				'$title',
+			INSERT INTO N_ONE_ATTRIBUTES (TITLE)
+			VALUE (
+				'$title'
 			);"
 		);
 

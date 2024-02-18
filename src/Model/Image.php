@@ -5,20 +5,27 @@ namespace N_ONE\App\Model;
 class Image extends Entity
 {
 	private string $path;
+
 	public function __construct(
-		protected int|null $id,
-		private int        $itemId,
-		private bool       $isMain,
-		private int        $type,
-		private int        $height,
-		private int        $width,
-		private string     $extension
+		protected int|null  $id,
+		private int|null    $itemId,
+		private bool|null   $isMain,
+		private int|null    $type,
+		private int|null    $height,
+		private int|null    $width,
+		private string|null $extension
 	)
 	{
 
 		$size = ($this->type === 1) ? 'fullsize' : 'preview';
 		$description = $this->isMain ? 'main' : 'base';
-		$this->path = $this->itemId . "/$this->id" . "_$this->height" . "_$this->width" . "_$size" . "_$description" . ".$this->extension";
+		$this->path = $this->itemId
+			. "/$this->id"
+			. "_$this->height"
+			. "_$this->width"
+			. "_$size"
+			. "_$description"
+			. ".$this->extension";
 	}
 
 	public function getExtension(): string
