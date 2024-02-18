@@ -8,6 +8,7 @@ use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Item;
 use N_ONE\App\Model\Service\ImageService;
+use N_ONE\App\Model\Service\PaginationService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Exceptions\LoginException;
@@ -133,7 +134,7 @@ class AdminController extends BaseController
 						'itemId' => $itemId,
 					]);
 					$deleteImagesSection = TemplateEngine::render('components/deleteImagesSection', [
-						'images' => $images[$itemId],
+						'images' => $images[$itemId] ?? [],
 					]);
 
 					$additionalSections = [
@@ -233,21 +234,37 @@ class AdminController extends BaseController
 		return true;
 	}
 
-	public function renderEntityPage(string $entityToDisplay): string
+	public function renderEntityPage(string $entityToDisplay, ?int $pageNumber): string
 	{
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityToDisplay);
-			$items = $repository->getList();
+
+			$filter = [
+				'pageNumber' => $pageNumber,
+			];
+
+			$items = $repository->getList($filter);
+			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
+			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber);
+
 			if (empty($items))
 			{
-				$content = TemplateEngine::renderAdminError(':(', 'Товары не найдены');
-
+				$content = TemplateEngine::renderAdminError(':(', 'Сущности не найдены');
 				return $this->renderAdminView($content);
 			}
+
+			if ($entityToDisplay === 'items' && count($items) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
+			{
+				array_pop($items);
+			}
+
 			$content = TemplateEngine::render('pages/adminItemsPage', [
 				'items' => $items,
+				'previousPageUri' => $previousPageUri,
+				'nextPageUri' => $nextPageUri,
 			]);
+
 		}
 		catch (InvalidArgumentException)
 		{
@@ -256,7 +273,6 @@ class AdminController extends BaseController
 		catch (Exception)
 		{
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
-
 		}
 
 		return $this->renderAdminView($content);

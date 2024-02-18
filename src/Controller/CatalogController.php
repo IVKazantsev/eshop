@@ -35,12 +35,12 @@ class CatalogController extends BaseController
 			{
 				array_pop($items);
 			}
-
 			$content = TemplateEngine::render('pages/catalogPage', [
 				'cars' => $items,
 				'previousPageUri' => $previousPageUri,
 				'nextPageUri' => $nextPageUri,
 			]);
+
 		}
 		catch (DatabaseException)
 		{

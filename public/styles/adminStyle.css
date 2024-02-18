@@ -424,14 +424,23 @@ td {
 	align-items: center;
 }
 
-/*.attribute-input {*/
-/*	height: 10px;*/
-/*}*/
+/*пагинация для items*/
 
-/*.attribute-container {*/
-/*	display: grid;*/
-/*	grid-template-columns: 150px 1fr;*/
+.pagination {
+	display: flex;
+	justify-content: space-evenly;
+	margin-bottom: 50px;
+	width: 100%;
+}
+.pagination a {
+	text-decoration: none;
+	font-size: 50px;
+	color: #383838;
+}
 
-/*	!*grid-template-rows: 1fr;*!*/
-
-/*}*/
+.pagination a:hover {
+	text-decoration: none;
+	font-size: 53px;
+	color: #666666;
+	transition: .3s;
+}

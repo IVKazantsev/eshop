@@ -58,8 +58,9 @@ Router::get('/admin', MiddleWare::adminMiddleware(function() {
 Router::get('/admin/:string', MiddleWare::adminMiddleware(function(Route $route) {
 	$di = Application::getDI();
 	$entityToEdit = $route->getVariables()[0];
+	$currentPageNumber = $_GET['page'] ?? null;
 
-	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit);
+	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit, $currentPageNumber);
 }));
 
 Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {

@@ -52,7 +52,7 @@ class Item extends Entity
 				return $image;
 			}
 		}
-		throw new Exception("Preview image for Item with id {$this->getId()} not found");
+		return $this->images[0];
 	}
 
 	public function getFullSizeImages(): array
@@ -67,7 +67,7 @@ class Item extends Entity
 		}
 		if (empty($images))
 		{
-			throw new Exception("FullSize image for Item with id {$this->getId()} not found");
+			return $this->getImages();
 		}
 
 		return $images;

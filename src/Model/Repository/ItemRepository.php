@@ -55,7 +55,7 @@ class ItemRepository extends Repository
 				$row['SORT_ORDER'],
 				$this->tagRepository->getByItemsIds([$row['ID']])[$row['ID']],
 				$this->attributeRepository->getByItemsIds([$row['ID']])[$row['ID']],
-				$this->imageRepository->getList([$row['ID']]) [$row['ID']]
+				$this->imageRepository->getList([$row['ID']]) [$row['ID']] ?? []
 			);
 
 			$item->setId($id);
@@ -69,6 +69,9 @@ class ItemRepository extends Repository
 		return $item;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();

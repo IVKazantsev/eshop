@@ -18,7 +18,11 @@ $priceString = PriceFormatService::formatPrice($car->getPrice())
 
 <div class="car-card">
 	<a class="car-card-link" href='<?= '/products/' . $car->getId() ?>'>
-		<img class="car-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath() ?>" alt="image of a car">
+		<?php if($car->getImages()):?>
+			<img class="car-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath() ?>" alt="image of a car">
+		<?php else:?>
+			<img class="car-image" src="<?= $imagesPath . 'plugs/imageNotFound.jpeg' ?>" alt="image of a car">
+		<?php endif;?>
 		<div class="description">
 			<h2 class="car-name"><?= $car->getTitle() ?></h2>
 			<p class="car-year">2024</p>

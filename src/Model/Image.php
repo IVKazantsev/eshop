@@ -15,6 +15,7 @@ class Image extends Entity
 		private string     $extension
 	)
 	{
+
 		$size = ($this->type === 1) ? 'fullsize' : 'preview';
 		$description = $this->isMain ? 'main' : 'base';
 		$this->path = $this->itemId . "/$this->id" . "_$this->height" . "_$this->width" . "_$size" . "_$description" . ".$this->extension";
