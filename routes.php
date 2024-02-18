@@ -125,30 +125,29 @@ Router::get('/logout', function() {
 });
 
 // роуты для картинок
-
-Router::get('/addImagesForm/:id', function(Route $route) {
-	$di = Application::getDI();
-	$itemId = $route->getVariables()[0];
-
-	return ($di->getComponent('imageController'))->renderAddImagesForm($itemId);
-});
-
-Router::post('/addImages/:id', function(Route $route) {
-	$di = Application::getDI();
-	$itemId = $route->getVariables()[0];
-
-	return ($di->getComponent('imageController'))->addBaseImages($_FILES, $itemId);
-});
-
-Router::get('/deleteImageForm/:id', function(Route $route) {
-	$di = Application::getDI();
-	$itemId = $route->getVariables()[0];
-
-	return ($di->getComponent('imageController'))->renderDeleteImagesForm($itemId);
-});
-
-Router::post('/deleteImages', function() {
-	$di = Application::getDI();
-
-	return ($di->getComponent('imageController'))->deleteImages($_POST['imageIds']);
-});
+// Router::get('/addImagesForm/:id', function(Route $route) {
+// 	$di = Application::getDI();
+// 	$itemId = $route->getVariables()[0];
+//
+// 	return ($di->getComponent('imageController'))->renderAddImagesForm($itemId);
+// });
+//
+// Router::post('/addImages/:id', function(Route $route) {
+// 	$di = Application::getDI();
+// 	$itemId = $route->getVariables()[0];
+//
+// 	return ($di->getComponent('imageController'))->addBaseImages($_FILES, $itemId);
+// });
+//
+// Router::get('/deleteImageForm/:id', function(Route $route) {
+// 	$di = Application::getDI();
+// 	$itemId = $route->getVariables()[0];
+//
+// 	return ($di->getComponent('imageController'))->renderDeleteImagesForm($itemId);
+// });
+//
+// Router::post('/deleteImages', function() {
+// 	$di = Application::getDI();
+//
+// 	return ($di->getComponent('imageController'))->deleteImages($_POST['imageIds']);
+// });

@@ -129,10 +129,10 @@ class AdminController extends BaseController
 					]);
 
 					$images = $this->imageRepository->getList([$itemId]);
-					$addImagesSection = TemplateEngine::render('pages/addImageForm', [
+					$addImagesSection = TemplateEngine::render('components/addImagesSection', [
 						'itemId' => $itemId,
 					]);
-					$deleteImagesSection = TemplateEngine::render('pages/deleteImageForm', [
+					$deleteImagesSection = TemplateEngine::render('components/deleteImagesSection', [
 						'images' => $images[$itemId],
 					]);
 
@@ -292,14 +292,23 @@ class AdminController extends BaseController
 		if ($entityType === 'attributes')
 		{
 			$fields['value'] = null;
-			foreach ($fields as $field => $value)
-			{
+			// foreach ($fields as $field => $value)
+			// {
 				// $fields[$field] = ValidationService::validateEntryField($value);
-			}
+			// }
 		}
 		if ($entityType === 'items')
 		{
 			// $tags = [];
+			if (array_key_exists('imageIds', $fields))
+			{
+				$this->deleteImages($fields['imageIds']);
+			}
+			if ($_FILES['image']['size'][0] !== 0)
+			{
+				$this->addBaseImages($_FILES, $itemId);
+			}
+
 			foreach ($fields as $field => $value)
 			{
 				if (
