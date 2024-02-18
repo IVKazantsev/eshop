@@ -11,6 +11,7 @@ main {
 	max-height: calc(100vh - 60px - 20px);
 	overflow-y: auto;
 	padding: 0;
+
 }
 
 header {
@@ -174,7 +175,7 @@ header {
 .id-field,
 .title-field,
 .price-field,
-.description-field,
+#description,
 .sort-order-field,
 td {
 	vertical-align: middle; /* Vertical alignment of content */
@@ -228,21 +229,34 @@ td {
 	display: flex;
 	justify-content: space-between; /* Distribute space between sections */
 	align-items: flex-start; /* Align sections to the top */
+
 	gap: 20px; /* Space between the form sections */
 	padding: 20px; /* Padding around the form container */
 }
 
+
 /* Edit form styles */
 .edit-form {
-	display: flex;
+	/*display: flex;*/
 	/*flex-wrap: wrap; !* Allow form sections to wrap onto multiple lines if needed *!*/
 	width: 100%; /* Full width of the container */
 	gap: 20px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+
+}
+
+main::-webkit-scrollbar {
+	display: none;
+}
+
+.attribute-container {
+	grid-column: 1;
 }
 
 /* Form section styles */
 .form-section {
-	flex: 1; /* Grow and shrink equally */
+	/*flex: 1; !* Grow and shrink equally *!*/
 	min-width: 45%; /* Minimum width for each section */
 	padding: 20px; /* Padding around each section */
 	box-sizing: border-box; /* Include padding and border in the element's total width and height */
@@ -276,6 +290,18 @@ td {
 	margin-right: 5px; /* Space between the radio button and its label */
 }
 
+.tag-group p {
+	margin-bottom: 8px; /* Space between the radio button and its label */
+}
+
+.form-section p {
+	margin-bottom: 8px;
+}
+
+label input[type="text"] {
+	margin-top: 8px;
+}
+
 /* Button styles (if you have buttons in your form) */
 .submit-button {
 	padding: 10px 20px;
@@ -291,9 +317,9 @@ td {
 	background-color: #0056b3;
 }
 
-.description-textarea {
+#description {
 	resize: none;
-	height: 100px;
+	height: 75px;
 }
 
 .confirm-delete-container {
@@ -347,7 +373,7 @@ td {
 
 /*Стили для формы добавления картинок*/
 
-.add-images-form {
+.add-images-section {
 	margin: 20px;
 }
 
@@ -359,9 +385,6 @@ td {
 	align-items: center;
 }
 
-.choose-file-button {
-	margin-bottom: 50px;
-}
 
 .submit-image-button {
 
@@ -369,17 +392,26 @@ td {
 
 /*Стили для формы удаления картинок*/
 
-.delete-images-form {
+.delete-images-section {
 	margin: 20px;
-	width: 270px;
+	width: 90%;
+}
+
+.delete-images-section p {
+	margin-bottom: 12px;
+}
+
+.choose-file-button {
+	margin-bottom: 20px;
 }
 
 .image-grid {
-	width: 270px;
+	/*width: 270px;*/
 	margin: 20px;
+	gap: 20px;
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between; /* Выравнивание элементов по ширине */
+	/*justify-content: space-between; !* Выравнивание элементов по ширине *!*/
 }
 
 .image-item {

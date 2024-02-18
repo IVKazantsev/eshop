@@ -8,6 +8,7 @@
 ?>
 
 	<div class="form-section attribute-container">
+		<p>Аттрибуты:</p>
 		<?php foreach ($attributes as $attribute): ?>
 			<label class="attribute" for="<?= $attribute->getTitle() ?>">
 				<?= $attribute->getTitle() ?>

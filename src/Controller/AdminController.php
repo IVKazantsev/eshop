@@ -108,6 +108,14 @@ class AdminController extends BaseController
 					$itemAttributes = $item->getAttributes();
 					$itemTags = [];
 					$childrenTags = [];
+					$specificFields = [
+						'isActive' => TemplateEngine::render('components/editIsActive', [
+							'item' => $item,
+						]),
+						'description' => TemplateEngine::render('components/editItemDescription', [
+							'item' => $item,
+						]),
+					];
 					foreach ($parentTags as $parentTag)
 					{
 						$childrenTags[(string)($parentTag->getTitle())] = $this->tagRepository->getByParentId(
@@ -146,6 +154,7 @@ class AdminController extends BaseController
 
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'item' => $item,
+						'specificFields' => $specificFields,
 						'additionalSections' => $additionalSections,
 					]);
 					break;
@@ -153,9 +162,15 @@ class AdminController extends BaseController
 				case Tag::class:
 				{
 					$parentTags = $repository->getAllParentTags();
+					$specificFields = [
+						'parentId' => TemplateEngine::render('components/editTagParentId', [
+							'item' => $item,
+							'parentTags' => $parentTags,
+						]),
+					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'item' => $item,
-						'parentTags' => $parentTags,
+						'specificFields' => $specificFields,
 					]);
 					break;
 
@@ -172,9 +187,14 @@ class AdminController extends BaseController
 				case Order::class:
 				{
 					$statuses = $this->orderRepository->getStatuses();
+					$specificFields = [
+						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]
+						),
+						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['item' => $item]),
+					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'item' => $item,
-						'statuses' => $statuses,
+						'specificFields' => $specificFields,
 					]);
 					break;
 
@@ -310,7 +330,7 @@ class AdminController extends BaseController
 			$fields['value'] = null;
 			// foreach ($fields as $field => $value)
 			// {
-				// $fields[$field] = ValidationService::validateEntryField($value);
+			// $fields[$field] = ValidationService::validateEntryField($value);
 			// }
 		}
 		if ($entityType === 'items')
@@ -475,12 +495,19 @@ class AdminController extends BaseController
 		{
 			ValidationService::validateImage($files, $i);
 
-			$targetDir = ROOT . '/public' . Configurator::option('IMAGES_PATH') . "$itemId/"; // директория для сохранения загруженных файлов
+			$targetDir = ROOT
+				. '/public'
+				. Configurator::option('IMAGES_PATH')
+				. "$itemId/"; // директория для сохранения загруженных файлов
 			$targetFile = $targetDir . basename($files["image"]["name"][$i]);
 			$file_extension = pathinfo($files['image']['name'][$i], PATHINFO_EXTENSION);
 
-			$fullSizeImageId = $this->imageRepository->add(new Image(null, $itemId,  false, 1, 1200, 900, $file_extension));
-			$previewImageId = $this->imageRepository->add(new Image(null, $itemId,  false, 2, 640, 480, $file_extension));
+			$fullSizeImageId = $this->imageRepository->add(
+				new Image(null, $itemId, false, 1, 1200, 900, $file_extension)
+			);
+			$previewImageId = $this->imageRepository->add(
+				new Image(null, $itemId, false, 2, 640, 480, $file_extension)
+			);
 
 			$finalFullSizePath = $targetDir . $fullSizeImageId . "_1200_900_fullsize_base" . ".$file_extension";
 			$finalPreviewPath = $targetDir . $previewImageId . '_640_480_preview_base' . ".$file_extension";
@@ -496,6 +523,7 @@ class AdminController extends BaseController
 				return false;
 			}
 		}
+
 		return true;
 	}
 
