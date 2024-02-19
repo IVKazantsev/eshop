@@ -74,3 +74,5 @@ $scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
 		</div>
 	</form>
 </div>
+
+<script src="/js/checkingEmptyEntry.js"></script>

@@ -47,7 +47,7 @@ class ValidationService
 	public static function validateEntryField(string $field): string
 	{
 		$validatedField = trim($field);
-		if(!$validatedField)
+		if($validatedField === "")
 		{
 			throw new ValidateException("No field should be empty");
 		}

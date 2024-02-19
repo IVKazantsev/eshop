@@ -93,3 +93,4 @@ $priceString = number_format($priceString, 0, '', ' ');
 </div>
 
 <script src="/js/checkingEmptyEntry.js"></script>
+<script src="/js/validatePhone.js"></script>
