@@ -16,12 +16,15 @@ class UserRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		$users = [];
 
+		$whereQueryBlock = $this->getWhereQueryBlock();
+
 		$result = mysqli_query(
 			$connection,
 			"
 		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
 		FROM N_ONE_USERS u
-		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID;
+		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+		$whereQueryBlock;
 		"
 		);
 
@@ -44,6 +47,13 @@ class UserRepository extends Repository
 		}
 
 		return $users;
+	}
+
+	private function getWhereQueryBlock(): string
+	{
+		$whereQueryBlock = "WHERE u.IS_ACTIVE = 1";
+
+		return $whereQueryBlock;
 	}
 
 	/**
