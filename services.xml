@@ -1,0 +1,103 @@
+<services>
+	<service name="orderController">
+		<class name="N_ONE\App\Controller\OrderController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+		</class>
+	</service>
+	<service name="imageController">
+		<class name="N_ONE\App\Controller\ImageController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+		</class>
+	</service>
+	<service name="catalogController">
+		<class name="N_ONE\App\Controller\CatalogController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+		</class>
+	</service>
+	<service name="detailController">
+		<class name="N_ONE\App\Controller\DetailController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+		</class>
+	</service>
+	<service name="adminController">
+		<class name="N_ONE\App\Controller\AdminController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+		</class>
+	</service>
+	<service name="orderRepository">
+		<class name="\N_ONE\App\Model\Repository\OrderRepository">
+			<arg service="dbConnector"/>
+			<arg service="userRepository"/>
+			<arg service="itemRepository"/>
+		</class>
+	</service>
+	<service name="itemRepository">
+		<class name="\N_ONE\App\Model\Repository\ItemRepository">
+			<arg service="dbConnector"/>
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="attributeRepository"/>
+		</class>
+	</service>
+	<service name="attributeRepository">
+		<class name="\N_ONE\App\Model\Repository\AttributeRepository">
+			<arg service="dbConnector"/>
+		</class>
+	</service>
+	<service name="tagRepository">
+		<class name="\N_ONE\App\Model\Repository\TagRepository">
+			<arg service="dbConnector"/>
+		</class>
+	</service>
+	<service name="repositoryFactory">
+		<class name="\N_ONE\App\Model\Repository\RepositoryFactory"/>
+	</service>
+	<service name="userRepository">
+		<class name="\N_ONE\App\Model\Repository\UserRepository">
+			<arg service="dbConnector"/>
+		</class>
+	</service>
+	<service name="imageRepository">
+		<class name="\N_ONE\App\Model\Repository\ImageRepository">
+			<arg service="dbConnector"/>
+		</class>
+	</service>
+	<service name="migrator">
+		<class name="N_ONE\Core\Migrator\Migrator" isSingleton="1">
+			<arg service="dbConnector"/>
+		</class>
+	</service>
+	<service name="dbConnector">
+		<class name="N_ONE\Core\DbConnector\DbConnector" isSingleton="1"/>
+	</service>
+</services>

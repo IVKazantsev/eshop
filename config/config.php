@@ -17,4 +17,16 @@ return [
 	'PAGES_PATH' => ROOT . '/src/View/pages/',
 	'LAYOUTS_PATH' => ROOT . '/src/View/layouts/',
 
+	'MIGRATION_NEEDED' => true,
+
+	'SERVICES_PATH' => ROOT . '/services.xml',
+
+	'HOST_NAME' => $_SERVER['HTTP_HOST'],
+
+	'ORDER_HASH_PREFIX' => 'BITCAR_ORD',
+	'ORDER_HASH_ALGO' => 'crc32',
+	'SCRIPTS_PATH' => ROOT . '/js/',
+
+	'PUBLIC_ERROR_PAGE' => 'pages/publicErrorPage',
+	'ADMIN_ERROR_PAGE' => 'pages/adminErrorPage',
 ];

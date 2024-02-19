@@ -1,0 +1,2 @@
+ALTER TABLE N_ONE_TAGS
+	ADD PARENT_ID int default null;

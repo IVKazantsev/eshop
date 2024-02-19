@@ -5,7 +5,8 @@ namespace N_ONE\Core\Migrator;
 use DateTime;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
-use RuntimeException;
+use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Exceptions\FileException;
 
 class Migrator
 {
@@ -32,10 +33,13 @@ class Migrator
 		}
 
 		$dbConnector = DbConnector::getInstance();
-
 		return static::$instance = new self($dbConnector);
 	}
 
+	/**
+	 * @throws FileException
+	 * @throws DatabaseException
+	 */
 	public function migrate(): void
 	{
 
@@ -53,6 +57,9 @@ class Migrator
 		}
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function getLastMigration()
 	{
 		$connection = $this->dbConnector->getConnection();
@@ -76,7 +83,7 @@ class Migrator
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		// Если результат пустой, также возвращаем null
@@ -119,6 +126,10 @@ class Migrator
 		return $migrations;
 	}
 
+	/**
+	 * @throws FileException
+	 * @throws DatabaseException
+	 */
 	private function executeMigration($migration): void
 	{
 
@@ -130,7 +141,7 @@ class Migrator
 
 		if (!$sql)
 		{
-			throw new RuntimeException("Failed to read migration file: $migration");
+			throw new FileException("Read migration file $migration");
 		}
 
 		$queries = explode(';', $sql);
@@ -147,12 +158,15 @@ class Migrator
 
 				if (!$result)
 				{
-					throw new RuntimeException(mysqli_error($connection));
+					throw new DatabaseException(mysqli_error($connection));
 				}
 			}
 		}
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function updateLastMigration($migration): void
 	{
 		$connection = $this->dbConnector->getConnection();
@@ -162,7 +176,7 @@ class Migrator
 		$result = mysqli_query($connection, $sql);
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 	}
 

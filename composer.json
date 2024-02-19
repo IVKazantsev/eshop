@@ -6,6 +6,10 @@
 		}
 	},
 	"require": {
-		"ext-mysqli": "*"
+		"ext-mysqli": "*",
+		"ext-simplexml": "*",
+		"ext-mbstring": "*",
+		"ext-gd": "*",
+		"ext-http": "*"
 	}
 }

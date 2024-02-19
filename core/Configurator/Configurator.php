@@ -2,31 +2,13 @@
 
 namespace N_ONE\Core\Configurator;
 
-use RuntimeException;
+use http\Exception\InvalidArgumentException;
 
 class Configurator
 {
-
-	static private ?Configurator $instance = null;
-
-	private function __construct()
-	{
-	}
-
-	private function __clone()
-	{
-	}
-
-	public static function getInstance(): Configurator
-	{
-		if (static::$instance)
-		{
-			return static::$instance;
-		}
-
-		return static::$instance = new self();
-	}
-
+	/**
+	 * @throws InvalidArgumentException
+	 */
 	public static function option(string $name, $defaultValue = null)
 	{
 		static $config = null;
@@ -56,6 +38,6 @@ class Configurator
 			return $defaultValue;
 		}
 
-		throw new RuntimeException("Configuration option $name not found");
+		throw new InvalidArgumentException("There is no configuration option $name");
 	}
 }

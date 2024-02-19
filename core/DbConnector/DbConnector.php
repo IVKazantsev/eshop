@@ -5,12 +5,12 @@ namespace N_ONE\Core\DbConnector;
 use Exception;
 use mysqli;
 use N_ONE\Core\Configurator\Configurator;
-use RuntimeException;
+use N_ONE\Core\Exceptions\DatabaseException;
 
 class DbConnector
 {
 	static private ?DbConnector $instance = null;
-
+	private static mysqli|false $connection;
 	/**
 	 * @throws Exception
 	 */
@@ -33,11 +33,8 @@ class DbConnector
 
 		return static::$instance = new self();
 	}
-
-	private static mysqli|false $connection;
-
 	/**
-	 * @throws Exception
+	 * @throws DatabaseException
 	 */
 	private function createConnection($dbOptions): void
 	{
@@ -52,13 +49,13 @@ class DbConnector
 		if (!$connected)
 		{
 			$error = mysqli_connect_errno() . ': ' . mysqli_connect_error();
-			throw new RuntimeException($error);
+			throw new DatabaseException($error);
 		}
 
 		$encodingResult = mysqli_set_charset(static::$connection, 'utf8');
 		if (!$encodingResult)
 		{
-			throw new RuntimeException(mysqli_error(static::$connection));
+			throw new DatabaseException(mysqli_error(static::$connection));
 		}
 	}
 

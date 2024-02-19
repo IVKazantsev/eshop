@@ -4,122 +4,126 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
-use N_ONE\Core\DbConnector\DbConnector;
+use N_ONE\Core\Exceptions\DatabaseException;
 use RuntimeException;
 
 class ImageRepository extends Repository
 {
-
-	private DbConnector $dbConnection;
-
-	public function __construct(DbConnector $dbConnection)
-	{
-		$this->dbConnection = $dbConnection;
-	}
-
-	public function getList(array $filter = null): array
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getList(array $filter = null, bool $isImageId = null): array
 	{
 		$images = [];
 		$connection = $this->dbConnection->getConnection();
-
-		$result = mysqli_query($connection, "
-		SELECT id, item_id, height, width, is_main, type, path
+		$field = ($isImageId === null) ? 'item_id' : 'id';
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT id, item_id, height, width, is_main, type, extension
 		FROM N_ONE_IMAGES
-		WHERE item_id IN (" . implode(',', $filter) . ");
-		");
+		WHERE $field IN (" . implode(',', $filter) . ");
+		"
+		);
+
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
-			$images[$row['item_id']][] = new Image(
+			$images[$row[$field]][] = new Image(
 				$row['id'],
 				$row['item_id'],
-				$row['path'],
 				$row['is_main'],
 				$row['type'],
 				$row['height'],
 				$row['width'],
+				$row['extension'],
 			);
-		}
-
-		if (empty($images))
-		{
-			throw new RuntimeException("Items not found");
 		}
 
 		return $images;
 	}
 
-	public function getById(int $id): Image
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getById(int $id): Image|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
-		$result = mysqli_query($connection, "
-		SELECT id, item_id, height, width, is_main, type, path
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT id, item_id, height, width, is_main, type, extension
 		FROM N_ONE_IMAGES 
 		WHERE id = $id;
-		");
+		"
+		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$image = null;
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$image = new Image(
 				$row['id'],
 				$row['item_id'],
-				$row['path'],
 				$row['is_main'],
 				$row['type'],
 				$row['height'],
 				$row['width'],
+				$row['extension'],
 			);
-		}
-
-		if ($image === null)
-		{
-			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $image;
 	}
 
-	public function add(Image|Entity $entity): bool
+	/**
+	 * @throws DatabaseException
+	 */
+	public function add(Image|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
-		$imageId = $entity->getId();
 		$itemId = $entity->getItemId();
 		$height = $entity->getHeight();
 		$width = $entity->getWidth();
 		$isMain = $entity->isMain();
 		$type = $entity->getType();
+		$extension = mysqli_real_escape_string($connection, $entity->getExtension());
 
-		$result = mysqli_query($connection, "
-		INSERT INTO N_ONE_IMAGES (ID, ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE) 
+		$result = mysqli_query(
+			$connection,
+			"
+		INSERT INTO N_ONE_IMAGES (ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE, EXTENSION) 
 		VALUES (
-			$imageId,
 			$itemId,
 			$height,
 			$width,
 			$isMain,
-			{$type}
-		);");
+			$type,
+			'$extension'
+		);"
+		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		return true;
+		return mysqli_insert_id($connection);
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Image|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -129,24 +133,45 @@ class ImageRepository extends Repository
 		$width = $entity->getWidth();
 		$isMain = $entity->isMain();
 		$type = $entity->getType();
+		$extension = mysqli_real_escape_string($connection, $entity->getExtension());
 
-		$result = mysqli_query($connection, "
+		$result = mysqli_query(
+			$connection,
+			"
 		UPDATE N_ONE_IMAGES 
 		SET 
 			ITEM_ID = $itemId,
 			HEIGHT = $height,
 			WIDTH = $width,
 			IS_MAIN = $isMain,
-			TYPE = {$type}
+			TYPE = $type,
+			EXTENSION = '$extension'
 		where ID = $imageId;
-		");
-
+		"
+		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;
 	}
+	public function permanentDeleteByIds(array $entityId): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+
+		$result = mysqli_query(
+			$connection,
+			"DELETE FROM N_ONE_IMAGES WHERE ID IN (" . implode(',', $entityId) . ");"
+		);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		return true;
+	}
+
 }

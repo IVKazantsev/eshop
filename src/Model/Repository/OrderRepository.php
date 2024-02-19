@@ -4,26 +4,15 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
-use N_ONE\Core\DbConnector\DbConnector;
+use N_ONE\Core\Exceptions\DatabaseException;
 use RuntimeException;
 
 class OrderRepository extends Repository
 {
-	private DbConnector $dbConnection;
-	private UserRepository $userRepository;
-	private ItemRepository $itemRepository;
 
-	public function __construct(
-		DbConnector    $dbConnection,
-		UserRepository $userRepository,
-		ItemRepository $itemRepository
-	)
-	{
-		$this->dbConnection = $dbConnection;
-		$this->userRepository = $userRepository;
-		$this->itemRepository = $itemRepository;
-	}
-
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -32,48 +21,46 @@ class OrderRepository extends Repository
 		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
 		$orders = [];
 
+		$whereQueryBlock = $this->getWhereQueryBlock();
+
 		$result = mysqli_query(
 			$connection,
 			"
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
-	");
+		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+		$whereQueryBlock;
+	"
+		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
 		{
-			$orders[] = new Order(
+			$order = new Order(
 				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
-		}
 
-		if (empty($orders))
-		{
-			throw new RuntimeException("Items not found");
-		}
-
-		$itemsIds = array_map(static function($order) {return $order->getItemId();}, $orders);
-		$usersIds = array_map(static function($user) {return $user->getUserId();}, $orders);
-
-		$items = $this->itemRepository->getByIds($itemsIds);
-		$users = $this->userRepository->getByIds($usersIds);
-
-		$ordersCount = count($orders);
-		for ($i = 0; $i < $ordersCount; $i++)
-		{
-			$orders[$i]->setItem($items[$i]);
-			$orders[$i]->setUser($users[$i]);
+			$orders[] = $order;
 		}
 
 		return $orders;
 	}
 
-	public function getById(int $id): Order
+	private function getWhereQueryBlock(): string
+	{
+		$whereQueryBlock = "WHERE o.IS_ACTIVE = 1";
+
+		return $whereQueryBlock;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getById(int $id): Order|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -82,73 +69,94 @@ class OrderRepository extends Repository
 			"
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
-	");
+		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+		WHERE o.ID = $id;
+	"
+		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$order = null;
-		while($row = mysqli_fetch_assoc($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'],
-				$row['USER_ID'],
-				$row['ITEM_ID'],
-				$row['STATUS_ID'],
-				$row['TITLE'],
-				$row['PRICE'],
-				$this->userRepository->getById($row['USER_ID']),
-				$this->itemRepository->getById($row['ITEM_ID'])
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
-		}
-
-		if ($order === null)
-		{
-			throw new RuntimeException("Item with id $id not found");
 		}
 
 		return $order;
 	}
 
-	public function add(Order|Entity $entity): bool
+	/**
+	 * @throws DatabaseException
+	 */
+	public function getStatuses(): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$orderId = $entity->getId();
-		$userId = $entity->getUser()->getId();
-		$itemId = $entity->getItem()->getId();
+		$result = mysqli_query(
+			$connection,
+			"
+		SELECT ID, TITLE 
+		FROM N_ONE_STATUSES s;
+	"
+		);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+		$statuses = [];
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$statuses[(string)($row['ID'])] = $row['TITLE'];
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 */
+	public function add(Order|Entity $entity): int
+	{
+		$connection = $this->dbConnection->getConnection();
+		$userId = $entity->getUserId();
+		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ORDERS (ID, USER_ID, ITEM_ID, STATUS_ID, PRICE) 
+		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
 		VALUES (
-			$orderId,
 			$userId,
 			$itemId,
 			$statusId,
-			{$price}
+			$price
 		);"
 		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		return true;
+		return mysqli_insert_id($connection);
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Order|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
 		$orderId = $entity->getId();
-		$userId = $entity->getUser()->getId();
-		$itemId = $entity->getItem()->getId();
+		$userId = $entity->getUserId();
+		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
 
@@ -160,14 +168,14 @@ class OrderRepository extends Repository
 			USER_ID = $userId,
 			ITEM_ID = $itemId,
 			STATUS_ID = $statusId,
-			PRICE = {$price}
-		where ID = $orderId;
-		");
-
+			PRICE = $price
+		WHERE ID = $orderId;
+		"
+		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

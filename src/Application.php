@@ -3,34 +3,32 @@
 namespace N_ONE\App;
 
 use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\DependencyInjection\DependencyInjection;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class Application
 {
-	static private ?Application $instance = null;
+	private static null|DependencyInjection $di = null;
 
-	private function __construct()
+	public static function run(): void
 	{
-	}
-
-	public static function getInstance(): Application
-	{
-		if (static::$instance)
+		if (self::$di === null)
 		{
-			return static::$instance;
+			$di = new DependencyInjection(Configurator::option('SERVICES_PATH'));
+			self::$di = $di;
+		}
+		if (Configurator::option('MIGRATION_NEEDED'))
+		{
+			$migrator = self::$di->getComponent('migrator');
+			$migrator->migrate();
 		}
 
-		return static::$instance = new self();
-	}
-
-	public function run(): void
-	{
 		$route = Router::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 		if (!$route)
 		{
 			http_response_code(404);
-			echo (new TemplateEngine())->renderError(404, "Page not found");
+			echo(TemplateEngine::renderAdminError(404, "Page not found"));
 			exit;
 		}
 		$action = $route->action;
@@ -38,7 +36,20 @@ class Application
 		echo $action(...$variables);
 	}
 
-	private function __clone()
+	public static function getDI(): DependencyInjection
 	{
+		if (self::$di === null)
+		{
+			$di = new DependencyInjection(Configurator::option('SERVICES_PATH'));
+
+			return self::$di = $di;
+		}
+
+		return self::$di;
+	}
+
+	private static function setDI($di): void
+	{
+		self::$di = $di;
 	}
 }

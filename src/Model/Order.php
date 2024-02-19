@@ -2,18 +2,47 @@
 
 namespace N_ONE\App\Model;
 
+// use N_ONE\Core\Configurator\Configurator;
+
 class Order extends Entity
 {
+	private string|null $dateCreate;
+
 	public function __construct(
-		protected int  $id,
-		private int    $userId,
-		private int    $itemId,
-		private int    $statusId,
-		private string $status,
-		private int    $price,
-		private ?User  $user = null,
-		private ?Item  $item = null,
-	){}
+		protected int|null  $id,
+		private int|null    $userId,
+		private int|null    $itemId,
+		private int|null    $statusId,
+		private string|null $status,
+		private int|null    $price,
+	)
+	{
+	}
+
+	public function getExcludedFields(): array
+	{
+		return ['dateCreate', 'statusId'];
+	}
+
+	public function generateNumber(int $time): void
+	{
+		$this->dateCreate = date('Y-m-d H:i:s', $time);
+
+		// $hashString = Configurator::option('ORDER_HASH_PREFIX') . $this->userId . $this->itemId . $this->dateCreate;
+		// $this->number = hash(Configurator::option('ORDER_HASH_ALGO'), $hashString);
+	}
+
+	public function getClassname(): string
+	{
+		$array = explode('\\', __CLASS__);
+
+		return strtolower(end($array));
+	}
+
+	public function getField(string $fieldName)
+	{
+		return $this->$fieldName;
+	}
 
 	public function getUserId(): int
 	{
@@ -45,26 +74,6 @@ class Order extends Entity
 		$this->statusId = $statusId;
 	}
 
-	public function getUser(): User
-	{
-		return $this->user;
-	}
-
-	public function setUser(User $user): void
-	{
-		$this->user = $user;
-	}
-
-	public function getItem(): Item
-	{
-		return $this->item;
-	}
-
-	public function setItem(Item $item): void
-	{
-		$this->item = $item;
-	}
-
 	public function getStatus(): string
 	{
 		return $this->status;
@@ -83,5 +92,15 @@ class Order extends Entity
 	public function setPrice(int $price): void
 	{
 		$this->price = $price;
+	}
+
+	public function getDateCreate(): string
+	{
+		return $this->dateCreate;
+	}
+
+	public function setDateCreate(string $dateCreate): void
+	{
+		$this->dateCreate = $dateCreate;
 	}
 }
