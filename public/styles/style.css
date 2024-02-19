@@ -287,14 +287,53 @@ footer {
 
 /* для dual range slider */
 
-.num-input {
-	display: flex;
+
+.range_input {
+	/*margin-left: 20px;*/
+	/*width: 25px;*/
 }
-.field input {
-	width: 70%;
-	margin-left: 10px;
-	text-align: center;
+
+.range_button {
+	position: sticky;
+	transform: none;
 }
+
+/*.range {*/
+/*	width:500px;*/
+/*	height:10px;*/
+
+/*	border-radius: 4px;*/
+/*	background-color: #ddd;*/
+/*}*/
+
+/*.range__button_1, .range__button_2 {*/
+/*	position: absolute;*/
+/*	top: 50%;*/
+
+/*	width: 20px;*/
+/*	height: 20px;*/
+
+/*	cursor: move;*/
+/*	transform: translateY(-50%);*/
+
+/*	border: none;*/
+/*	border-radius: 50%;*/
+/*	background-color: #999;*/
+/*}*/
+/*.range__between*/
+/*{*/
+/*	position: absolute;*/
+/*	height: 5px;*/
+/*	width:0px;*/
+/*	margin-top:3px;*/
+/*	border: none;*/
+/*	background-color: #559933;*/
+/*}*/
+/*.range_inpt1, .range_inpt2*/
+/*{*/
+/*	margin-top:20px;*/
+/*	width: 50px;*/
+/*}*/
 
 
 

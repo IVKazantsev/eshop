@@ -61,8 +61,23 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 					<li class="tag-item">
 						<?= $attribute->getTitle() ?>
 					</li>
+					<li class="tag-item">
+						<input class="range_input" id="input1_<?=$attribute->getId()?>" type="number" min="0" max="999">
+						<input class="range_input" id="input2_<?=$attribute->getId()?>" type="number" min="0" max="999">
+						<button class="range_button" onclick="sendGetRequest(<?=$attribute->getId()?>)">sort</button>
+					</li>
 				<?php endforeach; ?>
-			</ul>
+				<script>
+					function sendGetRequest(id) {
+						var input1Value = document.getElementById('input1_' + id).value;
+						var input2Value = document.getElementById('input2_' + id).value;
+
+						// Формируем GET-запрос с использованием переменной из PHP
+						// Выполняем GET-запрос
+						window.location.href = `?range=${id}:${input1Value},${input2Value}`;
+					}
+				</script>
+
 
 		</div>
 	</div>

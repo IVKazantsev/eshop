@@ -2,22 +2,13 @@
 ?>
 
 
-<div class="price-input">
-	<div class="field">
-		<input type="number" class="input-min" value="50">
-	</div>
-
-	<div class="field">
-		<input type="number" class="input-max" value="300">
-	</div>
-</div>
-<div class="slider">
-	<div class="progress"></div>
-</div>
-<div class="range-input">
-	<input type="range" class="range-min" min="0" max="1000" value="50" step="10">
-	<input type="range" class="range-max" min="0" max="1000" value="300" step="10">
+<div id='id66' class="range">
+	<div id='id66b' class='range__between'></div>
+	<button id='id661' class="range__button_1"></button>
+	<button id='id662' class="range__button_2"></button>
+	<input id='id66i1' class='range_inpt1' type='number' min='20' max='700'>
+	<input id='id66i2' class='range_inpt2' type='number' min='20' max='700'>
 </div>
 
 
-<script src="/js/dualRangeSlider.js"></script>
+

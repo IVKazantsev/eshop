@@ -2,7 +2,6 @@
 
 namespace N_ONE\App\Model\Repository;
 
-use N_ONE\App\Model\Service\TagService;
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -81,7 +80,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], null, null,
+				$row['ID'], $row['TITLE'], null,
 			);
 		}
 
@@ -208,7 +207,6 @@ class TagRepository extends Repository
 	public function add(Tag|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
-		// $tagId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 		$parentId = $entity->getParentId();
 
@@ -217,23 +215,29 @@ class TagRepository extends Repository
 			$result = mysqli_query(
 				$connection,
 				"
-		INSERT INTO N_ONE_TAGS (TITLE, PARENT_ID)
-		VALUES (
-			'$title',
-			$parentId
-		);"
+				INSERT INTO N_ONE_TAGS (TITLE, PARENT_ID)
+				VALUES (
+				'$title',
+				$parentId
+				);"
 			);
+			$countOfParentTags = $this->checkIfParentHasTags($parentId);
+
+			if ($countOfParentTags === 1)
+			{
+				$this->toggleParentTagIsActive($parentId, true);
+			}
+
 		}
 		else
 		{
 			$result = mysqli_query(
 				$connection,
 				"
-		INSERT INTO N_ONE_TAGS (TITLE)
-		VALUES (
-			'$title'
-			
-		);"
+				INSERT INTO N_ONE_TAGS (TITLE)
+				VALUES (
+					'$title'
+					);"
 			);
 		}
 
@@ -260,11 +264,11 @@ class TagRepository extends Repository
 			$result = mysqli_query(
 				$connection,
 				"
-		UPDATE N_ONE_TAGS 
-		SET 
-			TITLE = '$title',
-			PARENT_ID = null
-		WHERE ID = $tagId"
+				UPDATE N_ONE_TAGS 
+				SET 
+				TITLE = '$title',
+				PARENT_ID = null
+				WHERE ID = $tagId"
 			);
 		}
 		else
@@ -274,31 +278,13 @@ class TagRepository extends Repository
 			$result = mysqli_query(
 				$connection,
 				"
-		UPDATE N_ONE_TAGS 
-		SET 
-			TITLE = '$title',
-			PARENT_ID = $parentId
-		WHERE ID = $tagId"
+				UPDATE N_ONE_TAGS 
+				SET 
+				TITLE = '$title',
+				PARENT_ID = $parentId
+				WHERE ID = $tagId"
 			);
-			$countOfNewParentTags = $this->checkIfParentHasTags($parentId);
-			$countOfOldParentTags = $this->checkIfParentHasTags($oldParentId);
-
-			if ($countOfOldParentTags === 0)
-			{
-				$this->toggleParentTagIsActive($oldParentId, false);
-			}
-			elseif ($countOfOldParentTags === 1)
-			{
-				$this->toggleParentTagIsActive($oldParentId, true);
-			}
-			if ($countOfNewParentTags === 1)
-			{
-				$this->toggleParentTagIsActive($parentId, true);
-			}
-			elseif ($countOfNewParentTags === 0)
-			{
-				$this->toggleParentTagIsActive($parentId, false);
-			}
+			$this->parentUpdate($parentId, $oldParentId);
 		}
 
 		if (!$result)
@@ -335,7 +321,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $id, null,
+				$row['ID'], $row['TITLE'], $id,
 			);
 		}
 
@@ -376,7 +362,7 @@ class TagRepository extends Repository
 			"
 		SELECT t.ID
 		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID = '$parentId'
+		WHERE t.PARENT_ID = '$parentId' and t.IS_ACTIVE = 1 
 		"
 		);
 
@@ -430,7 +416,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], null, null,
+				$row['ID'], $row['TITLE'], null,
 			);
 		}
 
@@ -440,5 +426,78 @@ class TagRepository extends Repository
 		}
 
 		return $tags;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 */
+	public function parentUpdate($parentId, $oldParentId): void
+	{
+		$countOfNewParentTags = $this->checkIfParentHasTags($parentId);
+		$countOfOldParentTags = $this->checkIfParentHasTags($oldParentId);
+
+		if ($countOfOldParentTags === 0)
+		{
+			$this->toggleParentTagIsActive($oldParentId, false);
+		}
+		elseif ($countOfOldParentTags === 1)
+		{
+			$this->toggleParentTagIsActive($oldParentId, true);
+		}
+		if ($countOfNewParentTags === 1)
+		{
+			$this->toggleParentTagIsActive($parentId, true);
+		}
+		elseif ($countOfNewParentTags === 0)
+		{
+			$this->toggleParentTagIsActive($parentId, false);
+		}
+	}
+
+	public function delete(string $entities, int $entityId): bool
+	{
+		$tag = $this->getById($entityId);
+		$connection = $this->dbConnection->getConnection();
+
+		if ($tag->getParentId()) //если дочерний тег
+		{
+			$result = mysqli_query(
+				$connection,
+				"
+				UPDATE N_ONE_$entities 
+				SET IS_ACTIVE = 0
+				WHERE ID = $entityId"
+			);
+
+			// mysqli_query(
+			// 	$connection,
+			// 	"
+			// 	DELETE FROM N_ONE_ITEMS_TAGS
+			// 	WHERE TAG_ID = $entityId; "
+			// );
+
+			$countOfParentTags = $this->checkIfParentHasTags($tag->getParentId());
+			if ($countOfParentTags === 0)
+			{
+				$this->toggleParentTagIsActive($tag->getParentId(), false);
+			}
+		}
+		else //если родительский тег
+		{
+			$result = mysqli_query(
+				$connection,
+				"
+				UPDATE N_ONE_$entities 
+				SET IS_ACTIVE = 0
+				WHERE ID = $entityId or PARENT_ID = $entityId"
+			);
+		}
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		return true;
 	}
 }
