@@ -97,6 +97,12 @@ Router::get('/admin/edit/success', MiddleWare::adminMiddleware(function() {
 	return ($di->getComponent('adminController'))->renderSuccessEditPage();
 }));
 
+Router::get('/admin/add/success', MiddleWare::adminMiddleware(function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderSuccessAddPage();
+}));
+
 Router::get('/admin/:entity/delete/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToDelete = $route->getVariables()[0];
 	$entityId = $route->getVariables()[1];

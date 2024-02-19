@@ -401,6 +401,20 @@ class AdminController extends BaseController
 		return $this->renderAdminView($successEditPage);
 	}
 
+	public function renderSuccessAddPage(): string
+	{
+		if ($_SERVER['REQUEST_URI'] !== "/admin/add/success")
+		{
+			Router::redirect("/admin/add/success");
+		}
+
+		$successAddPage = TemplateEngine::render(
+			'pages/successAddPage'
+		);
+
+		return $this->renderAdminView($successAddPage);
+	}
+
 	public function logout(): void
 	{
 		session_start();
@@ -731,7 +745,7 @@ class AdminController extends BaseController
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
 
-		return $this->renderSuccessEditPage();
+		return $this->renderSuccessAddPage();
 	}
 
 }
