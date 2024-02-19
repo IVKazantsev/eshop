@@ -58,7 +58,14 @@ class ImageService
 
 		return true;
 	}
-
+	public static function createDirIfNotExist($folderPath): void
+	{	// Проверяем существует ли папка
+		if (!file_exists($folderPath))
+		{
+			// Создаем папку если она не существует
+			mkdir($folderPath, 0777, true);
+		}
+	}
 	public static function changeMainImage()
 	{
 
