@@ -146,7 +146,8 @@ class AttributeRepository extends Repository
 			SELECT ia.ITEM_ID, a.ID, a.TITLE, ia.VALUE
 			FROM N_ONE_ATTRIBUTES a 
 			JOIN N_ONE_ITEMS_ATTRIBUTES ia on a.ID = ia.ATTRIBUTE_ID
-			WHERE ia.ITEM_ID IN ($itemsIdsString);
+			WHERE ia.ITEM_ID IN ($itemsIdsString)
+			AND a.IS_ACTIVE = 1;
 			"
 		);
 

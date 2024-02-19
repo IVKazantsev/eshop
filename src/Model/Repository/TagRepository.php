@@ -174,7 +174,8 @@ class TagRepository extends Repository
 		SELECT it.ITEM_ID, t.ID, t.TITLE, t.PARENT_ID
 		FROM N_ONE_TAGS t 
 		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-		WHERE it.ITEM_ID IN ($itemsIdsString);
+		WHERE it.ITEM_ID IN ($itemsIdsString)
+		AND t.IS_ACTIVE = 1;
 	"
 		);
 
@@ -321,7 +322,8 @@ class TagRepository extends Repository
 			"
 		SELECT t.ID, t.TITLE
 		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID = $id;
+		WHERE t.PARENT_ID = $id
+		AND t.IS_ACTIVE = 1;
 		"
 		);
 
