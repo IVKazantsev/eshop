@@ -140,7 +140,6 @@ class ItemRepository extends Repository
 
 	private function getWhereQueryBlock(?string $tag, ?string $title, ?string $range, mysqli $connection): string
 	{
-
 		$whereQueryBlock = "WHERE i.IS_ACTIVE = 1";
 		if ($range !== null)
 		{
@@ -180,6 +179,9 @@ class ItemRepository extends Repository
 		return $whereQueryBlock;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getByIds(array $ids): array
 	{
 		$connection = $this->dbConnection->getConnection();

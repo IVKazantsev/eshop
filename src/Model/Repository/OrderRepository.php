@@ -21,12 +21,15 @@ class OrderRepository extends Repository
 		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
 		$orders = [];
 
+		$whereQueryBlock = $this->getWhereQueryBlock();
+
 		$result = mysqli_query(
 			$connection,
 			"
 		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID;
+		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+		$whereQueryBlock;
 	"
 		);
 
@@ -45,6 +48,13 @@ class OrderRepository extends Repository
 		}
 
 		return $orders;
+	}
+
+	private function getWhereQueryBlock(): string
+	{
+		$whereQueryBlock = "WHERE o.IS_ACTIVE = 1";
+
+		return $whereQueryBlock;
 	}
 
 	/**
@@ -80,6 +90,9 @@ class OrderRepository extends Repository
 		return $order;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getStatuses(): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -93,7 +106,7 @@ class OrderRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 		$statuses = [];
 		while ($row = mysqli_fetch_assoc($result))

@@ -4,6 +4,7 @@ namespace N_ONE\App\Model\Repository;
 
 use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Entity;
+use N_ONE\Core\Exceptions\DatabaseException;
 use RuntimeException;
 
 class AttributeRepository extends Repository
@@ -14,17 +15,20 @@ class AttributeRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		$attributes = [];
 
+		$whereQueryBlock = $this->getWhereQueryBlock();
+
 		$result = mysqli_query(
 			$connection,
 			"
 		SELECT a.ID, a.TITLE
-		FROM N_ONE_ATTRIBUTES a;
+		FROM N_ONE_ATTRIBUTES a
+		$whereQueryBlock;
 		"
 		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -36,12 +40,22 @@ class AttributeRepository extends Repository
 
 		if (empty($attributes))
 		{
-			throw new RuntimeException("Items not found");
+			throw new RuntimeException("Entities not found");
 		}
 
 		return $attributes;
 	}
 
+	private function getWhereQueryBlock(): string
+	{
+		$whereQueryBlock = "WHERE a.IS_ACTIVE = 1";
+
+		return $whereQueryBlock;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getById(int $id): Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -57,7 +71,7 @@ class AttributeRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$attribute = null;
@@ -70,12 +84,15 @@ class AttributeRepository extends Repository
 
 		if ($attribute === null)
 		{
-			throw new RuntimeException("Item with id $id not found");
+			throw new RuntimeException("Entities not found");
 		}
 
 		return $attribute;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getByTitle(string $title): Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -92,7 +109,7 @@ class AttributeRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		$attribute = null;
@@ -105,7 +122,7 @@ class AttributeRepository extends Repository
 
 		if ($attribute === null)
 		{
-			throw new RuntimeException("Item with title $title not found");
+			throw new RuntimeException("Entities not found");
 		}
 
 		return $attribute;
@@ -113,6 +130,8 @@ class AttributeRepository extends Repository
 
 	/**
 	 * @param int[] $itemsIds
+	 *
+	 * @throws DatabaseException
 	 */
 
 	public function getByItemsIds(array $itemsIds): array
@@ -133,7 +152,7 @@ class AttributeRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -170,12 +189,15 @@ class AttributeRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Attribute|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -193,7 +215,7 @@ class AttributeRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;

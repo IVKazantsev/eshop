@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use N_ONE\App\Model\Service\TagService;
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -17,17 +18,20 @@ class TagRepository extends Repository
 		$connection = $this->dbConnection->getConnection();
 		$tags = [];
 
+		$whereQueryBlock = $this->getWhereQueryBlock();
+
 		$result = mysqli_query(
 			$connection,
 			"
 		SELECT t.ID, t.TITLE, t.PARENT_ID 
-		FROM N_ONE_TAGS t;
+		FROM N_ONE_TAGS t
+		$whereQueryBlock;
 		"
 		);
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -39,12 +43,22 @@ class TagRepository extends Repository
 
 		if (empty($tags))
 		{
-			throw new RuntimeException("Items not found");
+			throw new RuntimeException("Entities not found");
 		}
 
 		return $tags;
 	}
 
+	private function getWhereQueryBlock(): string
+	{
+		$whereQueryBlock = "WHERE t.IS_ACTIVE = 1";
+
+		return $whereQueryBlock;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getParentTags(): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -61,7 +75,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -73,12 +87,15 @@ class TagRepository extends Repository
 
 		if (empty($tags))
 		{
-			throw new RuntimeException("Items not found");
+			throw new RuntimeException("Entities not found");
 		}
 
 		return $tags;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getById(int $id): Tag
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -142,6 +159,9 @@ class TagRepository extends Repository
 		return $tag;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getByItemsIds(array $itemsIds): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -181,6 +201,9 @@ class TagRepository extends Repository
 		return $tags;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function add(Tag|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -215,12 +238,15 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Tag|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -276,12 +302,15 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return true;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getByParentId(int $id): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -298,7 +327,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -310,12 +339,15 @@ class TagRepository extends Repository
 
 		if (empty($tags))
 		{
-			throw new RuntimeException("Items not found");
+			throw new RuntimeException("Entities not found");
 		}
 
 		return $tags;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function toggleParentTagIsActive(int $parentId, bool $toggle): void
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -334,7 +366,7 @@ class TagRepository extends Repository
 		}
 	}
 
-	private function checkIfParentHasTags(string $parentId)
+	private function checkIfParentHasTags(string $parentId): int|string
 	{
 		$connection = $this->dbConnection->getConnection();
 		$result = mysqli_query(
@@ -349,6 +381,9 @@ class TagRepository extends Repository
 		return mysqli_num_rows($result);
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function getParentById(int $id): ?int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -362,12 +397,15 @@ class TagRepository extends Repository
 		);
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		return mysqli_fetch_assoc($result)['PARENT_ID'];
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getAllParentTags(): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -384,7 +422,7 @@ class TagRepository extends Repository
 
 		if (!$result)
 		{
-			throw new RuntimeException(mysqli_error($connection));
+			throw new DatabaseException(mysqli_error($connection));
 		}
 
 		while ($row = mysqli_fetch_assoc($result))
@@ -396,7 +434,7 @@ class TagRepository extends Repository
 
 		if (empty($tags))
 		{
-			throw new RuntimeException("Items not found");
+			throw new RuntimeException("Entities not found");
 		}
 
 		return $tags;
