@@ -504,6 +504,8 @@ class AdminController extends BaseController
 			$targetFile = $targetDir . basename($files["image"]["name"][$i]);
 			$file_extension = pathinfo($files['image']['name'][$i], PATHINFO_EXTENSION);
 
+			ImageService::createDirIfNotExist($targetDir);
+
 			$fullSizeImageId = $this->imageRepository->add(
 				new Image(null, $itemId, false, 1, 1200, 900, $file_extension)
 			);
@@ -543,8 +545,7 @@ class AdminController extends BaseController
 			{
 				$parentTags = $this->tagRepository->getParentTags();
 				$attributes = $this->attributeRepository->getList();
-				$itemAttributes = [];
-				// $itemAttributes = $item->getAttributes();
+
 				$itemTags = [];
 				$childrenTags = [];
 				$specificFields = [
@@ -683,15 +684,6 @@ class AdminController extends BaseController
 		}
 		if ($entityToAdd === 'item')
 		{
-			if (array_key_exists('imageIds', $fields))
-			{
-				$this->deleteImages($fields['imageIds']);
-			}
-			if ($_FILES['image']['size'][0] !== 0)
-			{
-				$this->addBaseImages($_FILES, $itemId);
-			}
-
 			foreach ($fields as $field => $value)
 			{
 				if (
@@ -717,10 +709,15 @@ class AdminController extends BaseController
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
-			// var_dump(null, $fields);
-			// exit();
 			$item = new $className(null, ...array_values($fields));
-			$repository->add($item);
+			$itemId = $repository->add($item);
+			if ($entityToAdd === 'item')
+			{
+				if ($_FILES['image']['size'][0] !== 0)
+				{
+					$this->addBaseImages($_FILES, $itemId);
+				}
+			}
 		}
 		catch (ValidateException $e)
 		{

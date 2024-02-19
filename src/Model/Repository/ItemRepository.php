@@ -254,7 +254,6 @@ class ItemRepository extends Repository
 			"
 		INSERT INTO N_ONE_ITEMS ( TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
 		VALUES (
-			
 			'{$title}',
 			{$isActive},
 			{$price},
@@ -262,6 +261,8 @@ class ItemRepository extends Repository
 			{$sortOrder}
 		);"
 		);
+
+		$result = mysqli_insert_id($connection);
 
 		if (!$result)
 		{
@@ -271,7 +272,7 @@ class ItemRepository extends Repository
 		$this->addItemTags($connection, $itemId, $tags);
 		$this->addItemAttributes($connection, $itemId, $attributes);
 
-		return true;
+		return $result;
 	}
 
 	public function update(Item|Entity $entity): bool
@@ -375,10 +376,8 @@ class ItemRepository extends Repository
 		$itemTags = "";
 		foreach ($tags as $tag)
 		{
-			// var_dump($tag);
 			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag . '),';
 		}
-		// exit();
 		$itemTags = substr($itemTags, 0, -1);
 
 		$sql = "INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";";
