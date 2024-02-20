@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var Item $car
+ * @var Item $item
  */
 
 use N_ONE\App\Model\Item;
@@ -9,7 +9,7 @@ use N_ONE\Core\Configurator\Configurator;
 
 $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
-$priceString = $car->getPrice();
+$priceString = $item->getPrice();
 $priceString = number_format($priceString, 0, '', ' ');
 ?>
 
@@ -54,17 +54,17 @@ $priceString = number_format($priceString, 0, '', ' ');
 				</thead>
 				<tbody>
 					<tr>
-						<td class="order-td order-car-info">
+						<td class="order-td order-item-info">
 							<div class="order-img-container">
 
-								<?php if($car->getImages()):?>
-									<img class="order-image" src="<?= $imagesPath . $car->getPreviewImage()->getPath() ?>" alt="image of a car">
+								<?php if($item->getImages()):?>
+									<img class="order-image" src="<?= $imagesPath . $item->getPreviewImage()->getPath() ?>" alt="image of an item">
 								<?php else:?>
-									<img class="order-image" src="<?= $imagesPath . 'plugs/imageNotFound.jpeg' ?>" alt="image of a car">
+									<img class="order-image" src="<?= $imagesPath . 'plugs/imageNotFound.jpeg' ?>" alt="image of an item">
 								<?php endif;?>
 							</div>
-							<div class="order-car-title">
-								<?= $car->getTitle() ?>
+							<div class="order-item-title">
+								<?= $item->getTitle() ?>
 							</div>
 						</td>
 						<td class="order-td">

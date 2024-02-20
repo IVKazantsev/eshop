@@ -145,7 +145,7 @@ footer {
 	display: none;
 }
 
-.car-card {
+.item-card {
 	display: flex;
 	width: 30%;
 	min-width: 250px;
@@ -159,7 +159,7 @@ footer {
 	box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.10);
 }
 
-.car-card-link {
+.item-card-link {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -168,16 +168,16 @@ footer {
 	color: black;
 }
 
-.car-card-link:active {
+.item-card-link:active {
 	color: black;
 }
 
-.car-card:hover {
+.item-card:hover {
 	transform: translateY(-5px);
 }
 
 
-.car-image {
+.item-image {
 	width: 100%;
 	border-top-left-radius: 15px;
 	border-top-right-radius: 15px;
@@ -185,32 +185,32 @@ footer {
 }
 
 
-.car-name {
+.item-name {
 	font-size: 20px;
 	color: #2d2d2d;
 	margin-bottom: 15px;
 }
 
 
-.car-year {
+.item-year {
 	color: #707070;
 	margin-bottom: 10px;
 }
 
 
-.car-details {
+.item-details {
 	list-style-type: none;
 }
 
 
-.car-spec {
+.item-spec {
 	display: flex;
 	gap: 12px;
 	margin-left: 10px;
 }
 
 
-.car-spec p {
+.item-spec p {
 	font-size: 16px;
 	line-height: 16px;
 	color: #252525;
@@ -242,7 +242,7 @@ footer {
 }
 
 
-.car-info {
+.item-info {
 	display: grid;
 	grid-template-columns: 3fr 1fr;
 	grid-template-rows: 1fr 300px;
@@ -342,7 +342,7 @@ footer {
 
 
 
-.car-image-gallery {
+.item-image-gallery {
 	aspect-ratio: auto;
 	margin: 0 auto;
 	position: relative;
@@ -409,37 +409,37 @@ button {
 }
 
 
-.car-additional-images {
+.item-additional-images {
 	display: flex;
 	gap: 20px;
 }
 
 
-.car-image-preview {
+.item-image-preview {
 	height: 10%;
 	width: 10%;
 }
 
 
-.car-main-image-container {
+.item-main-image-container {
 	display: block;
 	margin: 0 auto;
 }
 
 
-.car-main-image {
+.item-main-image {
 	width: 100%;
 	aspect-ratio: auto;
 }
 
 
-.car-specs {
+.item-specs {
 	background-color: rgba(242, 242, 242, 1);
 	padding: 15px;
 	margin-left: 10px;
 }
 
-.car-title-details {
+.item-title-details {
 	font-weight: 500;
 	margin-top: 15px;
 	margin-bottom: 10px;
@@ -452,16 +452,16 @@ hr {
 }
 
 
-.car-description {
+.item-description {
 	margin-top: 10px;
 	grid-column: 1;
 }
 
-.car-description h2 {
+.item-description h2 {
 	font-weight: 500;
 }
 
-.car-description-text{
+.item-description-text{
 	font-weight: 300;
 }
 
@@ -536,11 +536,11 @@ hr {
 	background-color: #e8e8e8;
 }
 
-.order-car-title {
+.order-item-title {
 	margin-left: 20px;
 }
 
-.order-car-info {
+.order-item-info {
 	display: flex;
 	align-items: center;
 }

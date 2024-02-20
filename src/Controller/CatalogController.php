@@ -9,12 +9,12 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(?int $pageNumber, ?string $carsTag, ?string $SearchRequest, ?string $range): string
+	public function renderCatalog(?int $pageNumber, ?string $itemsTag, ?string $SearchRequest, ?string $range): string
 	{
 		try
 		{
 			$filter = [
-				'tag' => $carsTag,
+				'tag' => $itemsTag,
 				'title' => $SearchRequest,
 				'pageNumber' => $pageNumber,
 				'range' => $range,
@@ -36,7 +36,7 @@ class CatalogController extends BaseController
 				array_pop($items);
 			}
 			$content = TemplateEngine::render('pages/catalogPage', [
-				'cars' => $items,
+				'items' => $items,
 				'previousPageUri' => $previousPageUri,
 				'nextPageUri' => $nextPageUri,
 			]);

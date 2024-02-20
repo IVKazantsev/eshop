@@ -40,11 +40,6 @@ class TagRepository extends Repository
 			);
 		}
 
-		if (empty($tags))
-		{
-			throw new RuntimeException("Entities not found");
-		}
-
 		return $tags;
 	}
 

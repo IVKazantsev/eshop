@@ -7,11 +7,11 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class DetailController extends BaseController
 {
-	public function renderDetailPage(string $carId): string
+	public function renderDetailPage(string $itemId): string
 	{
 		try
 		{
-			$item = $this->itemRepository->getById($carId);
+			$item = $this->itemRepository->getById($itemId);
 		}
 		catch (DatabaseException)
 		{
@@ -27,7 +27,7 @@ class DetailController extends BaseController
 		}
 
 		$content = TemplateEngine::render('pages/detailPage', [
-			'car' => $item,
+			'item' => $item,
 		]);
 
 		return $this->renderPublicView($content);

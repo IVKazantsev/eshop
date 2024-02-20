@@ -38,11 +38,6 @@ class AttributeRepository extends Repository
 			);
 		}
 
-		if (empty($attributes))
-		{
-			throw new RuntimeException("Entities not found");
-		}
-
 		return $attributes;
 	}
 

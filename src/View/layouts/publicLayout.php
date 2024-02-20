@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var array $cars
+ * @var array $items
  * @var string $content
  * @var Tag[] $tags
  * @var Attribute[] $attributes
@@ -12,7 +12,6 @@ use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Attribute;
 use N_ONE\Core\Configurator\Configurator;
-use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
@@ -39,24 +38,28 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 		<div class="tags-container">
 			<div class="tags-title">КАТЕГОРИИ</div>
 
+
 			<ul class="tags">
-				<?php foreach ($tags[""] as $parentTag): ?>
-					<li class="tag-item">
-						<?= $parentTag->getTitle() ?>
-					</li>
-					<ul class="child-tags">
-						<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
-							<li class="tag-item">
-								<a
-									class="tag-link"
-									href="<?= '/?tag=' . $childTag->getTitle() ?>"
-								>
-									<?= $childTag->getTitle() ?>
-								</a>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				<?php endforeach; ?>
+				<?php if (isset($tags[""])): ?>
+					<?php foreach ($tags[""] as $parentTag): ?>
+						<li class="tag-item">
+							<?= $parentTag->getTitle() ?>
+						</li>
+						<ul class="child-tags">
+							<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
+								<li class="tag-item">
+									<a
+										class="tag-link"
+										href="<?= '/?tag=' . $childTag->getTitle() ?>"
+									>
+										<?= $childTag->getTitle() ?>
+									</a>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endforeach; ?>
+				<?php endif; ?>
+
 				<?php foreach ($attributes as $attribute): ?>
 					<li class="tag-item">
 						<?= $attribute->getTitle() ?>
@@ -67,6 +70,7 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 						<button class="range_button" onclick="sendGetRequest(<?=$attribute->getId()?>)">sort</button>
 					</li>
 				<?php endforeach; ?>
+
 				<script>
 					function sendGetRequest(id) {
 						var input1Value = document.getElementById('input1_' + id).value;
@@ -77,7 +81,6 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 						window.location.href = `?range=${id}:${input1Value},${input2Value}`;
 					}
 				</script>
-
 
 		</div>
 	</div>

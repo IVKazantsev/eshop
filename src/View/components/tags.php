@@ -12,10 +12,10 @@ use N_ONE\Core\Configurator\Configurator;
 $iconsPath = Configurator::option('ICONS_PATH');
 ?>
 
-<ul class="car-details">
+<ul class="item-details">
 	<?php foreach ($tags as $tag): ?>
 		<li class="detail-item">
-			<div class="car-spec">
+			<div class="item-spec">
 				<p>
 					<img src="<?= $iconsPath . $tag->getParentId() ?>.svg" alt="">
 					<?= $tag->getTitle() ?>
@@ -25,7 +25,7 @@ $iconsPath = Configurator::option('ICONS_PATH');
 	<?php endforeach; ?>
 	<?php foreach ($attributes as $attribute): ?>
 		<li class="detail-item">
-			<div class="car-spec">
+			<div class="item-spec">
 				<p>
 					<?= $attribute->getTitle() ?> : <?= $attribute->getValue() ?>
 				</p>

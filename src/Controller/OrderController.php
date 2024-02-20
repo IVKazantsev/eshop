@@ -15,11 +15,11 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 class OrderController extends BaseController
 {
 
-	public function renderOrderPage(string $carId): string
+	public function renderOrderPage(string $itemId): string
 	{
 		try
 		{
-			$car = $this->itemRepository->getById($carId);
+			$item = $this->itemRepository->getById($itemId);
 		}
 		catch (Exception)
 		{
@@ -29,7 +29,7 @@ class OrderController extends BaseController
 		}
 
 		$orderPage = TemplateEngine::render('pages/orderPage', [
-			'car' => $car,
+			'item' => $item,
 		]);
 
 		return $this->renderPublicView($orderPage);

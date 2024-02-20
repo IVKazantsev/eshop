@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var array $cars
+ * @var array $items
  * @var string $previousPageUri
  * @var string $nextPageUri
  */
@@ -11,9 +11,9 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 ?>
 
 <div class="catalog">
-	<?php foreach ($cars as $car): ?>
-		<?= TemplateEngine::render('components/carCard', [
-			'car' => $car,
+	<?php foreach ($items as $item): ?>
+		<?= TemplateEngine::render('components/itemCard', [
+			'item' => $item,
 		])
 		?>
 	<?php endforeach; ?>
