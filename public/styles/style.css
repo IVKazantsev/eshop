@@ -563,6 +563,11 @@ hr {
 	text-align: center;
 	text-decoration: none;
 	cursor: pointer;
+
+	position: sticky;
+	top: 0;
+	transform: none;
+	z-index: 0;
 }
 
 .order-container {
@@ -819,4 +824,23 @@ footer {
 	text-align: center;
 	margin-top: auto;
 	padding-bottom: 8px;
+}
+
+.process-order-container {
+	display: flex;
+	justify-content: center;
+}
+
+.process-order-submit-button {
+	position: sticky;
+	top: 0;
+	transform: none;
+	z-index: 0;
+	margin: 0 auto;
+	width: 30%;
+}
+
+#process-order-form {
+	display: flex;
+	flex-direction: column;
 }

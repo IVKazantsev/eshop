@@ -34,11 +34,16 @@ Router::get('/products/:id/order', function(Route $route) {
 	return ($di->getComponent('orderController'))->renderOrderPage($carId);
 });
 
-Router::post('/products/:id/order', function(Route $route) {
-	$carId = $route->getVariables()[0];
+Router::post('/processOrder', function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('orderController'))->processOrder($carId);
+	return ($di->getComponent('orderController'))->processOrder();
+});
+
+Router::post('/successOrder', function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('orderController'))->renderSuccessOrderPage();
 });
 
 Router::get('/successOrder/:id', function(Route $route) {
@@ -88,7 +93,7 @@ Router::post('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $r
 	$entityToAdd = $route->getVariables()[0];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->addItem($entityToAdd);
+	return ($di->getComponent('adminController'))->addEntity($entityToAdd);
 }));
 
 Router::get('/admin/edit/success', MiddleWare::adminMiddleware(function() {

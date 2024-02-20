@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var array $items
+ * @var array $entities
  * @var string $previousPageUri
  * @var string $nextPageUri
  */
@@ -12,7 +12,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 ?>
 <div class="admin-content">
-	<?= TemplateEngine::renderTable($items) ?>
+	<?= TemplateEngine::renderTable($entities) ?>
 </div>
 <div class="pagination">
 

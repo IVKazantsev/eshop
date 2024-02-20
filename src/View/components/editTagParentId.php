@@ -1,15 +1,15 @@
 <?php
 /**
- * @var Entity $item
+ * @var Tag $tag
  * @var array $parentTags
  */
 
-use N_ONE\App\Model\Entity;
+use N_ONE\App\Model\Tag;
 
 ?>
 
 
-<?php if (!$item->getParentId() && !$item->getId()): ?>
+<?php if (!$tag->getParentId() && !$tag->getId()): ?>
 	<label class="checkbox-label">
 		Является категорией:
 		<input type="checkbox" id="isParent" value="1">
@@ -22,7 +22,7 @@ use N_ONE\App\Model\Entity;
 			<?php endforeach; ?>
 		</select>
 	</label>
-<?php elseif (!$item->getParentId()): ?>
+<?php elseif (!$tag->getParentId()): ?>
 	<label hidden for="parentId">
 		<input type="hidden" name="parentId" value="">
 	</label>

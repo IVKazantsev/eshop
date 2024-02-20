@@ -35,10 +35,11 @@ class OrderController extends BaseController
 		return $this->renderPublicView($orderPage);
 	}
 
-	public function processOrder(string $itemId): string
+	public function processOrder(): string
 	{
 		try
 		{
+			$itemId = ValidationService::validateEntryField($_POST['itemId']);
 			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
 			$name = ValidationService::validateEntryField($_POST['name']);
 			$email = ValidationService::validateEmailAddress($_POST['email']);
@@ -79,21 +80,28 @@ class OrderController extends BaseController
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
-		return $this->renderSuccessOrderPage($orderId);
+		$processOrderPage = TemplateEngine::render(
+			'pages/processOrder', ['orderNumber' => $orderId]
+		);
+
+		return $this->renderPublicView($processOrderPage);
 
 	}
 
-	public function renderSuccessOrderPage(string $orderNumber): string
+	public function renderSuccessOrderPage(): string
 	{
-		if ($_SERVER['REQUEST_URI'] !== "/successOrder/$orderNumber")
+		try
 		{
-			Router::redirect("/successOrder/$orderNumber");
+			$orderNumber = ValidationService::validateEntryField($_POST["orderNumber"]);
+			$successOrderPage = TemplateEngine::render(
+				'pages/successOrderPage', ['orderNumber' => $orderNumber]
+			);
+
+			return $this->renderPublicView($successOrderPage);
 		}
-
-		$successOrderPage = TemplateEngine::render(
-			'pages/successOrderPage', ['orderNumber' => $orderNumber]
-		);
-
-		return $this->renderPublicView($successOrderPage);
+		catch (ValidateException)
+		{
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
 	}
 }

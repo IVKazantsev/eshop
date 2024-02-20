@@ -1,6 +1,6 @@
 <?php
 /**
- * @var Entity $item
+ * @var Entity $entity
  */
 
 use N_ONE\App\Model\Entity;
@@ -17,6 +17,6 @@ use N_ONE\App\Model\Entity;
 		   type="checkbox"
 		   name="isActive"
 		   value="1"
-		<?= $item->getField("isActive") ? 'checked' : '' ?>
+		<?= $entity->getField("isActive") ? 'checked' : '' ?>
 	/>
 </label>

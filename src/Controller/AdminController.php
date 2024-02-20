@@ -88,33 +88,33 @@ class AdminController extends BaseController
 		exit();
 	}
 
-	public function renderEditPage(string $entityToEdit, string $itemId): string
+	public function renderEditPage(string $entityToEdit, string $entityId): string
 	{
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityToEdit);
-			$item = $repository->getById($itemId);
-			if ($item === null)
+			$entity = $repository->getById($entityId);
+			if ($entity === null)
 			{
 				$content = TemplateEngine::renderAdminError(':(', 'Данный товар не найден');
 
 				return $this->renderAdminView($content);
 			}
-			switch (get_class($item))
+			switch (get_class($entity))
 			{
 				case Item::class:
 				{
 					$parentTags = $this->tagRepository->getParentTags();
 					$attributes = $this->attributeRepository->getList();
-					$itemAttributes = $item->getAttributes();
+					$itemAttributes = $entity->getAttributes();
 					$itemTags = [];
 					$childrenTags = [];
 					$specificFields = [
 						'isActive' => TemplateEngine::render('components/editIsActive', [
-							'item' => $item,
+							'entity' => $entity,
 						]),
 						'description' => TemplateEngine::render('components/editItemDescription', [
-							'item' => $item,
+							'item' => $entity,
 						]),
 					];
 					foreach ($parentTags as $parentTag)
@@ -124,7 +124,7 @@ class AdminController extends BaseController
 						);
 
 					}
-					foreach ($item->getTags() as $tag)
+					foreach ($entity->getTags() as $tag)
 					{
 						$itemTags[$tag->getParentId()] = $tag->getId();
 
@@ -138,12 +138,12 @@ class AdminController extends BaseController
 						'itemAttributes' => $itemAttributes,
 					]);
 
-					$images = $this->imageRepository->getList([$itemId]);
+					$images = $this->imageRepository->getList([$entityId]);
 					$addImagesSection = TemplateEngine::render('components/addImagesSection', [
-						'itemId' => $itemId,
+						'itemId' => $entity,
 					]);
 					$deleteImagesSection = TemplateEngine::render('components/deleteImagesSection', [
-						'images' => $images[$itemId] ?? [],
+						'images' => $images[$entityId] ?? [],
 					]);
 
 					$additionalSections = [
@@ -154,7 +154,7 @@ class AdminController extends BaseController
 					];
 
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
 						'specificFields' => $specificFields,
 						'additionalSections' => $additionalSections,
 					]);
@@ -165,12 +165,12 @@ class AdminController extends BaseController
 					$parentTags = $repository->getAllParentTags();
 					$specificFields = [
 						'parentId' => TemplateEngine::render('components/editTagParentId', [
-							'item' => $item,
+							'tag' => $entity,
 							'parentTags' => $parentTags,
 						]),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
 						'specificFields' => $specificFields,
 					]);
 					break;
@@ -180,7 +180,7 @@ class AdminController extends BaseController
 				case User::class:
 				{
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
 					]);
 					break;
 
@@ -191,10 +191,10 @@ class AdminController extends BaseController
 					$specificFields = [
 						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]
 						),
-						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['item' => $item]),
+						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['order' => $entity]),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
 						'specificFields' => $specificFields,
 					]);
 					break;
@@ -265,24 +265,24 @@ class AdminController extends BaseController
 				'pageNumber' => $pageNumber,
 			];
 
-			$items = $repository->getList($filter);
+			$entities = $repository->getList($filter);
 			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
-			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber);
+			$nextPageUri = PaginationService::getNextPageUri(count($entities), $pageNumber);
 
-			if (empty($items))
+			if (empty($entities))
 			{
 				$content = TemplateEngine::renderAdminError(':(', 'Сущности не найдены');
 
 				return $this->renderAdminView($content);
 			}
 
-			if ($entityToDisplay === 'items' && count($items) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
+			if ($entityToDisplay === 'items' && count($entities) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
 			{
-				array_pop($items);
+				array_pop($entities);
 			}
 
-			$content = TemplateEngine::render('pages/adminItemsPage', [
-				'items' => $items,
+			$content = TemplateEngine::render('pages/adminEntitiesPage', [
+				'entities' => $entities,
 				'previousPageUri' => $previousPageUri,
 				'nextPageUri' => $nextPageUri,
 			]);
@@ -304,7 +304,7 @@ class AdminController extends BaseController
 	 * @throws ValidateException
 	 * @throws DatabaseException
 	 */
-	public function updateItem(string $entityType, string $itemId): string
+	public function updateEntity(string $entityType, string $entityId): string
 	{
 		$fields = $_POST;
 
@@ -344,7 +344,7 @@ class AdminController extends BaseController
 			}
 			if ($_FILES['image']['size'][0] !== 0)
 			{
-				$this->addBaseImages($_FILES, $itemId);
+				$this->addBaseImages($_FILES, $entityId);
 			}
 
 			foreach ($fields as $field => $value)
@@ -372,8 +372,8 @@ class AdminController extends BaseController
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityType);
-			$item = new $className($itemId, ...array_values($fields));
-			$repository->update($item);
+			$entity = new $className($entityId, ...array_values($fields));
+			$repository->update($entity);
 		}
 		catch (ValidateException $e)
 		{
@@ -552,8 +552,8 @@ class AdminController extends BaseController
 				$entityToAdd
 			);//Костыль на приведение названия типа сущности из URL к названию класса
 
-		$item = ($className)::createDummyObject();
-		switch (get_class($item))
+		$entity = ($className)::createDummyObject();
+		switch (get_class($entity))
 		{
 			case Item::class:
 			{
@@ -564,10 +564,10 @@ class AdminController extends BaseController
 				$childrenTags = [];
 				$specificFields = [
 					'isActive' => TemplateEngine::render('components/editIsActive', [
-						'item' => $item,
+						'entity' => $entity,
 					]),
 					'description' => TemplateEngine::render('components/editItemDescription', [
-						'item' => $item,
+						'item' => $entity,
 					]),
 				];
 				foreach ($parentTags as $parentTag)
@@ -608,7 +608,7 @@ class AdminController extends BaseController
 				];
 
 				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
+					'entity' => $entity,
 					'specificFields' => $specificFields,
 					'additionalSections' => $additionalSections,
 				]);
@@ -619,12 +619,12 @@ class AdminController extends BaseController
 				$parentTags = $repository->getAllParentTags();
 				$specificFields = [
 					'parentId' => TemplateEngine::render('components/editTagParentId', [
-						'item' => $item,
+						'tag' => $entity,
 						'parentTags' => $parentTags,
 					]),
 				];
 				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
+					'entity' => $entity,
 					'specificFields' => $specificFields,
 				]);
 				break;
@@ -634,7 +634,7 @@ class AdminController extends BaseController
 			case User::class:
 			{
 				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
+					'entity' => $entity,
 				]);
 				break;
 
@@ -644,10 +644,10 @@ class AdminController extends BaseController
 				$statuses = $this->orderRepository->getStatuses();
 				$specificFields = [
 					'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]),
-					'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['item' => $item]),
+					'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['order' => $entity]),
 				];
 				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
+					'entity' => $entity,
 					'specificFields' => $specificFields,
 				]);
 				break;
@@ -664,7 +664,7 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
-	public function addItem(string $entityToAdd): string
+	public function addEntity(string $entityToAdd): string
 	{
 
 		$fields = $_POST;
