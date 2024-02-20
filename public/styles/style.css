@@ -581,7 +581,7 @@ hr {
 	color: #252525;
 }
 
-.order-form {
+#order-form {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	grid-template-areas:

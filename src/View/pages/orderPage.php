@@ -15,7 +15,7 @@ $priceString = number_format($priceString, 0, '', ' ');
 
 <div class="order-container">
 	<div class="order-title">Оформление заказа</div>
-	<form class="order-form" action="/processOrder" method="post">
+	<form id="order-form" action="/processOrder" method="post">
 		<div class="user-info-container">
 			<div class="order-form-title">
 				Контактная информация
