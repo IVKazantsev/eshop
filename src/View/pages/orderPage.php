@@ -61,16 +61,13 @@ $priceString = number_format($priceString, 0, '', ' ');
 					<td class="order-td order-item-info">
 						<div class="order-img-container">
 
-							<?php
-							if ($item->getImages()): ?>
+							<?php if ($item->getImages()): ?>
 								<img class="order-image" src="<?= $imagesPath . $item->getPreviewImage()->getPath(
 								) ?>" alt="image of an item">
-							<?php
-							else: ?>
+							<?php else: ?>
 								<img class="order-image" src="<?= $imagesPath
 								. 'plugs/imageNotFound.jpeg' ?>" alt="image of an item">
-							<?php
-							endif; ?>
+							<?php endif; ?>
 						</div>
 						<div class="order-item-title">
 							<?= $item->getTitle() ?>

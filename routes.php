@@ -46,11 +46,17 @@ Router::post('/successOrder', function() {
 	return ($di->getComponent('orderController'))->renderSuccessOrderPage();
 });
 
-Router::get('/successOrder/:id', function(Route $route) {
-	$orderId = $route->getVariables()[0];
+Router::get('/checkOrder', function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('orderController'))->renderSuccessOrderPage($orderId);
+	return ($di->getComponent('orderController'))->renderCheckOrderPage();
+});
+
+Router::get('/orderInfo', function() {
+	$di = Application::getDI();
+	$orderNumber = $_GET['number'] ?? null;
+
+	return ($di->getComponent('orderController'))->renderOrderInfoPage($orderNumber);
 });
 
 //роуты с защитой

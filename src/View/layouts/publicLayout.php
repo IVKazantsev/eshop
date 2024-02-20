@@ -96,7 +96,7 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 					</div>
 					<button type="submit" class="search-button btn"><img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
 				</form>
-				<button type="submit" class="check-order-button btn">Проверить заказ</button>
+				<a class="check-order-link" href="/checkOrder">Проверить заказ</a>
 			</div>
 		</div>
 	</header>

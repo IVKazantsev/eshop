@@ -104,4 +104,44 @@ class OrderController extends BaseController
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 	}
+
+	public function renderCheckOrderPage(): string
+	{
+		$checkOrderPage = TemplateEngine::render('pages/checkOrderPage');
+
+		return $this->renderPublicView($checkOrderPage);
+	}
+
+	public function renderOrderInfoPage(int $orderNumber): string
+	{
+		if (!$orderNumber)
+		{
+			$content = TemplateEngine::renderPublicError(";(", "Заказ не найден");
+
+			return $this->renderPublicView($content);
+		}
+		try
+		{
+			$order = $this->orderRepository->getById($orderNumber);
+			if ($order === null)
+			{
+				$content = TemplateEngine::renderPublicError(";(", "Заказ не найден");
+
+				return $this->renderPublicView($content);
+			}
+
+			$item = $this->itemRepository->getById($order->getItemId());
+		}
+		catch (DatabaseException)
+		{
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+
+		$content = TemplateEngine::render('pages/orderInfoPage', [
+			'order' => $order,
+			'item' => $item,
+		]);
+
+		return $this->renderPublicView($content);
+	}
 }
