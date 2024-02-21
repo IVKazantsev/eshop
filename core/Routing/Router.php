@@ -2,8 +2,8 @@
 
 namespace N_ONE\Core\Routing;
 
-use http\Exception\InvalidArgumentException;
 use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\Exceptions\NotFoundException;
 
 class Router
 {
@@ -39,7 +39,7 @@ class Router
 			{
 				return $action($route);
 			}
-			throw new InvalidArgumentException("There is no route ");
+			throw new NotFoundException("There is no route");
 		});
 	}
 

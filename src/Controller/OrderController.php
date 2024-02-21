@@ -2,14 +2,13 @@
 
 namespace N_ONE\App\Controller;
 
-use Exception;
-use http\Exception\InvalidArgumentException;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\User;
 use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Exceptions\NotFoundException;
 use N_ONE\Core\Exceptions\ValidateException;
-use N_ONE\Core\Routing\Router;
+use N_ONE\Core\Log\Logger;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class OrderController extends BaseController
@@ -21,11 +20,10 @@ class OrderController extends BaseController
 		{
 			$item = $this->itemRepository->getById($itemId);
 		}
-		catch (Exception)
+		catch (DatabaseException)
 		{
-			http_response_code(404);
-			echo TemplateEngine::renderPublicError(404, "Page not found");
-			exit;
+			Logger::error("Failed to fetch data from repository", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		$orderPage = TemplateEngine::render('pages/orderPage', [
@@ -48,7 +46,7 @@ class OrderController extends BaseController
 			$item = $this->itemRepository->getById($itemId);
 			if (!$item)
 			{
-				throw new InvalidArgumentException("There is no item with id $itemId");
+				throw new NotFoundException("There is no item with id $itemId");
 			}
 			$user = $this->userRepository->getByNumber($phone);
 
@@ -71,12 +69,13 @@ class OrderController extends BaseController
 		{
 			return TemplateEngine::renderPublicError(400, $e->getMessage());
 		}
-		catch (InvalidArgumentException)
+		catch (NotFoundException)
 		{
 			return TemplateEngine::renderPublicError(404, "Страница не найдена");
 		}
 		catch (DatabaseException)
 		{
+			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -134,7 +133,8 @@ class OrderController extends BaseController
 		}
 		catch (DatabaseException)
 		{
-			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+			Logger::error("Failed to fetch data from repository", __METHOD__);
+			return TemplateEngine::renderPublicError(":(", "Что-то пошло не так");
 		}
 
 		$content = TemplateEngine::render('pages/orderInfoPage', [

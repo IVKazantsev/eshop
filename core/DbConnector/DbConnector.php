@@ -11,8 +11,9 @@ class DbConnector
 {
 	static private ?DbConnector $instance = null;
 	private static mysqli|false $connection;
+
 	/**
-	 * @throws Exception
+	 * @throws DatabaseException
 	 */
 	private function __construct()
 	{
@@ -24,6 +25,9 @@ class DbConnector
 	{
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public static function getInstance(): DbConnector
 	{
 		if (static::$instance)

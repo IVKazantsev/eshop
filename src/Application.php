@@ -3,7 +3,10 @@
 namespace N_ONE\App;
 
 use N_ONE\Core\Configurator\Configurator;
+use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\DependencyInjection\DependencyInjection;
+use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Log\Logger;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
@@ -13,6 +16,17 @@ class Application
 
 	public static function run(): void
 	{
+		Logger::setRootLogDir(Configurator::option("ROOT_LOG_DIR"));
+		try
+		{
+			DbConnector::getInstance();
+		}
+		catch (\Exception)
+		{
+			Logger::error("Failed to create database connection", __METHOD__);
+			echo TemplateEngine::renderFinalError();
+			exit();
+		}
 		if (self::$di === null)
 		{
 			$di = new DependencyInjection(Configurator::option('SERVICES_PATH'));

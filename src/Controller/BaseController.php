@@ -11,6 +11,7 @@ use N_ONE\App\Model\Repository\TagRepository;
 use N_ONE\App\Model\Repository\UserRepository;
 use N_ONE\App\Model\Service\TagService;
 use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Log\Logger;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 abstract class BaseController
@@ -37,6 +38,7 @@ abstract class BaseController
 		}
 		catch (DatabaseException)
 		{
+			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
 		}
 
@@ -61,6 +63,7 @@ abstract class BaseController
 		}
 		catch (DatabaseException)
 		{
+			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderAdminError(';(', "Что-то пошло не так");
 		}
 

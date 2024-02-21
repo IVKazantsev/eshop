@@ -5,6 +5,7 @@ namespace N_ONE\App\Controller;
 use N_ONE\App\Model\Service\PaginationService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Log\Logger;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
@@ -44,7 +45,8 @@ class CatalogController extends BaseController
 		}
 		catch (DatabaseException)
 		{
-			$content = TemplateEngine::renderPublicError(':(', 'Something went wrong');
+			Logger::error("Failed to fetch data from repository", __METHOD__);
+			$content = TemplateEngine::renderPublicError(':(', 'Что-то пошло не так');
 		}
 
 		return $this->renderPublicView($content, $SearchRequest);

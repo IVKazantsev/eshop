@@ -7,6 +7,13 @@ use RuntimeException;
 
 class TemplateEngine
 {
+	public static function renderFinalError(): string
+	{
+		$errorViewFile = Configurator::option("FINAL_ERROR_PAGE");
+
+		return self::render($errorViewFile);
+	}
+
 	public static function renderPublicError(int|string $errorCode, string $errorMessage): string
 	{
 		$errorViewFile = Configurator::option("PUBLIC_ERROR_PAGE");
@@ -41,6 +48,7 @@ class TemplateEngine
 		$absolutePath = Configurator::option("VIEWS_PATH") . $file . ".php";
 		if (!file_exists($absolutePath))
 		{
+			echo self::renderPublicError('404', 'Страница не найдена');
 			exit(404);
 		}
 
