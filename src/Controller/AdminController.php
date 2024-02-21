@@ -4,6 +4,7 @@ namespace N_ONE\App\Controller;
 
 use Exception;
 use InvalidArgumentException;
+use mysqli_sql_exception;
 use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Item;
@@ -75,6 +76,12 @@ class AdminController extends BaseController
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			echo TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
+			exit();
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			echo TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 			exit();
 		}
 		catch (LoginException)
@@ -218,10 +225,16 @@ class AdminController extends BaseController
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
-		// catch (InvalidArgumentException|Exception)
-		// {
-		// 	$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
-		// }
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+		catch (InvalidArgumentException)
+		{
+			Logger::error("Failed to create repository", __METHOD__);
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
 
 		return $this->renderAdminView($content);
 	}
@@ -307,6 +320,11 @@ class AdminController extends BaseController
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderAdminView($content);
@@ -396,6 +414,11 @@ class AdminController extends BaseController
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
 
 		return $this->renderSuccessEditPage();
 	}
@@ -475,6 +498,11 @@ class AdminController extends BaseController
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderAdminError(":(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (InvalidArgumentException)
 		{
@@ -689,6 +717,11 @@ class AdminController extends BaseController
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
 
 		return $this->renderAdminView($content);
 	}
@@ -777,6 +810,11 @@ class AdminController extends BaseController
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderSuccessAddPage();

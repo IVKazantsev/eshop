@@ -1,3 +1,5 @@
 [18:38:15][error][N_ONE\App\Application::run] Failed to create database connection
 [18:39:14][error][N_ONE\App\Application::run] Failed to create database connection
 [18:39:54][error][N_ONE\App\Application::run] Failed to create database connection
+[19:18:12][error][N_ONE\App\Controller\CatalogController::renderCatalog] Failed to run query
+[19:21:37][error][N_ONE\App\Controller\DetailController::renderDetailPage] Failed to run query

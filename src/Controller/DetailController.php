@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Controller;
 
+use mysqli_sql_exception;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Log\Logger;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
@@ -19,6 +20,11 @@ class DetailController extends BaseController
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			$content = TemplateEngine::renderPublicError(':(', 'Что-то пошло не так');
 			return $this->renderPublicView($content);
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		if ($item === null)

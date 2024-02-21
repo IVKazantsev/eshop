@@ -16,12 +16,13 @@ class Application
 
 	public static function run(): void
 	{
+		error_reporting(1);
 		Logger::setRootLogDir(Configurator::option("ROOT_LOG_DIR"));
 		try
 		{
 			DbConnector::getInstance();
 		}
-		catch (\Exception)
+		catch (DatabaseException)
 		{
 			Logger::error("Failed to create database connection", __METHOD__);
 			echo TemplateEngine::renderFinalError();

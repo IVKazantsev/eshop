@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Controller;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Repository\AttributeRepository;
 use N_ONE\App\Model\Repository\ImageRepository;
 use N_ONE\App\Model\Repository\ItemRepository;
@@ -41,6 +42,11 @@ abstract class BaseController
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
 		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
 
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
@@ -65,6 +71,11 @@ abstract class BaseController
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderAdminError(';(', "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return TemplateEngine::render('layouts/adminLayout', [

@@ -2,3 +2,4 @@
 /.idea
 /composer.phar
 /config/config.local.php
+/var/log/*.log

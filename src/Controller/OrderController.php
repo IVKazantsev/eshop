@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Controller;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\User;
@@ -23,6 +24,11 @@ class OrderController extends BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -76,6 +82,11 @@ class OrderController extends BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -135,6 +146,11 @@ class OrderController extends BaseController
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			return TemplateEngine::renderPublicError(":(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		$content = TemplateEngine::render('pages/orderInfoPage', [

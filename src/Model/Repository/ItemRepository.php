@@ -26,7 +26,7 @@ class ItemRepository extends Repository
 	/**
 	 * @throws DatabaseException
 	 */
-	public function getById(int $id): ?Item
+	public function getById(int $id): Item|null
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -44,6 +44,7 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
+		$item = null;
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$item = new Item(
@@ -61,7 +62,7 @@ class ItemRepository extends Repository
 			$item->setId($id);
 		}
 
-		if (empty($item))
+		if ($item === null)
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
@@ -90,7 +91,7 @@ class ItemRepository extends Repository
 			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 			FROM N_ONE_ITEMS i
 			$whereQueryBlock
-			LIMIT {$currentLimit} OFFSET {$offset};"
+			LIMIT $currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -120,7 +121,7 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$itemsIds = array_map(function($item) {
+		$itemsIds = array_map(static function($item) {
 			return $item->getId();
 		}, $items);
 
@@ -128,7 +129,7 @@ class ItemRepository extends Repository
 		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as &$item)
+		foreach ($items as $item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setAttributes($attributes[$item->getId()] ?? []);
@@ -221,7 +222,7 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$itemsIds = array_map(function($item) {
+		$itemsIds = array_map(static function($item) {
 			return $item->getId();
 		}, $items);
 
@@ -229,7 +230,7 @@ class ItemRepository extends Repository
 		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
 		$images = $this->imageRepository->getList($itemsIds);
 
-		foreach ($items as &$item)
+		foreach ($items as $item)
 		{
 			$item->setTags($tags[$item->getId()] ?? []);
 			$item->setAttributes($attributes[$item->getId()] ?? []);
@@ -239,10 +240,12 @@ class ItemRepository extends Repository
 		return $items;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function add(Item|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
-		$itemId = $entity->getId();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 		$isActive = $entity->isActive() ? 1 : 0;
 		$price = $entity->getPrice();
@@ -256,15 +259,13 @@ class ItemRepository extends Repository
 			"
 		INSERT INTO N_ONE_ITEMS ( TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
 		VALUES (
-			'{$title}',
-			{$isActive},
-			{$price},
-			'{$description}',
+			'$title',
+			$isActive,
+			$price,
+			'$description',
 			{$sortOrder}
 		);"
 		);
-
-		$result = mysqli_insert_id($connection);
 
 		if (!$result)
 		{
@@ -277,6 +278,9 @@ class ItemRepository extends Repository
 		return $result;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function update(Item|Entity $entity): bool
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -292,12 +296,12 @@ class ItemRepository extends Repository
 			$connection,
 			"
 		UPDATE N_ONE_ITEMS 
-		SET TITLE = '{$title}', 
-			IS_ACTIVE = {$isActive}, 
-			PRICE = {$price}, 
-			DESCRIPTION = '{$description}', 
+		SET TITLE = '$title', 
+			IS_ACTIVE = $isActive, 
+			PRICE = $price, 
+			DESCRIPTION = '$description', 
 			SORT_ORDER = {$sortOrder}
-		WHERE ID = {$itemId}"
+		WHERE ID = $itemId"
 		);
 
 		if (!$result)
@@ -311,12 +315,15 @@ class ItemRepository extends Repository
 		return true;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function updateItemTags(bool|mysqli $connection, int $itemId, array $tags): void
 	{
 		$result = mysqli_query(
 			$connection,
 			"
-			DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = {$itemId}"
+			DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = $itemId"
 		);
 
 		if (!$result)
@@ -326,7 +333,7 @@ class ItemRepository extends Repository
 		$itemTags = "";
 		foreach ($tags as $tag)
 		{
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag . '),';
+			$itemTags .= '(' . $itemId . ', ' . $tag . '),';
 		}
 		// exit();
 		$itemTags = substr($itemTags, 0, -1);
@@ -340,12 +347,15 @@ class ItemRepository extends Repository
 		}
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function updateItemAttributes(bool|mysqli $connection, int $itemId, array $attributes): void
 	{
 		$result = mysqli_query(
 			$connection,
 			"
-			DELETE FROM N_ONE_ITEMS_ATTRIBUTES WHERE ITEM_ID = {$itemId}"
+			DELETE FROM N_ONE_ITEMS_ATTRIBUTES WHERE ITEM_ID = $itemId"
 		);
 
 		if (!$result)
@@ -359,7 +369,7 @@ class ItemRepository extends Repository
 			{
 				$attribute = 'null';
 			}
-			$itemAttributes = $itemAttributes . '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
+			$itemAttributes .= '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
 		}
 		$itemAttributes = substr($itemAttributes, 0, -1);
 		var_dump($itemAttributes);
@@ -372,13 +382,16 @@ class ItemRepository extends Repository
 		}
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function addItemTags(bool|mysqli $connection, int $itemId, array $tags): void
 	{
 
 		$itemTags = "";
 		foreach ($tags as $tag)
 		{
-			$itemTags = $itemTags . '(' . $itemId . ', ' . $tag . '),';
+			$itemTags .= '(' . $itemId . ', ' . $tag . '),';
 		}
 		$itemTags = substr($itemTags, 0, -1);
 
@@ -391,6 +404,9 @@ class ItemRepository extends Repository
 		}
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	private function addItemAttributes(bool|mysqli $connection, int $itemId, array $attributes): void
 	{
 		$itemAttributes = "";
@@ -400,7 +416,7 @@ class ItemRepository extends Repository
 			{
 				$attribute = 'null';
 			}
-			$itemAttributes = $itemAttributes . '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
+			$itemAttributes .= '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
 		}
 		$itemAttributes = substr($itemAttributes, 0, -1);
 		var_dump($itemAttributes);
