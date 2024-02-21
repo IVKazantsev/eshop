@@ -3,3 +3,4 @@
 [18:39:54][error][N_ONE\App\Application::run] Failed to create database connection
 [19:18:12][error][N_ONE\App\Controller\CatalogController::renderCatalog] Failed to run query
 [19:21:37][error][N_ONE\App\Controller\DetailController::renderDetailPage] Failed to run query
+[19:53:22][error][N_ONE\App\Controller\AdminController::renderEntityPage] Failed to create repository

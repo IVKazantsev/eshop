@@ -17,6 +17,7 @@ class Application
 	public static function run(): void
 	{
 		error_reporting(1);
+		// error_reporting(0);
 		Logger::setRootLogDir(Configurator::option("ROOT_LOG_DIR"));
 		try
 		{
@@ -43,7 +44,7 @@ class Application
 		if (!$route)
 		{
 			http_response_code(404);
-			echo(TemplateEngine::renderAdminError(404, "Page not found"));
+			echo(TemplateEngine::renderPublicError(404, "Page not found"));
 			exit;
 		}
 		$action = $route->action;

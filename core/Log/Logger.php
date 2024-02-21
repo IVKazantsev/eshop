@@ -60,10 +60,6 @@ class Logger
 		$time = date('H:i:s');
 		$logEntry = "[$time][$level][$callPlace] $message" . PHP_EOL;
 
-		if(!file_exists($logFile))
-		{
-
-		}
 		file_put_contents($logFile, $logEntry, FILE_APPEND);
 	}
 

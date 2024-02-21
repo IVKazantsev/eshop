@@ -45,7 +45,12 @@ class Router
 
 	public static function find(string $method, string $uri): Route|null
 	{
-		[$path] = explode('?', $uri);
+		[$path, $getParams] = explode('?', $uri);
+		if(str_ends_with($path, '/') && strlen($path) !== 1)
+		{
+			$path = rtrim($path, "/");
+			self::redirect($path . '?' . $getParams);
+		}
 		foreach (self::$routes as $route)
 		{
 			if ($route->method !== $method)
