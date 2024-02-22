@@ -25,8 +25,7 @@ abstract class BaseController
 		protected AttributeRepository $attributeRepository,
 		protected RepositoryFactory $repositoryFactory
 	)
-	{
-	}
+	{}
 
 	public function renderPublicView($content, string $currentSearchRequest = null): string
 	{

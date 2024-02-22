@@ -5,11 +5,12 @@ namespace N_ONE\App\Model\Repository;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
 use N_ONE\Core\Exceptions\DatabaseException;
-use RuntimeException;
 
 class ImageRepository extends Repository
 {
 	/**
+	 * @param int[]|null $filter
+	 *
 	 * @throws DatabaseException
 	 */
 	public function getList(array $filter = null, bool $isImageId = null): array
@@ -20,10 +21,10 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT id, item_id, height, width, is_main, type, extension
-		FROM N_ONE_IMAGES
-		WHERE $field IN (" . implode(',', $filter) . ");
-		"
+			SELECT id, item_id, height, width, is_main, type, extension
+			FROM N_ONE_IMAGES
+			WHERE $field IN (" . implode(',', $filter) . ");
+			"
 		);
 
 
@@ -58,10 +59,10 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT id, item_id, height, width, is_main, type, extension
-		FROM N_ONE_IMAGES 
-		WHERE id = $id;
-		"
+			SELECT id, item_id, height, width, is_main, type, extension
+			FROM N_ONE_IMAGES 
+			WHERE id = $id;
+			"
 		);
 
 		if (!$result)
@@ -102,15 +103,15 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_IMAGES (ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE, EXTENSION) 
-		VALUES (
-			$itemId,
-			$height,
-			$width,
-			$isMain,
-			$type,
-			'$extension'
-		);"
+			INSERT INTO N_ONE_IMAGES (ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE, EXTENSION) 
+			VALUES (
+				$itemId,
+				$height,
+				$width,
+				$isMain,
+				$type,
+				'$extension'
+			);"
 		);
 
 		if (!$result)
@@ -138,16 +139,16 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_IMAGES 
-		SET 
-			ITEM_ID = $itemId,
-			HEIGHT = $height,
-			WIDTH = $width,
-			IS_MAIN = $isMain,
-			TYPE = $type,
-			EXTENSION = '$extension'
-		where ID = $imageId;
-		"
+			UPDATE N_ONE_IMAGES 
+			SET 
+				ITEM_ID = $itemId,
+				HEIGHT = $height,
+				WIDTH = $width,
+				IS_MAIN = $isMain,
+				TYPE = $type,
+				EXTENSION = '$extension'
+				where ID = $imageId;
+			"
 		);
 
 		if (!$result)
@@ -157,6 +158,10 @@ class ImageRepository extends Repository
 
 		return true;
 	}
+
+	/**
+	 * @throws DatabaseException
+	 */
 	public function permanentDeleteByIds(array $entityId): bool
 	{
 		$connection = $this->dbConnection->getConnection();

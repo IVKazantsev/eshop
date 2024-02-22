@@ -22,10 +22,10 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID 
-		FROM N_ONE_TAGS t
-		$whereQueryBlock;
-		"
+			SELECT t.ID, t.TITLE, t.PARENT_ID 
+			FROM N_ONE_TAGS t
+			$whereQueryBlock;
+			"
 		);
 
 		if (!$result)
@@ -36,7 +36,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID']
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID']
 			);
 		}
 
@@ -61,10 +63,9 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE 
-		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID IS NULL AND t.IS_ACTIVE != 0;
-		"
+			SELECT t.ID, t.TITLE 
+			FROM N_ONE_TAGS t
+			WHERE t.PARENT_ID IS NULL AND t.IS_ACTIVE != 0;"
 		);
 
 		if (!$result)
@@ -75,7 +76,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], null,
+				$row['ID'],
+				$row['TITLE'],
+				null,
 			);
 		}
 
@@ -97,11 +100,10 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID
-		FROM N_ONE_TAGS t
-		LEFT JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-		WHERE t.ID = $id;
-		"
+			SELECT t.ID, t.TITLE, t.PARENT_ID
+			FROM N_ONE_TAGS t
+			LEFT JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
+			WHERE t.ID = $id ;"
 		);
 
 		if (!$result)
@@ -113,7 +115,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID']
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID']
 			);
 		}
 
@@ -131,10 +135,9 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE, t.PARENT_ID
-		FROM N_ONE_TAGS t
-		WHERE t.TITLE = '$title'
-		"
+			SELECT t.ID, t.TITLE, t.PARENT_ID
+			FROM N_ONE_TAGS t
+			WHERE t.TITLE = '$title'"
 		);
 
 		if (!$result)
@@ -146,7 +149,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID']
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID']
 			);
 		}
 
@@ -154,6 +159,7 @@ class TagRepository extends Repository
 	}
 
 	/**
+	 * @
 	 * @throws DatabaseException
 	 */
 	public function getByItemsIds(array $itemsIds): array
@@ -165,11 +171,11 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT it.ITEM_ID, t.ID, t.TITLE, t.PARENT_ID
-		FROM N_ONE_TAGS t 
-		JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-		WHERE it.ITEM_ID IN ($itemsIdsString)
-		AND t.IS_ACTIVE = 1;
+			SELECT it.ITEM_ID, t.ID, t.TITLE, t.PARENT_ID
+			FROM N_ONE_TAGS t 
+			JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
+			WHERE it.ITEM_ID IN ($itemsIdsString)
+			AND t.IS_ACTIVE = 1;
 	"
 		);
 
@@ -181,7 +187,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID'],
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID'],
 			);
 		}
 
@@ -212,8 +220,8 @@ class TagRepository extends Repository
 				"
 				INSERT INTO N_ONE_TAGS (TITLE, PARENT_ID)
 				VALUES (
-				'$title',
-				$parentId
+					'$title',
+					$parentId
 				);"
 			);
 			$countOfParentTags = $this->checkIfParentHasTags($parentId);
@@ -230,9 +238,7 @@ class TagRepository extends Repository
 				$connection,
 				"
 				INSERT INTO N_ONE_TAGS (TITLE)
-				VALUES (
-					'$title'
-					);"
+				VALUES ('$title');"
 			);
 		}
 
@@ -301,11 +307,10 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE
-		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID = $id
-		AND t.IS_ACTIVE = 1;
-		"
+			SELECT t.ID, t.TITLE
+			FROM N_ONE_TAGS t
+			WHERE t.PARENT_ID = $id
+			AND t.IS_ACTIVE = 1;"
 		);
 
 		if (!$result)
@@ -316,7 +321,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $id,
+				$row['ID'],
+				$row['TITLE'],
+				$id,
 			);
 		}
 
@@ -338,27 +345,26 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_TAGS 
-		SET 
-			IS_ACTIVE = $isActive
-		WHERE ID = $parentId"
+			UPDATE N_ONE_TAGS 
+			SET IS_ACTIVE = $isActive
+			WHERE ID = $parentId"
 		);
+
 		if (!$result)
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
 	}
 
-	private function checkIfParentHasTags(string $parentId): int|string
+	private function checkIfParentHasTags(int $parentId): int|string
 	{
 		$connection = $this->dbConnection->getConnection();
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID
-		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID = '$parentId' and t.IS_ACTIVE = 1 
-		"
+			SELECT t.ID
+			FROM N_ONE_TAGS t
+			WHERE t.PARENT_ID = '$parentId' and t.IS_ACTIVE = 1 ;"
 		);
 
 		return mysqli_num_rows($result);
@@ -373,10 +379,9 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.PARENT_ID
-		FROM N_ONE_TAGS t
-		WHERE t.ID = $id;
-		"
+			SELECT t.PARENT_ID
+			FROM N_ONE_TAGS t
+			WHERE t.ID = $id ;"
 		);
 		if (!$result)
 		{
@@ -397,9 +402,9 @@ class TagRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT t.ID, t.TITLE 
-		FROM N_ONE_TAGS t
-		WHERE t.PARENT_ID IS NULL;
+			SELECT t.ID, t.TITLE 
+			FROM N_ONE_TAGS t
+			WHERE t.PARENT_ID IS NULL;
 		"
 		);
 
@@ -411,7 +416,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], null,
+				$row['ID'],
+				$row['TITLE'],
+				null,
 			);
 		}
 
@@ -451,8 +458,9 @@ class TagRepository extends Repository
 
 	public function delete(string $entities, int $entityId): bool
 	{
-		$tag = $this->getById($entityId);
 		$connection = $this->dbConnection->getConnection();
+		$entities = mysqli_real_escape_string($connection, $entities);
+		$tag = $this->getById($entityId);
 
 		if ($tag->getParentId()) //если дочерний тег
 		{
@@ -463,6 +471,7 @@ class TagRepository extends Repository
 				SET IS_ACTIVE = 0
 				WHERE ID = $entityId"
 			);
+			//TODO удаление из ITEM_TAGS
 
 			// mysqli_query(
 			// 	$connection,

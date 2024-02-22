@@ -7,7 +7,6 @@
  */
 
 use N_ONE\Core\TemplateEngine\TemplateEngine;
-
 ?>
 
 <div class="catalog">
@@ -27,6 +26,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 		<?php if ($nextPageUri):?>
 			<a href="<?=$nextPageUri?>">&#10095</a>
 		<?php endif?>
-
 	</div>
 </div>
+
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

@@ -10,6 +10,9 @@ use RuntimeException;
 class AttributeRepository extends Repository
 {
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -20,10 +23,10 @@ class AttributeRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT a.ID, a.TITLE
-		FROM N_ONE_ATTRIBUTES a
-		$whereQueryBlock;
-		"
+			SELECT a.ID, a.TITLE
+			FROM N_ONE_ATTRIBUTES a
+			$whereQueryBlock;
+			"
 		);
 
 		if (!$result)
@@ -34,7 +37,9 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attributes[] = new Attribute(
-				$row['ID'], $row['TITLE'], null
+				$row['ID'],
+				$row['TITLE'],
+				null
 			);
 		}
 
@@ -54,7 +59,7 @@ class AttributeRepository extends Repository
 	public function getById(int $id): Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
-
+		$attribute = null;
 		$result = mysqli_query(
 			$connection,
 			"
@@ -69,11 +74,12 @@ class AttributeRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$attribute = null;
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attribute = new Attribute(
-				$row['ID'], $row['TITLE'], null
+				$row['ID'],
+				$row['TITLE'],
+				null
 			);
 		}
 
@@ -154,7 +160,9 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attributes[$row['ITEM_ID']][] = new Attribute(
-				$row['ID'], $row['TITLE'], $row['VALUE'],
+				$row['ID'],
+				$row['TITLE'],
+				$row['VALUE'],
 			);
 		}
 
@@ -169,6 +177,9 @@ class AttributeRepository extends Repository
 		return $attributes;
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public function add(Attribute|Entity $entity): int
 	{
 		$connection = $this->dbConnection->getConnection();
@@ -178,9 +189,7 @@ class AttributeRepository extends Repository
 			$connection,
 			"
 			INSERT INTO N_ONE_ATTRIBUTES (TITLE)
-			VALUE (
-				'$title'
-			);"
+			VALUE ('$title');"
 		);
 
 		if (!$result)

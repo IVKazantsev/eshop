@@ -16,8 +16,7 @@ class Order extends Entity
 		private string|null $status,
 		private int|null    $price,
 	)
-	{
-	}
+	{}
 
 	public function getExcludedFields(): array
 	{

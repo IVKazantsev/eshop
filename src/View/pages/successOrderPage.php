@@ -23,3 +23,4 @@ $iconsPath = Configurator::option('ICONS_PATH');
 		Мы свяжемся с Вами в ближайшее время
 	</div>
 </div>
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

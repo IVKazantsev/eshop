@@ -357,8 +357,13 @@ class AdminController extends BaseController
 					continue;
 				}
 			}
-			// $fields['tags'] = $tags;
+
 			$fields['images'] = [];
+			if (!isset($fields["tags"]))
+			{
+				array_splice($fields, array_search("attributes", array_keys($fields)), 0, ["tags" => []]);
+			}
+			$fields["attributes"] = array_filter($fields["attributes"], function($value) {return is_numeric($value);});
 		}
 		// foreach ($fields as $field => $value)
 		// {
@@ -577,33 +582,23 @@ class AdminController extends BaseController
 					);
 
 				}
-				// foreach ($item->getTags() as $tag)
-				// {
-				// 	$itemTags[$tag->getParentId()] = $tag->getId();
-				//
-				// }
 				$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
 					'childrenTags' => $childrenTags,
 					'itemTags' => $itemTags,
 				]);
 				$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
 					'attributes' => $attributes,
-					// 'itemAttributes' => $itemAttributes,
 				]);
 
-				// $images = $this->imageRepository->getList([$itemId]);
-				// $addImagesSection = TemplateEngine::render('components/addImagesSection', [
-				// 	'itemId' => $itemId,
-				// ]);
+
 				$deleteImagesSection = TemplateEngine::render(
-					'components/deleteImagesSection', [// 'images' => $images[$itemId] ?? [],
-													]
+					'components/deleteImagesSection',
+					[]
 				);
 
 				$additionalSections = [
 					$tagsSection,
 					$attributesSection,
-					// $addImagesSection,
 					$deleteImagesSection,
 				];
 
@@ -633,9 +628,11 @@ class AdminController extends BaseController
 			case Attribute::class:
 			case User::class:
 			{
+
 				$content = TemplateEngine::render('pages/adminEditPage', [
 					'entity' => $entity,
 				]);
+
 				break;
 
 			}
@@ -708,8 +705,15 @@ class AdminController extends BaseController
 					continue;
 				}
 			}
-			// $fields['tags'] = $tags;
+
 			$fields['images'] = [];
+
+			if (!isset($fields["tags"]))
+			{
+				array_splice($fields, array_search("attributes", array_keys($fields)), 0, ["tags" => []]);
+			}
+			$fields["attributes"] = array_filter($fields["attributes"], function($value) {return is_numeric($value);});
+
 		}
 		// foreach ($fields as $field => $value)
 		// {
@@ -743,6 +747,7 @@ class AdminController extends BaseController
 		}
 
 		return $this->renderSuccessAddPage();
+
 	}
 
 }

@@ -2,6 +2,8 @@
 
 namespace N_ONE\App\Model;
 
+use N_ONE\App\Model\Service\ValidationService;
+
 class User extends Entity
 {
 	public function __construct(
@@ -28,9 +30,9 @@ class User extends Entity
 		return strtolower(end($array));
 	}
 
-	public function getField(string $fieldName)
+	public function getField(string $fieldName): string
 	{
-		return $this->$fieldName;
+		return ValidationService::safe($this->$fieldName);
 	}
 
 	public function getRoleId(): int

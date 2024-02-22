@@ -15,3 +15,4 @@
 		</div>
 	</form>
 </div>
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

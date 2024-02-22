@@ -100,7 +100,7 @@ $priceString = number_format($priceString, 0, '', ' ');
 		</div>
 	</form>
 </div>
-
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">
 <script src="/js/checkingEmptyEntry.js"></script>
 <script src="/js/validatePhone.js"></script>
 <script src="/js/submitTimeout.js"></script>

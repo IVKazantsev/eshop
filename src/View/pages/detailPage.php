@@ -50,3 +50,4 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 		</p>
 	</div>
 </div>
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

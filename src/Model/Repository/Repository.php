@@ -21,22 +21,6 @@ abstract class Repository
 	/**
 	 * @return Entity[]
 	 */
-	public function getListOrFail(array $filter = []): array
-	{
-		$items = $this->getList($filter);
-
-		if (empty($items))
-		{
-			echo 'Nothing to do here' . PHP_EOL;
-			exit();
-		}
-
-		return $items;
-	}
-
-	/**
-	 * @return Entity[]
-	 */
 	abstract public function getList(array $filter = null): array;
 
 	/**
@@ -45,13 +29,14 @@ abstract class Repository
 	public function delete(string $entities, int $entityId): bool
 	{
 		$connection = $this->dbConnection->getConnection();
+		$entities = mysqli_real_escape_string($connection, $entities);
 
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_$entities 
-		SET IS_ACTIVE = 0
-		WHERE ID = $entityId"
+			UPDATE N_ONE_$entities 
+			SET IS_ACTIVE = 0
+			WHERE ID = $entityId"
 		);
 
 		if (!$result)
