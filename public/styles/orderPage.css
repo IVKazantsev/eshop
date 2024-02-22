@@ -1,5 +1,13 @@
 
 /* Order Page */
+#order-form {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-areas:
+"user-info-container order-info-container"
+"user-info-container order-info-container";
+}
+
 .order-title {
 	font-size: 32px;
 	font-weight: bold;

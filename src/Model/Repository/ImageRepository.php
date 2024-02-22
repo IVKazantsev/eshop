@@ -168,7 +168,8 @@ class ImageRepository extends Repository
 
 		$result = mysqli_query(
 			$connection,
-			"DELETE FROM N_ONE_IMAGES WHERE ID IN (" . implode(',', $entityId) . ");"
+			"DELETE FROM N_ONE_IMAGES 
+			WHERE ID IN (" . implode(',', $entityId) . ");"
 		);
 
 		if (!$result)
