@@ -12,6 +12,32 @@ Router::get('/', function() {
 	$currentPageNumber = (int)($_GET['page'] ?? null);
 	$currentRange = $_GET['range'] ?? null;
 
+	$tagsToFilter = $_GET['selectedTags'];
+	$tagGroups = explode(';', $tagsToFilter);
+
+	$finalTags = [];
+	foreach ($tagGroups as $tagGroup)
+	{
+
+		[$parentId, $childIds] = explode(':[', trim($tagGroup, '[]'));
+		$finalTags[$parentId] = array_map('trim', explode(',', $childIds));
+	}
+
+	var_dump($finalTags);
+	$attributesToFilter = $_GET['attributes'];
+	// var_dump($attributesToFilter);
+	$attributeGroups = explode(';', $attributesToFilter);
+	// var_dump($attributeGroups);
+	foreach ($attributeGroups as $attributeGroup)
+	{
+
+		[$parentId, $childIds] = explode('=[', trim($attributeGroup, '[]'));
+		[$from, $to] = explode('-', $childIds);
+		$finalAttributes[$parentId]['from'] = $from;
+		$finalAttributes[$parentId]['to'] = $to;
+	}
+	var_dump($finalAttributes);
+
 	return ($di->getComponent('catalogController'))->renderCatalog(
 		$currentPageNumber,
 		$currentTag,

@@ -35,51 +35,46 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 	<div class="sidebar">
 		<div class="tags-container">
 			<div class="tags-title">КАТЕГОРИИ</div>
-
-
 			<ul class="tags">
 				<?php if (isset($tags[""])): ?>
 					<?php foreach ($tags[""] as $parentTag): ?>
-						<li class="tag-item">
-							<?= $parentTag->getTitle() ?>
+						<li class="tag-item dropdown">
+							<a class="dropdown-toggle" href="#" data-parent-id="<?= $parentTag->getId(
+							) ?>" onclick="toggleDropdown(event)">
+								<?= $parentTag->getTitle() ?>
+							</a>
+
+							<div class="dropdown-content" id="dropdown-content-<?= $parentTag->getId() ?>">
+
+								<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
+
+									<input type="checkbox" class="tag-checkbox" data-parent-id="<?= $parentTag->getId(
+									) ?>" value="<?= $childTag->getId() ?>" id="input-<?= $childTag->getId() ?>">
+
+									<label for="input-<?= $childTag->getId() ?>"><?= $childTag->getTitle() ?></label>
+								<?php endforeach; ?>
+							</div>
 						</li>
-						<ul class="child-tags">
-							<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
-								<li class="tag-item">
-									<a
-										class="tag-link"
-										href="<?= '/?tag=' . $childTag->getTitle() ?>"
-									>
-										<?= $childTag->getTitle() ?>
-									</a>
-								</li>
-							<?php endforeach; ?>
-						</ul>
 					<?php endforeach; ?>
 				<?php endif; ?>
-
 				<?php foreach ($attributes as $attribute): ?>
 					<li class="tag-item">
-						<?= $attribute->getTitle() ?>
-					</li>
-					<li class="tag-item">
-						<input class="range_input" id="input1_<?=$attribute->getId()?>" type="number" min="0" max="999">
-						<input class="range_input" id="input2_<?=$attribute->getId()?>" type="number" min="0" max="999">
-						<button class="range_button" onclick="sendGetRequest(<?=$attribute->getId()?>)">sort</button>
+						<a class="dropdown-toggle" href="#" data-parent-id="<?= $attribute->getId(
+						) ?>" onclick="toggleDropdown(event)">
+							<?= $attribute->getTitle() ?>
+						</a>
+						<div class="dropdown-content" id="dropdown-content-<?= $attribute->getId() ?>">
+							<input class="range_input" id="input1_<?= $attribute->getId(
+							) ?>" type="number" min="0" max="999" name="" data-attribute-title="<?= $attribute->getTitle(
+							) ?>"> -
+							<input class="range_input" id="input2_<?= $attribute->getId(
+							) ?>" type="number" min="0" max="999" data-attribute-title="<?= $attribute->getTitle() ?>">
+						</div>
+
 					</li>
 				<?php endforeach; ?>
-
-				<script>
-					function sendGetRequest(id) {
-						var input1Value = document.getElementById('input1_' + id).value;
-						var input2Value = document.getElementById('input2_' + id).value;
-
-						// Формируем GET-запрос с использованием переменной из PHP
-						// Выполняем GET-запрос
-						window.location.href = `?range=${id}:${input1Value},${input2Value}`;
-					}
-				</script>
-
+			</ul>
+			<button id="collect-data-btn">Фильтровать</button>
 		</div>
 	</div>
 	<div id="logo">
@@ -107,5 +102,47 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 		Created by N_ONE team 2024
 	</footer>
 </div>
+
+<?php
+//TODO ВЫНЕСТИ ЭТО ВСЕ НАХОЙ ОТСЕДА
+$tagsData = [];
+
+$parentTags = isset($tags['']) ? $tags[''] : [];
+$childTags = array_filter($tags, function($key) {
+	return is_numeric($key);
+},                        ARRAY_FILTER_USE_KEY);
+
+foreach ($parentTags as $parentTag)
+{
+	$tagsData[$parentTag->getId()] = [
+		'id' => $parentTag->getId(),
+		'title' => $parentTag->getTitle(),
+	];
+}
+
+foreach ($childTags as $parentId => $childTagGroup)
+{
+	$tagsData[$parentId] = [];
+	foreach ($childTagGroup as $childTag)
+	{
+		$tagsData[$parentId][] = [
+			'id' => $childTag->getId(),
+			'title' => $childTag->getTitle(),
+		];
+	}
+}
+
+$tagsJson = json_encode($tagsData);
+
+?>
+<script>
+	const tagsData = <?php echo $tagsJson; ?>;
+
+
+</script>
+<script src="/js/categoryFilter.js">
+</script>
 </body>
+
+
 </html>
