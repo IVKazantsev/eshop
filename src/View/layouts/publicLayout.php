@@ -15,7 +15,7 @@ use N_ONE\Core\Configurator\Configurator;
 
 $iconsPath = Configurator::option('ICONS_PATH');
 $imagesPath = Configurator::option('IMAGES_PATH');
-//TODO СДЕЛАТЬ ПОДКЛЮЧЕНИЕ ДОП ФАЙЛОВ CSS В ЗАВИСИМОСТИ ОТ СТРАНИЦЫ
+$cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css') : null;
 ?>
 
 <!DOCTYPE html>
@@ -24,12 +24,10 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/styles/reset.css">
-	<link rel="stylesheet" href="/styles/style.css">
-
-	<?php if (isset($additional_css)): ?>
-		<link rel="stylesheet" href="<?= $additional_css ?>">
+	<link rel="stylesheet" href="/styles/publicLayout.css">
+	<?php if (isset($cssFile)): ?>
+		<link rel="stylesheet" href="<?= $cssFile ?>">
 	<?php endif; ?>
-
 	<title>eshop</title>
 </head>
 <body>
@@ -105,7 +103,9 @@ $imagesPath = Configurator::option('IMAGES_PATH');
 		<?= $content ?>
 	</main>
 
-	<footer>Created by N_ONE team 2024</footer>
+	<footer>
+		Created by N_ONE team 2024
+	</footer>
 </div>
 </body>
 </html>

@@ -25,3 +25,4 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 	<?php endif?>
 
 </div>
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

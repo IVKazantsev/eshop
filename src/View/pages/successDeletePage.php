@@ -13,3 +13,4 @@ $iconsPath = Configurator::option('ICONS_PATH');
 		Вы успешно удалили сущность
 	</div>
 </div>
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

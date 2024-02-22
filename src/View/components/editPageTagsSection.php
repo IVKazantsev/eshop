@@ -21,7 +21,12 @@
 					{
 						echo $itemTags[$tag->getParentId()] === $tag->getId() ? 'checked' : '';
 					}
-					?> type="radio" name="tags[<?= $tag->getParentId() ?>]" value="<?= $tag->getId() ?>">
+					?>
+						class="specific-input-string"
+						type="radio"
+						name="tags[<?= $tag->getParentId() ?>]"
+						value="<?= $tag->getId() ?>"
+					>
 					<?= $tag->getTitle() ?>
 				</label>
 

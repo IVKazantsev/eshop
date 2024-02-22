@@ -1,0 +1,270 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap');
+
+body {
+	font-family: 'Open Sans', sans-serif;
+}
+
+img {
+	object-fit: cover;
+}
+
+header {
+	grid-column: 3;
+	left: 300px;
+}
+
+main {
+	grid-column: 3;
+	grid-row: 2/4;
+	max-height: calc(100vh - 60px - 20px);
+	overflow-y: auto;
+}
+
+main::-webkit-scrollbar {
+	display: none;
+}
+
+
+footer {
+	grid-column: 1/-1;
+	background-color: #ee753b;
+	text-align: center;
+	height: 25px;
+}
+
+button {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 1000;
+}
+
+.container {
+	margin: 0 auto;
+	height: 100vh;
+	display: grid;
+	grid-template-rows: 10% 1fr 1%;
+	grid-template-columns: 7% 20% 1fr 7%;
+	overflow-y: auto;
+}
+
+.search-form {
+	display: flex;
+	width: 100%;
+	align-items: center;
+}
+
+.search-icon-and-input {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	gap: 8px;
+}
+
+.search-icon {
+	height: 60%;
+}
+
+.search-input {
+	box-sizing: border-box;
+	width: 80%;
+	height: 40px;
+	text-indent: 10px;
+	border: #dcdcdc solid 1px;
+	border-top-left-radius: 7px;
+	border-bottom-left-radius: 7px;
+	outline: none;
+}
+
+.search-button {
+	margin-left: 75%;
+}
+
+.searchbar {
+	display: flex;
+	align-items: center;
+	position: fixed;
+	height: 10%;
+	width: 60%;
+	gap: 135px;
+	z-index: 2;
+	background-color: #fff;
+}
+
+.btn {
+	background-color: #ee753b;
+	width: 60px;
+	height: 40px;
+	color: white;
+	border-radius: 7px;
+	border: none;
+	cursor: pointer;
+}
+
+
+.check-order-button {
+	width: 130px;
+	margin-left: 100%;
+	margin-right: 40px;
+}
+
+
+.sidebar {
+	grid-row: 2/-1;
+	grid-column: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	position: sticky;
+	height: 100%;
+	z-index: 1;
+	top: 0;
+}
+
+
+#logo {
+	display: flex;
+	align-items: center;
+	grid-column: 2;
+	grid-row: 1;
+	margin-top: 10px;
+}
+
+.logo-link {
+	margin-left: auto;
+}
+
+#logo img {
+	width: 80%;
+}
+
+
+.tags-container {
+	overflow-y: auto;
+	width: 85%;
+	margin-top: 60px;
+}
+
+.tags-container::-webkit-scrollbar {
+	display: none;
+}
+
+
+.tags-title {
+	text-transform: uppercase;
+	padding: 20px 20px 20px 50px;
+	color: white;
+	background-color: #f45507;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+}
+
+
+.tags {
+	list-style-type: none;
+	border: 2px solid #dcdcdc;
+	border-top: none;
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
+	padding-bottom: 25px;
+}
+
+.child-tags {
+	padding-left: 30px;
+	padding-right: 10px;
+	font-weight: 300;
+}
+
+.tag-item {
+	padding: 9px 100px 9px 50px;
+}
+.tag-link {
+	text-decoration: none;
+	color: #000;
+}
+.tag-link:active,
+.tag-link:hover,
+.tag-link:visited {
+	color: #000;
+}
+
+/* для dual range филтрации */
+.range_button {
+	position: sticky;
+	transform: none;
+}
+/*-----------------------*/
+
+
+
+
+
+
+/* стили для login page*/
+
+/* Center the login container */
+.login-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100vh; /* Full viewport height */
+	width: 100%; /* Full viewport width */
+}
+
+/* Style the login form */
+.login-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1em; /* Space between form elements */
+	max-width: 300px; /* Maximum width of the form */
+	padding: 1em; /* Padding around the form */
+	border: 1px solid #ccc; /* Optional border */
+	background-color: #fff; /* Background color */
+}
+
+/* Position labels above inputs */
+.input-label {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start; /* Align items to the start of the label */
+	margin-bottom: 0.5em; /* Space below the label */
+}
+
+/* Style the paragraph text inside labels */
+.input-label p {
+	margin: 0; /* Remove default margins */
+	font-weight: bold; /* Bold text for labels */
+}
+
+/* Style the remember container */
+.remember-container {
+	display: flex;
+	align-items: center; /* Vertically center the checkbox and text */
+	gap: 0.5em; /* Space between checkbox and text */
+}
+
+/* Style the checkbox label */
+.checkbox-label {
+	cursor: pointer;
+	font-size: 0.9em; /* Smaller font size for the label */
+}
+
+/* Style the submit button */
+.login-form button[type="submit"] {
+	background-color: #007bff; /* Blue background */
+	color: white; /* White text */
+	border: none; /* No border */
+	padding: 0.5em 1em; /* Padding around the text */
+	cursor: pointer; /* Pointer cursor on hover */
+	transition: background-color 0.3s ease; /* Transition effect */
+	position: sticky;
+}
+
+/* Change button background color on hover */
+.login-form button[type="submit"]:hover {
+	background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+/*---------------------------------------------------*/

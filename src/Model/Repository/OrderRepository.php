@@ -5,7 +5,6 @@ namespace N_ONE\App\Model\Repository;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Exceptions\DatabaseException;
-use RuntimeException;
 
 class OrderRepository extends Repository
 {
@@ -16,9 +15,6 @@ class OrderRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		// $currentLimit = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		// $offset = calculateCurrentOffset($currentPageNumber);
-		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
 		$orders = [];
 
 		$whereQueryBlock = $this->getWhereQueryBlock();
@@ -26,11 +22,10 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
-		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-		$whereQueryBlock;
-	"
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+			FROM N_ONE_ORDERS o
+			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+			$whereQueryBlock;"
 		);
 
 		if (!$result)
@@ -41,7 +36,12 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'],
+				$row['USER_ID'],
+				$row['ITEM_ID'],
+				$row['STATUS_ID'],
+				$row['TITLE'],
+				$row['PRICE'],
 			);
 
 			$orders[] = $order;
@@ -67,11 +67,10 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
-		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-		WHERE o.ID = $id;
-	"
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+			FROM N_ONE_ORDERS o
+			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+			WHERE o.ID = $id;"
 		);
 
 		if (!$result)
@@ -83,7 +82,12 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'],
+				$row['USER_ID'],
+				$row['ITEM_ID'],
+				$row['STATUS_ID'],
+				$row['TITLE'],
+				$row['PRICE'],
 			);
 		}
 
@@ -99,9 +103,8 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT ID, TITLE 
-		FROM N_ONE_STATUSES s;
-	"
+			SELECT ID, TITLE 
+			FROM N_ONE_STATUSES s;"
 		);
 
 		if (!$result)
@@ -131,13 +134,13 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
-		VALUES (
-			$userId,
-			$itemId,
-			$statusId,
-			$price
-		);"
+			INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
+			VALUES (
+				$userId,
+				$itemId,
+				$statusId,
+				$price
+			);"
 		);
 
 		if (!$result)
@@ -163,14 +166,13 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_ORDERS 
-		SET 
-			USER_ID = $userId,
-			ITEM_ID = $itemId,
-			STATUS_ID = $statusId,
-			PRICE = $price
-		WHERE ID = $orderId;
-		"
+			UPDATE N_ONE_ORDERS 
+			SET 
+				USER_ID = $userId,
+				ITEM_ID = $itemId,
+				STATUS_ID = $statusId,
+				PRICE = $price
+			WHERE ID = $orderId;"
 		);
 
 		if (!$result)

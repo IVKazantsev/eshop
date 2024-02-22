@@ -106,4 +106,18 @@ class ValidationService
 
 		return true;
 	}
+
+	public static function validateMetaTag($html, $tagName)
+	{
+		$pattern = '/<meta\s+name="' . preg_quote($tagName, '/') . '"\s+content="([^"]*)"\s*\/?>/i';
+		if (preg_match($pattern, $html, $matches)) {
+
+			return $matches[1];
+		}
+		else
+		{
+
+			return null;
+		}
+	}
 }

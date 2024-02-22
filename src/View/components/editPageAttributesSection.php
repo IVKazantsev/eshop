@@ -12,7 +12,7 @@
 		<?php foreach ($attributes as $attribute): ?>
 			<label class="attribute" for="<?= $attribute->getTitle() ?>">
 				<?= $attribute->getTitle() ?>
-				<input class="attribute-input" type="text" name="attributes[<?= $attribute->getId() ?>]"
+				<input class="number" type="text" name="attributes[<?= $attribute->getId() ?>]"
 					<?php if (empty($itemAttributes))
 					{
 						echo "value={$attribute->getValue()}";

@@ -90,7 +90,7 @@ Router::post('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Rou
 	$itemId = $route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->updateItem($entityToEdit, $itemId);
+	return ($di->getComponent('adminController'))->updateEntity($entityToEdit, $itemId);
 }));
 Router::get('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];

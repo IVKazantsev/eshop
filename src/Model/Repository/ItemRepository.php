@@ -33,10 +33,10 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
-		FROM N_ONE_ITEMS i
-		WHERE i.ID = $id;
-		"
+			SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
+			FROM N_ONE_ITEMS i
+			WHERE i.ID = $id;
+			"
 		);
 
 		if (!$result)
@@ -112,8 +112,6 @@ class ItemRepository extends Repository
 				[],
 				[]
 			);
-
-			// $items[count($items) - 1]->setId($row['ID']);
 		}
 
 		if (empty($items))
@@ -121,9 +119,7 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$itemsIds = array_map(static function($item) {
-			return $item->getId();
-		}, $items);
+		$itemsIds = array_map(static function($item) {return $item->getId();}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
@@ -191,10 +187,10 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
-		FROM N_ONE_ITEMS i
-		WHERE i.ID IN (" . implode(',', $ids) . ");
-	"
+			SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
+			FROM N_ONE_ITEMS i
+			WHERE i.ID IN (" . implode(',', $ids) . ");
+			"
 		);
 
 		if (!$result)
@@ -222,9 +218,7 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$itemsIds = array_map(static function($item) {
-			return $item->getId();
-		}, $items);
+		$itemsIds = array_map(static function($item) {return $item->getId();}, $items);
 
 		$tags = $this->tagRepository->getByItemsIds($itemsIds);
 		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
@@ -257,25 +251,34 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ITEMS ( TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
-		VALUES (
-			'$title',
-			$isActive,
-			$price,
-			'$description',
-			{$sortOrder}
-		);"
+			INSERT INTO N_ONE_ITEMS (TITLE, IS_ACTIVE, PRICE, DESCRIPTION, SORT_ORDER) 
+			VALUES (
+				'$title',
+				$isActive,
+				$price,
+				'$description',
+				$sortOrder
+				);"
 		);
 
 		if (!$result)
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
-		$itemId = mysqli_insert_id($connection);
-		$this->addItemTags($connection, $itemId, $tags);
-		$this->addItemAttributes($connection, $itemId, $attributes);
 
-		return $result;
+		$itemId = mysqli_insert_id($connection);
+
+
+		if (!empty($tags) )
+		{
+			$this->updateItemTags($connection, $itemId, $tags);
+		}
+		if (!empty($attributes))
+		{
+			$this->updateItemAttributes($connection, $itemId, $attributes);
+		}
+
+		return $itemId;
 	}
 
 	/**
@@ -285,23 +288,25 @@ class ItemRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 		$itemId = $entity->getId();
-		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 		$isActive = $entity->isActive() ? 1 : 0;
-		$price = mysqli_real_escape_string($connection, $entity->getPrice());
-		$description = mysqli_real_escape_string($connection, $entity->getDescription());
 		$sortOrder = $entity->getSortOrder();
 		$tags = $entity->getTags();
 		$attributes = $entity->getAttributes();
+		$title = mysqli_real_escape_string($connection, $entity->getTitle());
+		$price = mysqli_real_escape_string($connection, $entity->getPrice());
+		$description = mysqli_real_escape_string($connection, $entity->getDescription());
+
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_ITEMS 
-		SET TITLE = '$title', 
-			IS_ACTIVE = $isActive, 
-			PRICE = $price, 
-			DESCRIPTION = '$description', 
-			SORT_ORDER = {$sortOrder}
-		WHERE ID = $itemId"
+			UPDATE N_ONE_ITEMS 
+			SET 
+				TITLE = '$title', 
+				IS_ACTIVE = $isActive, 
+				PRICE = $price, 
+				DESCRIPTION = '$description', 
+				SORT_ORDER = {$sortOrder}
+			WHERE ID = $itemId"
 		);
 
 		if (!$result)
@@ -309,8 +314,14 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$this->updateItemTags($connection, $itemId, $tags);
-		$this->updateItemAttributes($connection, $itemId, $attributes);
+		if (!empty($tags) )
+		{
+			$this->updateItemTags($connection, $itemId, $tags);
+		}
+		if (!empty($attributes))
+		{
+			$this->updateItemAttributes($connection, $itemId, $attributes);
+		}
 
 		return true;
 	}
@@ -323,28 +334,16 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-			DELETE FROM N_ONE_ITEMS_TAGS WHERE ITEM_ID = $itemId"
+			DELETE FROM N_ONE_ITEMS_TAGS 
+			WHERE ITEM_ID = $itemId"
 		);
 
 		if (!$result)
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
-		$itemTags = "";
-		foreach ($tags as $tag)
-		{
-			$itemTags .= '(' . $itemId . ', ' . $tag . '),';
-		}
-		// exit();
-		$itemTags = substr($itemTags, 0, -1);
 
-		$sql = "INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";";
-		$result = mysqli_query($connection, $sql);
-
-		if (!$result)
-		{
-			throw new DatabaseException(mysqli_error($connection));
-		}
+		$this->addItemTags($connection, $itemId, $tags);
 	}
 
 	/**
@@ -355,31 +354,16 @@ class ItemRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-			DELETE FROM N_ONE_ITEMS_ATTRIBUTES WHERE ITEM_ID = $itemId"
+			DELETE FROM N_ONE_ITEMS_ATTRIBUTES 
+			WHERE ITEM_ID = $itemId"
 		);
 
 		if (!$result)
 		{
 			throw new DatabaseException(mysqli_error($connection));
 		}
-		$itemAttributes = "";
-		foreach ($attributes as $attributeId => $attribute)
-		{
-			if (!trim($attribute))
-			{
-				$attribute = 'null';
-			}
-			$itemAttributes .= '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
-		}
-		$itemAttributes = substr($itemAttributes, 0, -1);
-		var_dump($itemAttributes);
-		$sql = "INSERT INTO N_ONE_ITEMS_ATTRIBUTES (ITEM_ID, ATTRIBUTE_ID, VALUE) VALUES " . $itemAttributes . ";";
-		$result = mysqli_query($connection, $sql);
 
-		if (!$result)
-		{
-			throw new DatabaseException(mysqli_error($connection));
-		}
+		$this->addItemAttributes($connection, $itemId, $attributes);
 	}
 
 	/**
@@ -393,10 +377,14 @@ class ItemRepository extends Repository
 		{
 			$itemTags .= '(' . $itemId . ', ' . $tag . '),';
 		}
+
 		$itemTags = substr($itemTags, 0, -1);
 
-		$sql = "INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) VALUES " . $itemTags . ";";
-		$result = mysqli_query($connection, $sql);
+		$result = mysqli_query(
+			$connection,
+			"INSERT INTO N_ONE_ITEMS_TAGS (ITEM_ID, TAG_ID) 
+			VALUES " . $itemTags . ";"
+		);
 
 		if (!$result)
 		{
@@ -419,9 +407,12 @@ class ItemRepository extends Repository
 			$itemAttributes .= '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
 		}
 		$itemAttributes = substr($itemAttributes, 0, -1);
-		var_dump($itemAttributes);
-		$sql = "INSERT INTO N_ONE_ITEMS_ATTRIBUTES (ITEM_ID, ATTRIBUTE_ID, VALUE) VALUES " . $itemAttributes . ";";
-		$result = mysqli_query($connection, $sql);
+
+		$result = mysqli_query(
+			$connection,
+			"INSERT INTO N_ONE_ITEMS_ATTRIBUTES (ITEM_ID, ATTRIBUTE_ID, VALUE) 
+			VALUES " . $itemAttributes . ";"
+		);
 
 		if (!$result)
 		{

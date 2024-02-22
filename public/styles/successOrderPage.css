@@ -1,0 +1,50 @@
+/* Success Order */
+
+.success-order-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 60px 0 0;
+	background-color: #fff;
+}
+
+.success-img-container {
+	width: 10%;
+}
+
+.success-img {
+	width: 100%;
+}
+
+.success-order-title {
+	margin-top: 60px;
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+.order-number-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: #e8e8e8;
+	margin-top: 30px;
+	padding: 20px 100px;
+}
+
+.order-number-header {
+	font-weight: bold;
+	font-size: 1em;
+	color: #919090;
+}
+
+.specific-order-number {
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+.order-info {
+	margin-top: 20px;
+}
+
+/*               */

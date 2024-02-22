@@ -1,0 +1,138 @@
+
+/* для карусели картинок */
+.item-image-gallery {
+	aspect-ratio: auto;
+	margin: 0 auto;
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.slide {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+}
+
+.slide img {
+	width: 100%;
+	height: 100%;
+}
+
+
+#prev {
+	left: 10px;
+	background-color: transparent; /* Убираем фон */
+	border: none; /* Убираем границу */
+	outline: none;
+	font-size: 50px;
+	color: #383838;
+}
+
+#next {
+	right: 10px;
+	background-color: transparent; /* Убираем фон */
+	border: none; /* Убираем границу */
+	outline: none;
+	font-size: 50px;
+	color: #383838;
+}
+
+#prev:hover {
+	text-decoration: none;
+	border: none; /* Убираем границу */
+	outline: none;
+	font-size: 53px;
+	color: #666666;
+	transition: .3s;
+}
+
+#next:hover {
+	text-decoration: none;
+	border: none; /* Убираем границу */
+	outline: none;
+	font-size: 53px;
+	color: #666666;
+	transition: .3s;
+}
+/*-----------------------*/
+
+
+.item-info {
+	display: grid;
+	grid-template-columns: 3fr 1fr;
+	grid-template-rows: 1fr 300px;
+	background-color: #fff;
+	padding: 40px 0;
+}
+
+.item-specs {
+	background-color: rgba(242, 242, 242, 1);
+	padding: 15px;
+	margin-left: 10px;
+}
+
+.item-description {
+	margin-top: 10px;
+	grid-column: 1;
+}
+
+.item-description h2 {
+	font-weight: 500;
+}
+
+.item-description-text{
+	font-weight: 300;
+}
+
+
+
+.item-title-details {
+	font-weight: 500;
+	margin-top: 15px;
+	margin-bottom: 10px;
+}
+
+hr {
+	border: none;
+	border-top: 1px solid rgba(204, 204, 204, 1);
+	margin: 17px 5px 15px 5px;
+}
+
+
+
+
+.year-title-details {
+	text-align: right;
+	margin-bottom: 20px;
+}
+
+
+
+.detail-price {
+	font-size: 28px;
+	margin-bottom: 10px;
+	margin-left: 10px;
+	font-weight: 300;
+	margin-top: 100%;
+}
+
+.buy-link {
+	background-color: #07a6f4;
+	color: whitesmoke;
+	font-weight: 500;
+	letter-spacing: 2px;
+	display: block;
+	border: none;
+	width: 100%;
+	height: 30px;
+	text-align: center;
+	text-decoration: none;
+	margin-top: 25px;
+	cursor: pointer;
+	line-height: 1.8;
+}

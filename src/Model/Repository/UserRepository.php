@@ -21,11 +21,10 @@ class UserRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
-		FROM N_ONE_USERS u
-		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-		$whereQueryBlock;
-		"
+			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
+			FROM N_ONE_USERS u
+			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+			$whereQueryBlock;"
 		);
 
 		if (!$result)
@@ -66,11 +65,10 @@ class UserRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
-		FROM N_ONE_USERS u
-		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-		WHERE u.EMAIL = '$escapedEmail';
-		"
+			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, r.TITLE
+			FROM N_ONE_USERS u
+			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+			WHERE u.EMAIL = '$escapedEmail';"
 		);
 
 		if (!$result)
@@ -90,7 +88,6 @@ class UserRepository extends Repository
 				$row['PHONE_NUMBER'],
 				$row['ADDRESS'],
 			);
-			// $user->setId($row['ID']);
 		}
 
 		return $user;
@@ -106,11 +103,10 @@ class UserRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
-		FROM N_ONE_USERS u
-		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-		WHERE u.ID = $id;
-		"
+			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
+			FROM N_ONE_USERS u
+			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+			WHERE u.ID = $id ;"
 		);
 
 		if (!$result)
@@ -141,15 +137,15 @@ class UserRepository extends Repository
 	public function getByNumber(string $phone): User|null
 	{
 		$connection = $this->dbConnection->getConnection();
+		$phone = mysqli_real_escape_string($connection, $phone);
 
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
-		FROM N_ONE_USERS u
-		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-		WHERE u.PHONE_NUMBER = '$phone';
-		"
+			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
+			FROM N_ONE_USERS u
+			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+			WHERE u.PHONE_NUMBER = '$phone';"
 		);
 
 		if (!$result)
@@ -187,11 +183,10 @@ class UserRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
-		FROM N_ONE_USERS u
-		JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-		WHERE u.ID IN (" . implode(',', $ids) . ");
-		"
+			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
+			FROM N_ONE_USERS u
+			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
+			WHERE u.ID IN (" . implode(',', $ids) . ");"
 		);
 
 		if (!$result)
@@ -231,15 +226,15 @@ class UserRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_USERS (ROLE_ID, NAME, EMAIL, PASSWORD, PHONE_NUMBER, ADDRESS) 
-		VALUES (
-			'$roleId',
-			'$name',
-			'$email',
-			'$password',
-			'$phoneNumber',
-			'$address'
-		);"
+			INSERT INTO N_ONE_USERS (ROLE_ID, NAME, EMAIL, PASSWORD, PHONE_NUMBER, ADDRESS) 
+			VALUES (
+				'$roleId',
+				'$name',
+				'$email',
+				'$password',
+				'$phoneNumber',
+				'$address'
+			);"
 		);
 
 		if (!$result)
@@ -267,14 +262,15 @@ class UserRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_USERS 
-		SET ROLE_ID = $roleId,
-			NAME = '$name', 
-			EMAIL = '$email', 
-			PASSWORD = '$password', 
-			PHONE_NUMBER = '$phoneNumber', 
-			ADDRESS = '$address'
-		WHERE ID = $userId"
+			UPDATE N_ONE_USERS 
+			SET 
+				ROLE_ID = $roleId,
+				NAME = '$name', 
+				EMAIL = '$email', 
+				PASSWORD = '$password', 
+				PHONE_NUMBER = '$phoneNumber', 
+				ADDRESS = '$address'
+			WHERE ID = $userId ;"
 		);
 
 		if (!$result)
