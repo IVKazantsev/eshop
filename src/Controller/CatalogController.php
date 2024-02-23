@@ -11,15 +11,15 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(?int $pageNumber, ?string $itemsTag, ?string $SearchRequest, ?string $range): string
+	public function renderCatalog(?int $pageNumber, ?string $SearchRequest,): string
 	{
 		try
 		{
 			$filter = [
-				'tag' => $itemsTag,
+				// 'tag' => $itemsTag,
 				'title' => $SearchRequest,
 				'pageNumber' => $pageNumber,
-				'range' => $range,
+				// 'range' => $range,
 			];
 
 			$items = $this->itemRepository->getList($filter);
@@ -52,6 +52,7 @@ class CatalogController extends BaseController
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderFinalError();
 		}
 

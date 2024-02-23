@@ -1,15 +1,33 @@
 function toggleDropdown(event)
 {
+
+	if (event.target.tagName === 'INPUT' || event.target.tagName === 'LABEL' || event.target.tagName === 'DIV')
+	{
+		return;
+	}
+
 	event.preventDefault();
-	const dropdownContent = document.getElementById('dropdown-content-' + event.target.dataset.parentId);
-	dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+	const dropdownContent = document.getElementById('dropdown-content-' + event.currentTarget.querySelector('.dropdown-toggle').dataset.parentId);
+	const dropdownIcon = event.currentTarget.querySelector('.dropdown-icon');
+
+	dropdownContent.style.display = dropdownContent.style.display === 'flex' ? 'none' : 'flex';
+
+	if (dropdownContent.style.display === 'flex')
+	{
+		dropdownIcon.classList.remove('chevron-up');
+		dropdownIcon.classList.add('chevron-down');
+	}
+	else
+	{
+		dropdownIcon.classList.remove('chevron-down');
+		dropdownIcon.classList.add('chevron-up');
+	}
 }
 
 function collectTagData()
 {
 	const checkboxes = document.querySelectorAll('.tag-checkbox:checked');
 	const selectedTags = {};
-
 	checkboxes.forEach(function(checkbox) {
 		const parentId = checkbox.dataset.parentId;
 		const childId = checkbox.value;
@@ -20,25 +38,16 @@ function collectTagData()
 		}
 		selectedTags[parentId].push(childId);
 	});
-	let outputString = 'selectedTags=[';
-	let isFirst = true;
+	let tagsData = [];
+
 	for (const parentId in selectedTags)
 	{
 		if (selectedTags.hasOwnProperty(parentId))
 		{
-			if (!isFirst)
-			{
-				outputString += ';';
-			}
-			outputString += parentId + ':[' + selectedTags[parentId].join(',') + ']';
-			isFirst = false;
+			tagsData.push(parentId + ':[' + selectedTags[parentId].join(',') + ']');
 		}
 	}
-
-	outputString += ']';
-
-	console.log(outputString);
-	return outputString;
+	return tagsData.length ? 'selectedTags=[' + tagsData.join(';') + ']' : '';
 }
 
 function collectRangeFieldData()
@@ -59,8 +68,6 @@ function collectRangeFieldData()
 			[minValue, maxValue] = [maxValue, minValue];
 		}
 		const attributeId = rangeFields[i].id.split('_')[1];
-		const attributeTitle = rangeFields[i].dataset.attributeTitle;
-
 		const rangeParam = attributeId + '=[' + minValue + '-' + maxValue + ']';
 		rangeData.push(rangeParam);
 	}
@@ -72,8 +79,8 @@ function collectCheckedData()
 {
 	const tagData = collectTagData();
 	const rangeData = collectRangeFieldData();
-	const getRequestString = [tagData, rangeData].filter(Boolean).join('&');
-	return getRequestString;
+	return [tagData, rangeData].filter(Boolean).join('&');
+	// return getRequestString;
 }
 
 document.getElementById('collect-data-btn').addEventListener('click', function() {

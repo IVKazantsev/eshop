@@ -5,46 +5,57 @@ use N_ONE\App\Model\Service\MiddleWare;
 use N_ONE\Core\Routing\Route;
 use N_ONE\Core\Routing\Router;
 
-Router::get('/', function() {
-	$di = Application::getDI();
-	$currentTag = $_GET['tag'] ?? null;
-	$currentSearchRequest = $_GET['SearchRequest'] ?? null;
-	$currentPageNumber = (int)($_GET['page'] ?? null);
-	$currentRange = $_GET['range'] ?? null;
+Router::get(
+	'/',
+	MiddleWare::processFilters(
+		function($route, $finalTags, $finalAttributes) {
+			$di = Application::getDI();
+			$currentSearchRequest = $_GET['SearchRequest'] ?? null;
+			$currentPageNumber = (int)($_GET['page'] ?? null);
 
-	$tagsToFilter = $_GET['selectedTags'];
-	$tagGroups = explode(';', $tagsToFilter);
+			//TODO: ИСПОЛЬЗОВАТЬ FINALTAGS, FINALATTRIBUTES
+			return ($di->getComponent('catalogController'))->renderCatalog(
+				$currentPageNumber,
 
-	$finalTags = [];
-	foreach ($tagGroups as $tagGroup)
-	{
+				$currentSearchRequest
+			);
+			// $currentTag,
+			// $currentRange
+			// $currentTag = $_GET['tag'] ?? null;
+			// $currentSearchRequest = $_GET['SearchRequest'] ?? null;
+			// $currentPageNumber = (int)($_GET['page'] ?? null);
+			// $currentRange = $_GET['range'] ?? null;
+			//
+			// $tagsToFilter = $_GET['selectedTags'];
+			// $tagGroups = explode(';', $tagsToFilter);
+			//
+			// $finalTags = [];
+			// foreach ($tagGroups as $tagGroup)
+			// {
+			// 	[$parentId, $childIds] = explode(':[', trim($tagGroup, '[]'));
+			// 	foreach (explode(',', $childIds) as $childId)
+			// 	{
+			// 		$finalTags[(int)$parentId][] = (int)trim($childId);
+			// 	}
+			// }
+			//
+			// $attributesToFilter = $_GET['attributes'];
+			// $attributeGroups = explode(';', $attributesToFilter);
+			// foreach ($attributeGroups as $attributeGroup)
+			// {
+			//
+			// 	[$parentId, $childIds] = explode('=[', trim($attributeGroup, '[]'));
+			// 	[$from, $to] = explode('-', $childIds);
+			// 	$finalAttributes[(int)$parentId]['from'] = (int)$from;
+			// 	$finalAttributes[(int)$parentId]['to'] = (int)$to;
+			// }
+			// var_dump($finalTags, $finalAttributes);
+			//
 
-		[$parentId, $childIds] = explode(':[', trim($tagGroup, '[]'));
-		$finalTags[$parentId] = array_map('trim', explode(',', $childIds));
-	}
-
-	var_dump($finalTags);
-	$attributesToFilter = $_GET['attributes'];
-	// var_dump($attributesToFilter);
-	$attributeGroups = explode(';', $attributesToFilter);
-	// var_dump($attributeGroups);
-	foreach ($attributeGroups as $attributeGroup)
-	{
-
-		[$parentId, $childIds] = explode('=[', trim($attributeGroup, '[]'));
-		[$from, $to] = explode('-', $childIds);
-		$finalAttributes[$parentId]['from'] = $from;
-		$finalAttributes[$parentId]['to'] = $to;
-	}
-	var_dump($finalAttributes);
-
-	return ($di->getComponent('catalogController'))->renderCatalog(
-		$currentPageNumber,
-		$currentTag,
-		$currentSearchRequest,
-		$currentRange
-	);
-});
+			// );
+		}
+	)
+);
 
 Router::get('/products/:id', function(Route $route) {
 	$carId = (int)$route->getVariables()[0];
@@ -81,6 +92,7 @@ Router::get('/checkOrder', function() {
 Router::get('/orderInfo', function() {
 	$di = Application::getDI();
 	$orderNumber = (int)($_GET['number'] ?? null);
+
 	return ($di->getComponent('orderController'))->renderOrderInfoPage($orderNumber);
 });
 

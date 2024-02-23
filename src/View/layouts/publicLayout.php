@@ -38,37 +38,34 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 			<ul class="tags">
 				<?php if (isset($tags[""])): ?>
 					<?php foreach ($tags[""] as $parentTag): ?>
-						<li class="tag-item dropdown">
-							<a class="dropdown-toggle" href="#" data-parent-id="<?= $parentTag->getId(
-							) ?>" onclick="toggleDropdown(event)">
-								<?= $parentTag->getTitle() ?>
+						<li class="tag-item dropdown" onclick="toggleDropdown(event)">
+							<a class="dropdown-toggle" href="#" data-parent-id="<?= $parentTag->getId() ?>">
+								<?= $parentTag->getTitle() ?> <i class="Chevron dropdown-icon chevron-up "></i>
 							</a>
-
 							<div class="dropdown-content" id="dropdown-content-<?= $parentTag->getId() ?>">
-
 								<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
-
-									<input type="checkbox" class="tag-checkbox" data-parent-id="<?= $parentTag->getId(
-									) ?>" value="<?= $childTag->getId() ?>" id="input-<?= $childTag->getId() ?>">
-
-									<label for="input-<?= $childTag->getId() ?>"><?= $childTag->getTitle() ?></label>
+									<label for="input-<?= $childTag->getId() ?>">
+										<input type="checkbox" class="tag-checkbox" data-parent-id="<?= $parentTag->getId(
+										) ?>" value="<?= $childTag->getId() ?>" id="input-<?= $childTag->getId() ?>">
+										<?= $childTag->getTitle() ?>
+									</label>
 								<?php endforeach; ?>
 							</div>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 				<?php foreach ($attributes as $attribute): ?>
-					<li class="tag-item">
-						<a class="dropdown-toggle" href="#" data-parent-id="<?= $attribute->getId(
-						) ?>" onclick="toggleDropdown(event)">
-							<?= $attribute->getTitle() ?>
+					<li class="tag-item dropdown" onclick="toggleDropdown(event)">
+						<a class="dropdown-toggle" href="#" data-parent-id="<?= $attribute->getId() ?>">
+							<?= $attribute->getTitle() ?> <i class="Chevron dropdown-icon chevron-up "></i>
 						</a>
-						<div class="dropdown-content" id="dropdown-content-<?= $attribute->getId() ?>">
+						<div class="dropdown-content attributes" id="dropdown-content-<?= $attribute->getId() ?>">
 							<input class="range_input" id="input1_<?= $attribute->getId(
-							) ?>" type="number" min="0" max="999" name="" data-attribute-title="<?= $attribute->getTitle(
-							) ?>"> -
+							) ?>" type="number" min="0" max="999" name="" placeholder="От..." data-attribute-title="<?= $attribute->getTitle(
+							) ?>">-&nbsp;
 							<input class="range_input" id="input2_<?= $attribute->getId(
-							) ?>" type="number" min="0" max="999" data-attribute-title="<?= $attribute->getTitle() ?>">
+							) ?>" type="number" min="0" max="999" placeholder="До..." data-attribute-title="<?= $attribute->getTitle(
+							) ?>">
 						</div>
 
 					</li>
@@ -85,9 +82,12 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 			<div class="searchbar">
 				<form class="search-form" action="/" method="get">
 					<div class="search-icon-and-input">
-						<input name="SearchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe($currentSearchRequest ?? '')?>" class="search-input" required>
+						<input name="SearchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe(
+							$currentSearchRequest ?? ''
+						) ?>" class="search-input" required>
 					</div>
-					<button type="submit" class="search-button btn"><img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
+					<button type="submit" class="search-button btn">
+						<img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
 				</form>
 				<a class="check-order-link" href="/checkOrder">Проверить заказ</a>
 			</div>
@@ -103,46 +103,9 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 	</footer>
 </div>
 
-<?php
-//TODO ВЫНЕСТИ ЭТО ВСЕ НАХОЙ ОТСЕДА
-$tagsData = [];
-
-$parentTags = isset($tags['']) ? $tags[''] : [];
-$childTags = array_filter($tags, function($key) {
-	return is_numeric($key);
-},                        ARRAY_FILTER_USE_KEY);
-
-foreach ($parentTags as $parentTag)
-{
-	$tagsData[$parentTag->getId()] = [
-		'id' => $parentTag->getId(),
-		'title' => $parentTag->getTitle(),
-	];
-}
-
-foreach ($childTags as $parentId => $childTagGroup)
-{
-	$tagsData[$parentId] = [];
-	foreach ($childTagGroup as $childTag)
-	{
-		$tagsData[$parentId][] = [
-			'id' => $childTag->getId(),
-			'title' => $childTag->getTitle(),
-		];
-	}
-}
-
-$tagsJson = json_encode($tagsData);
-
-?>
 <script>
-	const tagsData = <?php echo $tagsJson; ?>;
-
-
+	const tagsData = <?php echo json_encode($tags); ?>;
 </script>
-<script src="/js/categoryFilter.js">
-</script>
+<script src="/js/categoryFilter.js"></script>
 </body>
-
-
 </html>
