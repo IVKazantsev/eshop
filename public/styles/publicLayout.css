@@ -32,7 +32,7 @@ footer {
 	height: 25px;
 }
 
-button {
+.search-button {
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
@@ -108,6 +108,7 @@ button {
 	margin-left: 100%;
 	margin-right: 40px;
 }
+
 .check-order-link {
 	display: flex;
 	align-items: center;
@@ -166,6 +167,7 @@ button {
 	overflow-y: auto;
 	width: 85%;
 	margin-top: 60px;
+	/*margin-bottom: 60px;*/
 }
 
 .tags-container::-webkit-scrollbar {
@@ -201,10 +203,12 @@ button {
 .tag-item {
 	padding: 9px 100px 9px 50px;
 }
+
 .tag-link {
 	text-decoration: none;
 	color: #000;
 }
+
 .tag-link:active,
 .tag-link:hover,
 .tag-link:visited {
@@ -216,11 +220,8 @@ button {
 	position: sticky;
 	transform: none;
 }
+
 /*-----------------------*/
-
-
-
-
 
 
 /* стили для login page*/
@@ -435,6 +436,7 @@ button {
 .order-table {
 	border: none;
 }
+
 .order-th {
 	font-weight: normal;
 	text-align: left;
@@ -451,4 +453,106 @@ button {
 
 .gray-cell {
 	background-color: #e8e8e8;
+}
+
+/**/
+.tags {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	background-color: #f9f9f9;
+	border-right: 1px solid #ddd;
+}
+
+.tag-item {
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+	position: relative; /* Added to position the dropdown content relative to the tag item */
+}
+
+.dropdown-toggle {
+	text-decoration: none;
+	color: #333;
+	cursor: pointer;
+	font-size: 20px;
+	display: flex;
+	gap: 15px;
+	justify-content: space-between;
+}
+
+.dropdown-content {
+	display: none;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	padding: 12px 16px;
+	flex-direction: column;
+}
+
+.range_input {
+	width: 40%;
+	margin-right: 5px;
+}
+
+#collect-data-btn {
+	display: block;
+	width: 100%; /* Ensures the button fits within the container */
+	padding: 10px;
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	cursor: pointer;
+	margin-top: 10px;
+	text-align: center;
+}
+
+.dropdown-toggle:hover {
+	color: #007bff;
+}
+
+.attributes {
+	flex-direction: row;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.Chevron {
+	position: relative;
+	display: block;
+	height: 25px; /*height should be double border*/
+	margin-right: 25px;
+}
+
+.Chevron:before,
+.Chevron:after {
+	position: absolute;
+	display: block;
+	content: "";
+	border: 15px solid transparent; /*adjust size*/
+}
+
+/*Change four 'top' values below to rotate (top/right/bottom/left)*/
+
+.chevron-down:before {
+	bottom: 10px;
+	border-bottom-color: #666; /*Chevron Color*/
+}
+
+
+.chevron-down:after {
+	bottom: 5px; /*adjust thickness*/
+	border-bottom-color: #f9f9f9; /*Match background colour*/
+}
+
+.chevron-up:before {
+	top: 10px;
+	border-top-color: #666; /*Chevron Color*/
+}
+
+.chevron-up:after {
+	top: 5px; /*adjust thickness*/
+	border-top-color: #f9f9f9; /*Match background colour*/
 }

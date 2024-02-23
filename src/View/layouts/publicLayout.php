@@ -35,51 +35,43 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 	<div class="sidebar">
 		<div class="tags-container">
 			<div class="tags-title">КАТЕГОРИИ</div>
-
-
 			<ul class="tags">
 				<?php if (isset($tags[""])): ?>
 					<?php foreach ($tags[""] as $parentTag): ?>
-						<li class="tag-item">
-							<?= $parentTag->getTitle() ?>
-						</li>
-						<ul class="child-tags">
-							<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
-								<li class="tag-item">
-									<a
-										class="tag-link"
-										href="<?= '/?tag=' . $childTag->getTitle() ?>"
-									>
+						<li class="tag-item dropdown" onclick="toggleDropdown(event)">
+							<a class="dropdown-toggle" href="#" data-parent-id="<?= $parentTag->getId() ?>">
+								<?= $parentTag->getTitle() ?> <i class="Chevron dropdown-icon chevron-up "></i>
+							</a>
+							<div class="dropdown-content" id="dropdown-content-<?= $parentTag->getId() ?>">
+								<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
+									<label for="input-<?= $childTag->getId() ?>">
+										<input type="checkbox" class="tag-checkbox" data-parent-id="<?= $parentTag->getId(
+										) ?>" value="<?= $childTag->getId() ?>" id="input-<?= $childTag->getId() ?>">
 										<?= $childTag->getTitle() ?>
-									</a>
-								</li>
-							<?php endforeach; ?>
-						</ul>
+									</label>
+								<?php endforeach; ?>
+							</div>
+						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
-
 				<?php foreach ($attributes as $attribute): ?>
-					<li class="tag-item">
-						<?= $attribute->getTitle() ?>
-					</li>
-					<li class="tag-item">
-						<input class="range_input" id="input1_<?=$attribute->getId()?>" type="number" min="0" max="999">
-						<input class="range_input" id="input2_<?=$attribute->getId()?>" type="number" min="0" max="999">
-						<button class="range_button" onclick="sendGetRequest(<?=$attribute->getId()?>)">sort</button>
+					<li class="tag-item dropdown" onclick="toggleDropdown(event)">
+						<a class="dropdown-toggle" href="#" data-parent-id="<?= $attribute->getId() ?>">
+							<?= $attribute->getTitle() ?> <i class="Chevron dropdown-icon chevron-up "></i>
+						</a>
+						<div class="dropdown-content attributes" id="dropdown-content-<?= $attribute->getId() ?>">
+							<input class="range_input" id="input1_<?= $attribute->getId(
+							) ?>" type="number" min="0" max="999" name="" placeholder="От..." data-attribute-title="<?= $attribute->getTitle(
+							) ?>">-&nbsp;
+							<input class="range_input" id="input2_<?= $attribute->getId(
+							) ?>" type="number" min="0" max="999" placeholder="До..." data-attribute-title="<?= $attribute->getTitle(
+							) ?>">
+						</div>
+
 					</li>
 				<?php endforeach; ?>
-
-				<script>
-					function sendGetRequest(id) {
-						var input1Value = document.getElementById('input1_' + id).value;
-						var input2Value = document.getElementById('input2_' + id).value;
-
-						// Формируем GET-запрос с использованием переменной из PHP
-						// Выполняем GET-запрос
-						window.location.href = `?range=${id}:${input1Value},${input2Value}`;
-					}
-				</script>
-
+			</ul>
+			<button id="collect-data-btn">Фильтровать</button>
 		</div>
 	</div>
 	<div id="logo">
@@ -90,9 +82,12 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 			<div class="searchbar">
 				<form class="search-form" action="/" method="get">
 					<div class="search-icon-and-input">
-						<input name="SearchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe($currentSearchRequest ?? '')?>" class="search-input" required>
+						<input name="SearchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe(
+							$currentSearchRequest ?? ''
+						) ?>" class="search-input" required>
 					</div>
-					<button type="submit" class="search-button btn"><img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
+					<button type="submit" class="search-button btn">
+						<img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
 				</form>
 				<a class="check-order-link" href="/checkOrder">Проверить заказ</a>
 			</div>
@@ -107,5 +102,10 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 		Created by N_ONE team 2024
 	</footer>
 </div>
+
+<script>
+	const tagsData = <?php echo json_encode($tags); ?>;
+</script>
+<script src="/js/categoryFilter.js"></script>
 </body>
 </html>

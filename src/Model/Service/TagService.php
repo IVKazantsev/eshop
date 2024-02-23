@@ -9,7 +9,7 @@ class TagService
 	/**
 	 * @param Tag[] $tags
 	 */
-	public static function reformatTags(array $tags):array
+	public static function reformatTags(array $tags): array
 	{
 		// $result = [];
 		// foreach ($tags as $tag)
@@ -23,9 +23,11 @@ class TagService
 
 		$groupedTags = [];
 
-		foreach ($tags as $tag) {
+		foreach ($tags as $tag)
+		{
 			// Проверяем, есть ли уже массив с тегами для данного parentID
-			if (!isset($groupedTags[$tag->getParentId()])) {
+			if (!isset($groupedTags[$tag->getParentId()]))
+			{
 				$groupedTags[$tag->getParentId()] = [];
 			}
 
@@ -55,18 +57,18 @@ class TagService
 				$intVar2 = (int)$intVars[1];
 
 				// Возвращение массива значений
-				return array($idVar, $intVar1, $intVar2);
+				return [$idVar, $intVar1, $intVar2];
 			}
 			else
 			{
 				// Некорректный формат для целых чисел
-				return array(null, null, null);
+				return [null, null, null];
 			}
 		}
 		else
 		{
 			// Некорректный формат для диапазона
-			return array(null, null, null);
+			return [null, null, null];
 		}
 	}
 }
