@@ -9,7 +9,7 @@ Router::get('/', function() {
 	$di = Application::getDI();
 	$currentTag = $_GET['tag'] ?? null;
 	$currentSearchRequest = $_GET['SearchRequest'] ?? null;
-	$currentPageNumber = $_GET['page'] ?? null;
+	$currentPageNumber = (int)($_GET['page'] ?? null);
 	$currentRange = $_GET['range'] ?? null;
 
 	return ($di->getComponent('catalogController'))->renderCatalog(
@@ -21,14 +21,14 @@ Router::get('/', function() {
 });
 
 Router::get('/products/:id', function(Route $route) {
-	$carId = $route->getVariables()[0];
+	$carId = (int)$route->getVariables()[0];
 	$di = Application::getDI();
 
 	return ($di->getComponent('detailController'))->renderDetailPage($carId);
 });
 
 Router::get('/products/:id/order', function(Route $route) {
-	$carId = $route->getVariables()[0];
+	$carId = (int)$route->getVariables()[0];
 	$di = Application::getDI();
 
 	return ($di->getComponent('orderController'))->renderOrderPage($carId);
@@ -54,8 +54,7 @@ Router::get('/checkOrder', function() {
 
 Router::get('/orderInfo', function() {
 	$di = Application::getDI();
-	$orderNumber = $_GET['number'] ?? null;
-	$orderNumber = (int)$orderNumber;
+	$orderNumber = (int)($_GET['number'] ?? null);
 	return ($di->getComponent('orderController'))->renderOrderInfoPage($orderNumber);
 });
 
@@ -69,14 +68,14 @@ Router::get('/admin', MiddleWare::adminMiddleware(function() {
 Router::get('/admin/:string', MiddleWare::adminMiddleware(function(Route $route) {
 	$di = Application::getDI();
 	$entityToEdit = $route->getVariables()[0];
-	$currentPageNumber = $_GET['page'] ?? null;
+	$currentPageNumber = (int)($_GET['page'] ?? null);
 
 	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit, $currentPageNumber);
 }));
 
 Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];
-	$itemId = $route->getVariables()[1];
+	$itemId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderEditPage($entityToEdit, $itemId);
@@ -84,7 +83,7 @@ Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Rout
 
 Router::post('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];
-	$itemId = $route->getVariables()[1];
+	$itemId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->updateEntity($entityToEdit, $itemId);
@@ -116,7 +115,7 @@ Router::get('/admin/add/success', MiddleWare::adminMiddleware(function() {
 
 Router::get('/admin/:entity/delete/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToDelete = $route->getVariables()[0];
-	$entityId = $route->getVariables()[1];
+	$entityId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderConfirmDeletePage($entityToDelete, $entityId);
@@ -124,7 +123,7 @@ Router::get('/admin/:entity/delete/:id', MiddleWare::adminMiddleware(function(Ro
 
 Router::post('/admin/:entity/delete/:id', function(Route $route) {
 	$entityToDelete = $route->getVariables()[0];
-	$entityId = $route->getVariables()[1];
+	$entityId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->processDeletion($entityToDelete, $entityId);

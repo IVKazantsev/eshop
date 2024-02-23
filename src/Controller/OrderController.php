@@ -17,26 +17,27 @@ class OrderController extends BaseController
 
 	public function renderOrderPage(string $itemId): string
 	{
+		$content = '';
 		try
 		{
 			$item = $this->itemRepository->getById($itemId);
+
+			$orderPage = TemplateEngine::render('pages/orderPage', [
+				'item' => $item,
+			]);
 		}
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
-			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
-			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
-		$orderPage = TemplateEngine::render('pages/orderPage', [
-			'item' => $item,
-		]);
-
-		return $this->renderPublicView($orderPage);
+		return $this->renderPublicView($content);
 	}
 
 	public function processOrder(): string
@@ -70,31 +71,33 @@ class OrderController extends BaseController
 
 			$order = new Order(null, $user->getId(), $itemId, 1, 'обработка', $item->getPrice());
 			$orderId = $this->orderRepository->add($order);
+
+			$content = TemplateEngine::render(
+				'pages/processOrder', ['orderNumber' => $orderId]
+			);
 		}
 		catch (ValidateException $e)
 		{
-			return TemplateEngine::renderPublicError(400, $e->getMessage());
+			$content = TemplateEngine::renderPublicError(400, $e->getMessage());
 		}
 		catch (NotFoundException)
 		{
-			return TemplateEngine::renderPublicError(404, "Страница не найдена");
+			$content = TemplateEngine::renderPublicError(404, "Страница не найдена");
 		}
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
-			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
-			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
-		$processOrderPage = TemplateEngine::render(
-			'pages/processOrder', ['orderNumber' => $orderId]
-		);
-
-		return $this->renderPublicView($processOrderPage);
+		return $this->renderPublicView($content);
 
 	}
 
@@ -145,11 +148,13 @@ class OrderController extends BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+
 			return TemplateEngine::renderPublicError(":(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 

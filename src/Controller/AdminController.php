@@ -21,6 +21,7 @@ use N_ONE\Core\Log\Logger;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 use N_ONE\App\Model\Service\ValidationService;
+use ReflectionException;
 
 class AdminController extends BaseController
 {
@@ -100,7 +101,7 @@ class AdminController extends BaseController
 		exit();
 	}
 
-	public function renderEditPage(string $entityToEdit, string $entityId): string
+	public function renderEditPage(string $entityToEdit, int $entityId): string
 	{
 		try
 		{
@@ -228,11 +229,12 @@ class AdminController extends BaseController
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (InvalidArgumentException)
 		{
-			Logger::error("Failed to create repository", __METHOD__);
+			// Не получилось создать репозиторий. Логирование не нужно
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
 
@@ -313,7 +315,7 @@ class AdminController extends BaseController
 		}
 		catch (InvalidArgumentException)
 		{
-			Logger::error("Failed to create repository", __METHOD__);
+			// Не получилось создать репозиторий. Логирование не нужно
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
 		catch (DatabaseException)
@@ -324,6 +326,7 @@ class AdminController extends BaseController
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -393,7 +396,9 @@ class AdminController extends BaseController
 			{
 				array_splice($fields, array_search("attributes", array_keys($fields)), 0, ["tags" => []]);
 			}
-			$fields["attributes"] = array_filter($fields["attributes"], function($value) {return is_numeric($value);});
+			$fields["attributes"] = array_filter($fields["attributes"], function($value) {
+				return is_numeric($value);
+			});
 		}
 		// foreach ($fields as $field => $value)
 		// {
@@ -410,6 +415,11 @@ class AdminController extends BaseController
 			$entity = new $className($entityId, ...array_values($fields));
 			$repository->update($entity);
 		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
 		catch (ValidateException $e)
 		{
 			return TemplateEngine::renderAdminError(400, $e->getMessage());
@@ -417,11 +427,13 @@ class AdminController extends BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -477,18 +489,48 @@ class AdminController extends BaseController
 		Router::redirect('/login');
 	}
 
-	public function renderConfirmDeletePage(string $entities, string $entityId): string
+	public function renderConfirmDeletePage(string $entityType, int $entityId): string
 	{
-		$entity = substr($entities, 0, -1);
-		$confirmDeletePage = TemplateEngine::render('pages/confirmDeletePage', [
-			'entity' => $entity,
-			'entityId' => $entityId,
-		]);
+		try
+		{
+			$repository = $this->repositoryFactory->createRepository($entityType);
+			$entity = $repository->getById($entityId);
+			if ($entity === null)
+			{
+				$content = TemplateEngine::renderAdminError(':(', 'Данный товар не найден');
+			}
+			else
+			{
+				$entityName = substr($entityType, 0, -1);
 
-		return $this->renderAdminView($confirmDeletePage);
+				$content = TemplateEngine::render('pages/confirmDeletePage', [
+					'entity' => $entityName,
+					'entityId' => $entityId,
+				]);
+			}
+		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (DatabaseException)
+		{
+			Logger::error("Failed to fetch data from repository", __METHOD__);
+
+			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception)
+		{
+			Logger::error("Failed to run query", __METHOD__);
+
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+
+		return $this->renderAdminView($content);
 	}
 
-	public function processDeletion(string $entities, string $entityId): string
+	public function processDeletion(string $entities, int $entityId): string
 	{
 		if (!$entityId)
 		{
@@ -502,16 +544,18 @@ class AdminController extends BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+
 			return TemplateEngine::renderAdminError(":(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (InvalidArgumentException)
 		{
-			Logger::error("Failed to create repository", __METHOD__);
+			// Не получилось создать репозиторий. Логирование не нужно
 			return TemplateEngine::renderAdminError(":(", "Что-то пошло не так");
 
 		}
@@ -600,14 +644,14 @@ class AdminController extends BaseController
 
 	public function renderAddPage(string $entityToAdd): string
 	{
-		$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
-		$className = 'N_ONE\App\Model\\' . ucfirst(
-				$entityToAdd
-			);//Костыль на приведение названия типа сущности из URL к названию класса
-
-		$entity = ($className)::createDummyObject();
 		try
 		{
+			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
+			$className = 'N_ONE\App\Model\\' . ucfirst(
+					$entityToAdd
+				);//Костыль на приведение названия типа сущности из URL к названию класса
+
+			$entity = ($className)::createDummyObject();
 			switch (get_class($entity))
 			{
 				case Item::class:
@@ -631,26 +675,24 @@ class AdminController extends BaseController
 							$parentTag->getId()
 						);
 
-				}
-				$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
-					'childrenTags' => $childrenTags,
-					'itemTags' => $itemTags,
-				]);
-				$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
-					'attributes' => $attributes,
-				]);
+					}
+					$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
+						'childrenTags' => $childrenTags,
+						'itemTags' => $itemTags,
+					]);
+					$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
+						'attributes' => $attributes,
+					]);
 
+					$deleteImagesSection = TemplateEngine::render(
+						'components/deleteImagesSection', []
+					);
 
-				$deleteImagesSection = TemplateEngine::render(
-					'components/deleteImagesSection',
-					[]
-				);
-
-				$additionalSections = [
-					$tagsSection,
-					$attributesSection,
-					$deleteImagesSection,
-				];
+					$additionalSections = [
+						$tagsSection,
+						$attributesSection,
+						$deleteImagesSection,
+					];
 
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'entity' => $entity,
@@ -707,15 +749,25 @@ class AdminController extends BaseController
 				}
 			}
 		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (ReflectionException)
+		{
+			Logger::error("Failed to use Reflection", __METHOD__);
+			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
-			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
-			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderAdminView($content);
@@ -779,7 +831,9 @@ class AdminController extends BaseController
 			{
 				array_splice($fields, array_search("attributes", array_keys($fields)), 0, ["tags" => []]);
 			}
-			$fields["attributes"] = array_filter($fields["attributes"], function($value) {return is_numeric($value);});
+			$fields["attributes"] = array_filter($fields["attributes"], function($value) {
+				return is_numeric($value);
+			});
 
 		}
 		// foreach ($fields as $field => $value)
@@ -804,6 +858,11 @@ class AdminController extends BaseController
 				}
 			}
 		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
 		catch (ValidateException $e)
 		{
 			return TemplateEngine::renderAdminError(400, $e->getMessage());
@@ -811,11 +870,13 @@ class AdminController extends BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 

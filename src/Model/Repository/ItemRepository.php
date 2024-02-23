@@ -116,11 +116,6 @@ class ItemRepository extends Repository
 			$item->setId($id);
 		}
 
-		if ($item === null)
-		{
-			throw new DatabaseException(mysqli_error($connection));
-		}
-
 		return $item;
 	}
 

@@ -59,7 +59,7 @@ class AttributeRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Attribute
+	public function getById(int $id): Attribute|null
 	{
 		$connection = $this->dbConnection->getConnection();
 		$attribute = null;
@@ -86,11 +86,6 @@ class AttributeRepository extends Repository
 			);
 		}
 
-		if ($attribute === null)
-		{
-			throw new RuntimeException("Entities not found");
-		}
-
 		return $attribute;
 	}
 
@@ -98,7 +93,7 @@ class AttributeRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getByTitle(string $title): Attribute
+	public function getByTitle(string $title): Attribute|null
 	{
 		$connection = $this->dbConnection->getConnection();
 		$title = mysqli_real_escape_string($connection, $title);
@@ -123,11 +118,6 @@ class AttributeRepository extends Repository
 			$attribute = new Attribute(
 				$row['ID'], $row['TITLE'], null
 			);
-		}
-
-		if ($attribute === null)
-		{
-			throw new RuntimeException("Entities not found");
 		}
 
 		return $attribute;
