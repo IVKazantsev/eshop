@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -12,6 +13,7 @@ class ImageRepository extends Repository
 	 * @param int[]|null $filter
 	 *
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null, bool $isImageId = null): array
 	{
@@ -26,7 +28,6 @@ class ImageRepository extends Repository
 			WHERE $field IN (" . implode(',', $filter) . ");
 			"
 		);
-
 
 		if (!$result)
 		{
@@ -51,6 +52,7 @@ class ImageRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getById(int $id): Image|null
 	{
@@ -89,6 +91,7 @@ class ImageRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(Image|Entity $entity): int
 	{
@@ -124,6 +127,7 @@ class ImageRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(Image|Entity $entity): bool
 	{
@@ -161,6 +165,7 @@ class ImageRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function permanentDeleteByIds(array $entityId): bool
 	{

@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -11,6 +12,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null): array
 	{
@@ -59,6 +61,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getById(int $id): Order|null
 	{
@@ -96,6 +99,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getStatuses(): array
 	{
@@ -122,6 +126,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(Order|Entity $entity): int
 	{
@@ -153,6 +158,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(Order|Entity $entity): bool
 	{

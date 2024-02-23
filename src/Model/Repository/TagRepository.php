@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -11,6 +12,7 @@ class TagRepository extends Repository
 {
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null): array
 	{
@@ -54,6 +56,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getParentTags(): array
 	{
@@ -92,6 +95,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getById(int $id): Tag
 	{
@@ -126,6 +130,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByTitle(string $title): Tag|null
 	{
@@ -161,6 +166,7 @@ class TagRepository extends Repository
 	/**
 	 * @
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByItemsIds(array $itemsIds): array
 	{
@@ -206,6 +212,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(Tag|Entity $entity): int
 	{
@@ -252,6 +259,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(Tag|Entity $entity): bool
 	{
@@ -298,6 +306,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByParentId(int $id): array
 	{
@@ -337,6 +346,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	private function toggleParentTagIsActive(int $parentId, bool $toggle): void
 	{
@@ -372,6 +382,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	private function getParentById(int $id): ?int
 	{
@@ -393,6 +404,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getAllParentTags(): array
 	{
@@ -432,6 +444,7 @@ class TagRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function parentUpdate($parentId, $oldParentId): void
 	{
@@ -456,6 +469,10 @@ class TagRepository extends Repository
 		}
 	}
 
+	/**
+	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
+	 */
 	public function delete(string $entities, int $entityId): bool
 	{
 		$connection = $this->dbConnection->getConnection();

@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -12,6 +13,7 @@ class AttributeRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null): array
 	{
@@ -55,6 +57,7 @@ class AttributeRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getById(int $id): Attribute
 	{
@@ -93,6 +96,7 @@ class AttributeRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByTitle(string $title): Attribute
 	{
@@ -133,6 +137,7 @@ class AttributeRepository extends Repository
 	 * @param int[] $itemsIds
 	 *
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 
 	public function getByItemsIds(array $itemsIds): array
@@ -179,6 +184,7 @@ class AttributeRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(Attribute|Entity $entity): int
 	{
@@ -202,6 +208,7 @@ class AttributeRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(Attribute|Entity $entity): bool
 	{

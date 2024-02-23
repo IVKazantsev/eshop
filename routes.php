@@ -55,10 +55,11 @@ Router::get('/checkOrder', function() {
 Router::get('/orderInfo', function() {
 	$di = Application::getDI();
 	$orderNumber = $_GET['number'] ?? null;
-	if($orderNumber === "")
+	if ($orderNumber === "")
 	{
 		$orderNumber = null;
 	}
+	$orderNumber = (int)$orderNumber;
 	return ($di->getComponent('orderController'))->renderOrderInfoPage($orderNumber);
 });
 

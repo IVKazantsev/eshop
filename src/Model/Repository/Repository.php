@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -25,6 +26,7 @@ abstract class Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function delete(string $entities, int $entityId): bool
 	{

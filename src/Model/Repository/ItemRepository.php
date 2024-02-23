@@ -3,6 +3,8 @@
 namespace N_ONE\App\Model\Repository;
 
 use mysqli;
+use mysqli_result;
+use mysqli_sql_exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
 use N_ONE\App\Model\Service\TagService;
@@ -24,7 +26,59 @@ class ItemRepository extends Repository
 	}
 
 	/**
+	 * @param Item[] $items
+	 *
+	 * @return Item[]
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
+	 */
+	public function fillItemsWithOtherEntities(array $items): array
+	{
+		$itemsIds = array_map(static function($item) {
+			return $item->getId();
+		}, $items);
+
+		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
+		$images = $this->imageRepository->getList($itemsIds);
+
+		foreach ($items as $item)
+		{
+			$item->setTags($tags[$item->getId()] ?? []);
+			$item->setAttributes($attributes[$item->getId()] ?? []);
+			$item->setImages($images[$item->getId()] ?? []);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * @return Item[]
+	 */
+	public function getItemsFromResult(mysqli_result $result): array
+	{
+		$items = [];
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$items[] = new Item(
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
+				[],
+				[],
+				[]
+			);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getById(int $id): Item|null
 	{
@@ -72,6 +126,7 @@ class ItemRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null): array
 	{
@@ -84,7 +139,6 @@ class ItemRepository extends Repository
 		$range = $filter['range'] ?? null;
 
 		$whereQueryBlock = $this->getWhereQueryBlock($tag, $title, $range, $connection);
-		$items = [];
 
 		$result = mysqli_query(
 			$connection,
@@ -99,40 +153,14 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$items[] = new Item(
-				$row['ID'],
-				$row['TITLE'],
-				$row['IS_ACTIVE'],
-				$row['PRICE'],
-				$row['DESCRIPTION'],
-				$row['SORT_ORDER'],
-				[],
-				[],
-				[]
-			);
-		}
+		$items = $this->getItemsFromResult($result);
 
 		if (empty($items))
 		{
-			throw new DatabaseException(mysqli_error($connection));
+			return $items;
 		}
 
-		$itemsIds = array_map(static function($item) {return $item->getId();}, $items);
-
-		$tags = $this->tagRepository->getByItemsIds($itemsIds);
-		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
-		$images = $this->imageRepository->getList($itemsIds);
-
-		foreach ($items as $item)
-		{
-			$item->setTags($tags[$item->getId()] ?? []);
-			$item->setAttributes($attributes[$item->getId()] ?? []);
-			$item->setImages($images[$item->getId()] ?? []);
-		}
-
-		return $items;
+		return $this->fillItemsWithOtherEntities($items);
 	}
 
 	private function getWhereQueryBlock(?string $tag, ?string $title, ?string $range, mysqli $connection): string
@@ -178,11 +206,11 @@ class ItemRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByIds(array $ids): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$items = [];
 
 		$result = mysqli_query(
 			$connection,
@@ -198,44 +226,19 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$items[] = new Item(
-				$row['ID'],
-				$row['TITLE'],
-				$row['IS_ACTIVE'],
-				$row['PRICE'],
-				$row['DESCRIPTION'],
-				$row['SORT_ORDER'],
-				[],
-				[],
-				[]
-			);
-		}
+		$items = $this->getItemsFromResult($result);
 
 		if (empty($items))
 		{
-			throw new DatabaseException(mysqli_error($connection));
+			return $items;
 		}
 
-		$itemsIds = array_map(static function($item) {return $item->getId();}, $items);
-
-		$tags = $this->tagRepository->getByItemsIds($itemsIds);
-		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
-		$images = $this->imageRepository->getList($itemsIds);
-
-		foreach ($items as $item)
-		{
-			$item->setTags($tags[$item->getId()] ?? []);
-			$item->setAttributes($attributes[$item->getId()] ?? []);
-			$item->setImages($images[$item->getId()] ?? []);
-		}
-
-		return $items;
+		return $this->fillItemsWithOtherEntities($items);
 	}
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(Item|Entity $entity): int
 	{
@@ -268,8 +271,7 @@ class ItemRepository extends Repository
 
 		$itemId = mysqli_insert_id($connection);
 
-
-		if (!empty($tags) )
+		if (!empty($tags))
 		{
 			$this->updateItemTags($connection, $itemId, $tags);
 		}
@@ -283,6 +285,7 @@ class ItemRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(Item|Entity $entity): bool
 	{
@@ -314,7 +317,7 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		if (!empty($tags) )
+		if (!empty($tags))
 		{
 			$this->updateItemTags($connection, $itemId, $tags);
 		}
@@ -328,6 +331,7 @@ class ItemRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	private function updateItemTags(bool|mysqli $connection, int $itemId, array $tags): void
 	{
@@ -348,6 +352,7 @@ class ItemRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	private function updateItemAttributes(bool|mysqli $connection, int $itemId, array $attributes): void
 	{
@@ -368,6 +373,7 @@ class ItemRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	private function addItemTags(bool|mysqli $connection, int $itemId, array $tags): void
 	{
@@ -394,6 +400,7 @@ class ItemRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	private function addItemAttributes(bool|mysqli $connection, int $itemId, array $attributes): void
 	{

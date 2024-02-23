@@ -2,19 +2,62 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_result;
+use mysqli_sql_exception;
 use N_ONE\App\Model\User;
 use N_ONE\App\Model\Entity;
 use N_ONE\Core\Exceptions\DatabaseException;
 
 class UserRepository extends Repository
 {
+	public function getUserFromResult(mysqli_result $result): User|null
+	{
+		$user = null;
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$user = new User(
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
+			);
+		}
+
+		return $user;
+	}
+
+	/**
+	 * @return User[]
+	 */
+	public function getUsersFromResult(mysqli_result $result): array
+	{
+		$users = [];
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$users[] = new User(
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
+			);
+		}
+
+		return $users;
+	}
+
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$users = [];
 
 		$whereQueryBlock = $this->getWhereQueryBlock();
 
@@ -32,20 +75,7 @@ class UserRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$users[] = new User(
-				$row['ID'],
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
-			);
-		}
-
-		return $users;
+		return $this->getUsersFromResult($result);
 	}
 
 	private function getWhereQueryBlock(): string
@@ -57,6 +87,7 @@ class UserRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByEmail(string $email): User|null
 	{
@@ -76,25 +107,12 @@ class UserRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$user = null;
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$user = new User(
-				$row['ID'],
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
-			);
-		}
-
-		return $user;
+		return $this->getUserFromResult($result);
 	}
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getById(int $id): User|null
 	{
@@ -114,25 +132,12 @@ class UserRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		$user = null;
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$user = new User(
-				$row['ID'],
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
-			);
-		}
-
-		return $user;
+		return $this->getUserFromResult($result);
 	}
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByNumber(string $phone): User|null
 	{
@@ -174,11 +179,11 @@ class UserRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getByIds(array $ids): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$users = [];
 
 		$result = mysqli_query(
 			$connection,
@@ -194,24 +199,12 @@ class UserRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$users[] = new User(
-				$row['ID'],
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
-			);
-		}
-
-		return $users;
+		return $this->getUsersFromResult($result);
 	}
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(User|Entity $entity): int
 	{
@@ -247,6 +240,7 @@ class UserRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(User|Entity $entity): bool
 	{
