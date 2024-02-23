@@ -2,8 +2,6 @@
 
 namespace N_ONE\App\Controller;
 
-require_once ROOT . "/errorHandler.php";
-
 use mysqli_sql_exception;
 use N_ONE\App\Model\Service\PaginationService;
 use N_ONE\Core\Configurator\Configurator;
@@ -54,7 +52,6 @@ class CatalogController extends BaseController
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
-
 			return TemplateEngine::renderFinalError();
 		}
 

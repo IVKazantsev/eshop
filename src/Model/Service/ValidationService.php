@@ -54,7 +54,7 @@ class ValidationService
 		return $validatedField;
 	}
 
-	public static function safe(string $value): string
+	public static function safe(string|null $value): string
 	{
 		return htmlspecialchars($value, ENT_QUOTES);
 	}

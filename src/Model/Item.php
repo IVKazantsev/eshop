@@ -88,6 +88,7 @@ class Item extends Entity
 
 	public function getField(string $fieldName)
 	{
+		$fw = $this->$fieldName;
 		return $this->$fieldName;
 	}
 
