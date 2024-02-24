@@ -12,6 +12,15 @@ class Attribute extends Entity
 	{
 	}
 
+	public static function fromFields(array $fields): static
+	{
+		$new = new static(
+			$fields['id'], $fields['title'], $fields['value'],
+		);
+
+		return $new;
+	}
+
 	public function getTitle(): string
 	{
 		return $this->title;

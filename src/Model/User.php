@@ -18,6 +18,21 @@ class User extends Entity
 	{
 	}
 
+	public static function fromFields(array $fields): static
+	{
+		$new = new static(
+			$fields['id'],
+			$fields['roleId'],
+			$fields['name'],
+			$fields['email'],
+			$fields['pass'],
+			$fields['number'],
+			$fields['address'],
+		);
+
+		return $new;
+	}
+
 	public function getExcludedFields(): array
 	{
 		return ['pass'];
