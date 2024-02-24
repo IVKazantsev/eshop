@@ -26,6 +26,23 @@ class Item extends Entity
 	{
 	}
 
+	public static function fromFields(array $fields): static
+	{
+		$new = new static(
+			$fields['id'],
+			$fields['title'],
+			$fields['isActive'],
+			$fields['price'],
+			$fields['description'],
+			$fields['sortOrder'],
+			$fields['tags'],
+			$fields['attributes'],
+			$fields['images']
+		);
+
+		return $new;
+	}
+
 	public function getAttributes(): ?array
 	{
 		return $this->attributes;
@@ -89,6 +106,7 @@ class Item extends Entity
 	public function getField(string $fieldName)
 	{
 		$fw = $this->$fieldName;
+
 		return $this->$fieldName;
 	}
 
@@ -152,7 +170,7 @@ class Item extends Entity
 		$this->sortOrder = $sortOrder;
 	}
 
-	public function getTags(): array
+	public function getTags(): ?array
 	{
 		return $this->tags;
 	}

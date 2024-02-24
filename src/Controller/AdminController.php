@@ -152,18 +152,14 @@ class AdminController extends BaseController
 					]);
 
 					$images = $this->imageRepository->getList([$entityId]);
-					$addImagesSection = TemplateEngine::render('components/addImagesSection', [
-						'itemId' => $entity,
-					]);
 					$deleteImagesSection = TemplateEngine::render('components/deleteImagesSection', [
 						'images' => $images[$entityId] ?? [],
 					]);
 
 					$additionalSections = [
-						$tagsSection,
-						$attributesSection,
-						$addImagesSection,
-						$deleteImagesSection,
+						'tags' => $tagsSection,
+						'attributes' => $attributesSection,
+						'images' => $deleteImagesSection,
 					];
 
 					$content = TemplateEngine::render('pages/adminEditPage', [
@@ -296,9 +292,16 @@ class AdminController extends BaseController
 
 			if (empty($entities))
 			{
-				$content = TemplateEngine::renderAdminError(':(', 'Сущности не найдены');
+				$className = 'N_ONE\App\Model\\' . ucfirst(
+						substr_replace($entityToDisplay, '', -1)
+					);
+				$entities['dummy'] = ($className)::createDummyObject();
 
-				return $this->renderAdminView($content);
+				// $content = TemplateEngine::renderAdminError(':(', 'Сущности не найдены');
+
+				return $this->renderAdminView(TemplateEngine::render('pages/adminEntitiesPage', [
+					'entities' => $entities,
+				]));
 			}
 
 			if ($entityToDisplay === 'items' && count($entities) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
@@ -340,7 +343,7 @@ class AdminController extends BaseController
 	public function updateEntity(string $entityType, string $entityId): string
 	{
 		$fields = $_POST;
-
+		$fields['id'] = $entityId;
 		// foreach ($fields as $field)
 		// {
 		// 	$fields[$field] = ValidationService::validateEntryField($field);
@@ -412,7 +415,7 @@ class AdminController extends BaseController
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityType);
-			$entity = new $className($entityId, ...array_values($fields));
+			$entity = $className::fromFields($fields);
 			$repository->update($entity);
 		}
 		catch (InvalidArgumentException)
@@ -689,9 +692,9 @@ class AdminController extends BaseController
 					);
 
 					$additionalSections = [
-						$tagsSection,
-						$attributesSection,
-						$deleteImagesSection,
+						'tags' => $tagsSection,
+						'attributes' => $attributesSection,
+						'images' => $deleteImagesSection,
 					];
 
 					$content = TemplateEngine::render('pages/adminEditPage', [
@@ -777,6 +780,7 @@ class AdminController extends BaseController
 	{
 
 		$fields = $_POST;
+		$fields['id'] = null;
 		// foreach ($fields as $field)
 		// {
 		// 	$fields[$field] = ValidationService::validateEntryField($field);
@@ -848,7 +852,7 @@ class AdminController extends BaseController
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
-			$item = new $className(null, ...array_values($fields));
+			$item = $className::fromFields($fields);
 			$itemId = $repository->add($item);
 			if ($entityToAdd === 'item')
 			{

@@ -6,58 +6,43 @@ use N_ONE\Core\Configurator\Configurator;
 /**
  * @var Entity $entity
  * @var array $statuses
- * @var array $parentTags
  * @var array $additionalSections
  * @var array $specificFields
  */
 $fields = array_flip($entity->getFieldNames(true));
-$scriptsPath = Configurator::option('SCRIPTS_PATH');
+foreach ($fields as $field => $value)
+{
+	if (
+		array_key_exists(
+			$field,
+			array_merge($specificFields ?? [], $additionalSections ?? [], ['id' => '', 'dateCreate' => ''])
+		)
+	)
+	{
+		unset($fields[$field]);
+	}
+}
 
 ?>
 <div class="edit-form-container">
 	<form action="" class="edit-form" method="post" enctype="multipart/form-data">
 		<div class="form-section">
 			<p>ID сущности: <?= $entity->getId() ?></p>
+
 			<?php foreach ($fields as $field => $value): ?>
-
-				<?php if (in_array($field, ['tags', 'images', 'id', 'dateCreate', 'attributes', 'value'])):
-					{
-						continue;
-					}
-				endif ?>
-
-
-				<?php if ($field === 'parentId'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'isActive'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'description'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'status'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'statusId'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-
 				<label for="<?= $field ?>">
 					<?= $field ?>:
 					<input
 						class="specific-input-<?= $entity->getPropertyType($field) ?>"
 						id="<?= $field ?>"
-						type="text" name="<?= $field?>"
-						value="<?= $entity->getField($field)?>"
+						type="text" name="<?= $field ?>"
+						value="<?= $entity->getField($field) ?>"
 					>
 				</label>
+			<?php endforeach; ?>
 
+			<?php foreach ($specificFields as $field): ?>
+				<?= $field ?>
 			<?php endforeach; ?>
 
 		</div>
@@ -68,15 +53,9 @@ $scriptsPath = Configurator::option('SCRIPTS_PATH');
 				echo $section;
 			}
 		}
-		else
-		{
-			echo '';
-		}
 		?>
 		<div class="form-section">
-
 			<button class="submit-button" type="submit">Сохранить</button>
-
 		</div>
 	</form>
 </div>
