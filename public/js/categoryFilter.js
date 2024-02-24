@@ -86,5 +86,5 @@ function collectCheckedData()
 document.getElementById('collect-data-btn').addEventListener('click', function() {
 	const getRequestString = collectCheckedData();
 	// console.log(window.location.pathname + '?' + getRequestString);
-	window.location.href = window.location.pathname + '?' + getRequestString;
+	window.location.href = '/?' + getRequestString;
 });
