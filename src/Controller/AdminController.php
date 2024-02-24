@@ -123,9 +123,6 @@ class AdminController extends BaseController
 					$itemTags = [];
 					$childrenTags = [];
 					$specificFields = [
-						'isActive' => TemplateEngine::render('components/editIsActive', [
-							'entity' => $entity,
-						]),
 						'description' => TemplateEngine::render('components/editItemDescription', [
 							'item' => $entity,
 						]),
@@ -665,9 +662,6 @@ class AdminController extends BaseController
 					$itemTags = [];
 					$childrenTags = [];
 					$specificFields = [
-						'isActive' => TemplateEngine::render('components/editIsActive', [
-							'entity' => $entity,
-						]),
 						'description' => TemplateEngine::render('components/editItemDescription', [
 							'item' => $entity,
 						]),

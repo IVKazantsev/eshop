@@ -15,7 +15,7 @@ foreach ($fields as $field => $value)
 	if (
 		array_key_exists(
 			$field,
-			array_merge($specificFields ?? [], $additionalSections ?? [], ['id' => '', 'dateCreate' => ''])
+			array_merge($specificFields ?? [], $additionalSections ?? [], ['id' => ''])
 		)
 	)
 	{
