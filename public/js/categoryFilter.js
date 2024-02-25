@@ -75,18 +75,17 @@ function collectRangeFieldData()
 	return rangeData.length ? 'attributes=[' + rangeData.join(';') + ']' : '';
 }
 
-function collectCheckedData()
+function collectSortData()
 {
-	const tagData = collectTagData();
-	const rangeData = collectRangeFieldData();
-	return [tagData, rangeData].filter(Boolean).join('&');
+	const sortSelect = document.getElementById('sort') ? document.getElementById('sort') : '';
+	return sortSelect.value ? 'sortOrder=' + sortSelect.value : '';
 }
 
-document.getElementById('collect-data-btn').addEventListener('click', function() {
-	const getRequestString = collectCheckedData();
-	// console.log(window.location.pathname + '?' + getRequestString);
-	window.location.href = '/?' + getRequestString;
-});
+function collectSearchData()
+{
+	const searchInput = document.getElementById('search-input');
+	return searchInput.value ? 'searchRequest=' + searchInput.value : '';
+}
 
 function applyStateFromUrl()
 {
@@ -150,22 +149,37 @@ function applyStateFromUrl()
 	}
 }
 
-document.addEventListener('DOMContentLoaded', applyStateFromUrl);
-const sortSelect = document.getElementById('sort');
-console.log(sortSelect);
-sortSelect.addEventListener('change', (event) => {
-	console.log(sortSelect.value);
-	let getRequestString = collectCheckedData();
-	let sortQuery = 'sortOrder=' + sortSelect.value;
+function collectCheckedData()
+{
+	const tagData = collectTagData();
+	const rangeData = collectRangeFieldData();
+	const sortData = collectSortData();
+	const searchData = collectSearchData();
+	const pageData = new URLSearchParams(window.location.search).get('page');
+	const pageNumber = (pageData && pageData !== '0') ? 'page=' + pageData : '';
+	return [tagData, rangeData, sortData, searchData, pageNumber].filter(Boolean).join('&');
+}
 
-	if (!getRequestString)
-	{
-		getRequestString = sortQuery;
-	}
-	else
-	{
-		getRequestString += '&' + sortQuery;
-	}
-	// console.log(window.location.pathname + '?' + getRequestString);
+document.addEventListener('DOMContentLoaded', applyStateFromUrl);
+document.getElementById('collect-data-btn').addEventListener('click', function() {
+	const getRequestString = collectCheckedData();
+	window.location.href = '/?' + getRequestString;
+});
+document.getElementById('search-button').addEventListener('click', function(e) {
+	const getRequestString = collectCheckedData();
+	window.location.href = '/?' + getRequestString;
+});
+
+const sortField = document.getElementById('sort');
+if (sortField)
+{
+	sortField.addEventListener('change', function(e) {
+		const getRequestString = collectCheckedData();
+		window.location.href = '/?' + getRequestString;
+	});
+}
+document.getElementById('search-form').addEventListener('submit', function(e) {
+	e.preventDefault();
+	const getRequestString = collectCheckedData();
 	window.location.href = '/?' + getRequestString;
 });

@@ -100,13 +100,13 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 	<header>
 		<div class="bar">
 			<div class="searchbar">
-				<form class="search-form" action="/" method="get">
+				<form id="search-form" method="get">
 					<div class="search-icon-and-input">
-						<input name="SearchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe(
+						<input name="searchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe(
 							$currentSearchRequest ?? ''
-						) ?>" class="search-input" required>
+						) ?>" id="search-input" required>
 					</div>
-					<button type="submit" class="search-button btn">
+					<button type="submit" class="btn" id="search-button">
 						<img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
 				</form>
 				<a class="check-order-link" href="/checkOrder">Проверить заказ</a>

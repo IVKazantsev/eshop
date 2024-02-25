@@ -53,9 +53,16 @@ class MiddleWare
 			$sortField = $_GET['sortOrder'] ?? null;
 			[$attributeId, $sortDirection] = explode('-', $sortField);
 			$sortOrder = ['column' => $attributeId, 'direction' => $sortDirection];
+			$currentSearchRequest = $_GET['searchRequest'] ?? null;
 			unset($finalTags[0], $finalAttributes[0]);
 
-			return $action($route, $finalTags, $finalAttributes, $sortOrder);
+			return $action(
+				$route,
+				$currentSearchRequest,
+				$finalTags,
+				$finalAttributes,
+				$sortOrder,
+			);
 		};
 	}
 }

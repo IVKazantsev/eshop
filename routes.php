@@ -8,9 +8,14 @@ use N_ONE\Core\Routing\Router;
 Router::get(
 	'/',
 	MiddleWare::processFilters(
-		function($route, $finalTags, $finalAttributes, $sortOrder) {
+		function(
+			$route,
+			$currentSearchRequest,
+			$finalTags,
+			$finalAttributes,
+			$sortOrder
+		) {
 			$di = Application::getDI();
-			$currentSearchRequest = $_GET['SearchRequest'] ?? null;
 			$currentPageNumber = (int)($_GET['page'] ?? null);
 
 			return ($di->getComponent('catalogController'))->renderCatalog(
