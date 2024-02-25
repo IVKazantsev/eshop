@@ -8,7 +8,7 @@ use N_ONE\Core\Routing\Router;
 Router::get(
 	'/',
 	MiddleWare::processFilters(
-		function($route, $finalTags, $finalAttributes) {
+		function($route, $finalTags, $finalAttributes, $sortOrder) {
 			$di = Application::getDI();
 			$currentSearchRequest = $_GET['SearchRequest'] ?? null;
 			$currentPageNumber = (int)($_GET['page'] ?? null);
@@ -17,7 +17,8 @@ Router::get(
 				$currentPageNumber,
 				$currentSearchRequest,
 				$finalTags,
-				$finalAttributes
+				$finalAttributes,
+				$sortOrder
 			);
 		}
 	)

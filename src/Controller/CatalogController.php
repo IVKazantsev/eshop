@@ -11,7 +11,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(?int $pageNumber, ?string $SearchRequest, ?array $tags, ?array $attributes): string
+	public function renderCatalog(?int $pageNumber, ?string $SearchRequest, ?array $tags, ?array $attributes, ?array $sortOrder): string
 	{
 		try
 		{
@@ -20,7 +20,7 @@ class CatalogController extends BaseController
 				'title, description' => $SearchRequest,
 				'pageNumber' => $pageNumber,
 				'attributes' => $attributes,
-				// 'sortOrder' => ['column' => 1, 'direction' => 'ASC']
+				'sortOrder' => $sortOrder
 			];
 
 			$items = $this->itemRepository->getList($filter);
