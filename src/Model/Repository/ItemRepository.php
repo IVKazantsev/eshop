@@ -134,11 +134,11 @@ class ItemRepository extends Repository
 		}
 
 		$conditions[] = "i.IS_ACTIVE = $isActive";
-		if ($fulltext !== null)
+		if ($fulltext !== null && $fulltext !== "")
 		{
 			$itemFulltext = mysqli_real_escape_string($connection, $fulltext);
-			$conditions[] = "MATCH (title,description) AGAINST ('+$itemFulltext*' IN BOOLEAN MODE)";
-			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('+$itemFulltext*' IN BOOLEAN MODE) DESC";
+			$conditions[] = "MATCH (title,description) AGAINST ('$itemFulltext*' IN BOOLEAN MODE)";
+			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('$itemFulltext*' IN BOOLEAN MODE) DESC";
 		}
 
 		foreach ($attributes as $key => $attribute)
