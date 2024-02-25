@@ -7,10 +7,16 @@
  * @var int $isActive
  */
 
-use N_ONE\App\Model\Entity;
-use N_ONE\App\Model\Item;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
-$classname = $entities[0]->getClassname();
+if (isset($entities['dummy']))
+{
+
+	$classname = $entities['dummy']->getClassname();
+}
+else
+{
+	$classname = $entities[0]->getClassname();
+}
 ?>
 
 <?php if ($isActive === 0):?>

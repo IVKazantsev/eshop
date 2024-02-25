@@ -20,6 +20,7 @@ class CatalogController extends BaseController
 				'title' => $SearchRequest,
 				'pageNumber' => $pageNumber,
 				'attributes' => $attributes,
+				// 'sortOrder' => ['column' => 1, 'direction' => 'ASC']
 			];
 
 			$items = $this->itemRepository->getList($filter);

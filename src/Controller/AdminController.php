@@ -295,10 +295,9 @@ class AdminController extends BaseController
 					);
 				$entities['dummy'] = ($className)::createDummyObject();
 
-				// $content = TemplateEngine::renderAdminError(':(', 'Сущности не найдены');
-
 				return $this->renderAdminView(TemplateEngine::render('pages/adminEntitiesPage', [
 					'entities' => $entities,
+					'isActive' => $isActive,
 				]));
 			}
 

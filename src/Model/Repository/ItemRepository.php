@@ -7,7 +7,6 @@ use mysqli_result;
 use mysqli_sql_exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
-use N_ONE\App\Model\Service\TagService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -81,8 +80,9 @@ class ItemRepository extends Repository
 		$title = $filter['title'] ?? null;
 		$tags = $filter['tags'] ?? null;
 		$attributes = $filter['attributes'] ?? null;
+		$sortOrder = $filter['sortOrder'] ?? null;
 
-		$whereQueryBlock = $this->getWhereQueryBlock($tags, $title, $attributes, $isActive, $connection);
+		$whereQueryBlock = $this->getWhereQueryBlock($tags, $title, $attributes, $isActive, $sortOrder, $connection);
 
 		$result = mysqli_query(
 			$connection,
@@ -107,9 +107,25 @@ class ItemRepository extends Repository
 		return $this->fillItemsWithOtherEntities($items);
 	}
 
-	private function getWhereQueryBlock(?array $tags, ?string $title, ?array $attributes, ?int $isActive, mysqli $connection): string
+	private function getWhereQueryBlock(?array $tags, ?string $title, ?array $attributes, ?int $isActive, ?array $sortOrder, mysqli $connection): string
 	{
 		$whereQueryBlock = "";
+		$conditions = [];
+		if ($sortOrder === null)
+		{
+			$sortQueryBlock = "ORDER BY i.SORT_ORDER DESC";
+		}
+		elseif ($sortOrder['column'] === 'PRICE')
+		{
+			$sortQueryBlock = "ORDER BY i.PRICE {$sortOrder['direction']}";
+		}
+		elseif (is_int($sortOrder['column']))
+		{
+			$sortQueryBlock = "ORDER BY ia.VALUE {$sortOrder['direction']}";
+			$conditions[] = "ia.ATTRIBUTE_ID = {$sortOrder['column']}";
+			$whereQueryBlock .= " JOIN N_ONE_ITEMS_ATTRIBUTES ia ON ia.ITEM_ID = i.ID";
+		}
+
 		$conditions[] = "i.IS_ACTIVE = $isActive";
 		if ($title !== null)
 		{
@@ -146,7 +162,8 @@ class ItemRepository extends Repository
 		}
 
 		$whereQueryBlock .= " WHERE " . implode(' AND ', $conditions);
-
+		$whereQueryBlock .= " $sortQueryBlock" ?? "";
+		var_dump($whereQueryBlock);
 		return $whereQueryBlock;
 	}
 

@@ -17,7 +17,7 @@ return [
 	'PAGES_PATH' => ROOT . '/src/View/pages/',
 	'LAYOUTS_PATH' => ROOT . '/src/View/layouts/',
 
-	'MIGRATION_NEEDED' => false,
+	'MIGRATION_NEEDED' => true,
 
 	'SERVICES_PATH' => ROOT . '/services.xml',
 

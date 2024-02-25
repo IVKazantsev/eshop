@@ -45,8 +45,12 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 							<div class="dropdown-content" id="dropdown-content-<?= $parentTag->getId() ?>">
 								<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
 									<label for="input-<?= $childTag->getId() ?>">
-										<input type="checkbox" class="tag-checkbox" data-parent-id="<?= $parentTag->getId(
-										) ?>" value="<?= $childTag->getId() ?>" id="input-<?= $childTag->getId() ?>">
+										<input
+											type="checkbox"
+											class="tag-checkbox"
+											data-parent-id="<?= $parentTag->getId() ?>"
+											value="<?= $childTag->getId() ?>"
+											id="input-<?= $childTag->getId() ?>">
 										<?= $childTag->getTitle() ?>
 									</label>
 								<?php endforeach; ?>
@@ -60,16 +64,43 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 							<?= $attribute->getTitle() ?> <i class="Chevron dropdown-icon chevron-up "></i>
 						</a>
 						<div class="dropdown-content attributes" id="dropdown-content-<?= $attribute->getId() ?>">
-							<input class="range_input" id="input1_<?= $attribute->getId(
-							) ?>" type="number" min="0" max="999" name="" placeholder="От..." data-attribute-title="<?= $attribute->getTitle(
-							) ?>">-&nbsp;
-							<input class="range_input" id="input2_<?= $attribute->getId(
-							) ?>" type="number" min="0" max="999" placeholder="До..." data-attribute-title="<?= $attribute->getTitle(
-							) ?>">
+							<input
+								class="range_input"
+								id="input1_<?= $attribute->getId() ?>"
+								type="number"
+								min="0"
+								max="999"
+								name=""
+								placeholder="От..."
+								data-attribute-title="<?= $attribute->getTitle() ?>">-&nbsp;
+							<input
+								class="range_input"
+								id="input2_<?= $attribute->getId() ?>"
+								type="number"
+								min="0"
+								max="999"
+								placeholder="До..."
+								data-attribute-title="<?= $attribute->getTitle() ?>">
 						</div>
 
 					</li>
 				<?php endforeach; ?>
+
+				<label>
+					<select name="select">
+						<?php foreach ($attributes as $attribute): ?>
+							<option value="<?=$attribute->getId()?>-ASC">
+								по возрастанию <?=$attribute->getTitle()?>
+							</option>
+							<option value="<?=$attribute->getId()?>-DESC">
+								по убыванию <?=$attribute->getTitle()?>
+							</option>
+						<?php endforeach; ?>
+						<option value="PRICE-ASC">по возрастанию цены</option>
+						<option value="PRICE-DESK">по убыванию цены</option>
+					</select>
+				</label>
+
 			</ul>
 			<button id="collect-data-btn">Фильтровать</button>
 		</div>

@@ -19,39 +19,6 @@ Router::get(
 				$finalTags,
 				$finalAttributes
 			);
-			// $currentTag,
-			// $currentRange
-			// $currentTag = $_GET['tag'] ?? null;
-			// $currentSearchRequest = $_GET['SearchRequest'] ?? null;
-			// $currentPageNumber = (int)($_GET['page'] ?? null);
-			// $currentRange = $_GET['range'] ?? null;
-			//
-			// $tagsToFilter = $_GET['selectedTags'];
-			// $tagGroups = explode(';', $tagsToFilter);
-			//
-			// $finalTags = [];
-			// foreach ($tagGroups as $tagGroup)
-			// {
-			// 	[$parentId, $childIds] = explode(':[', trim($tagGroup, '[]'));
-			// 	foreach (explode(',', $childIds) as $childId)
-			// 	{
-			// 		$finalTags[(int)$parentId][] = (int)trim($childId);
-			// 	}
-			// }
-			//
-			// $attributesToFilter = $_GET['attributes'];
-			// $attributeGroups = explode(';', $attributesToFilter);
-			// foreach ($attributeGroups as $attributeGroup)
-			// {
-			//
-			// 	[$parentId, $childIds] = explode('=[', trim($attributeGroup, '[]'));
-			// 	[$from, $to] = explode('-', $childIds);
-			// 	$finalAttributes[(int)$parentId]['from'] = (int)$from;
-			// 	$finalAttributes[(int)$parentId]['to'] = (int)$to;
-			// }
-			// var_dump($finalTags, $finalAttributes);
-			//
-			// );
 		}
 	)
 );
