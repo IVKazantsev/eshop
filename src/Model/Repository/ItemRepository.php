@@ -107,7 +107,14 @@ class ItemRepository extends Repository
 		return $this->fillItemsWithOtherEntities($items);
 	}
 
-	private function getWhereQueryBlock(?array $tags, ?string $title, ?array $attributes, ?int $isActive, ?array $sortOrder, mysqli $connection): string
+	private function getWhereQueryBlock(
+		?array  $tags,
+		?string $title,
+		?array  $attributes,
+		?int    $isActive,
+		?array  $sortOrder,
+		mysqli  $connection
+	): string
 	{
 		$whereQueryBlock = "";
 		$conditions = [];
@@ -139,8 +146,7 @@ class ItemRepository extends Repository
 			$from = $attribute['from'];
 			$to = $attribute['to'];
 
-			$conditions[] =
-				"EXISTS
+			$conditions[] = "EXISTS
 				(SELECT 1 FROM N_ONE_ITEMS_ATTRIBUTES ia$attributeId
 				WHERE
 				ia$attributeId.ITEM_ID = i.ID AND
@@ -152,8 +158,7 @@ class ItemRepository extends Repository
 		{
 			$tagIdsString = implode(',', $tagIds);
 
-			$conditions[] =
-				"EXISTS 
+			$conditions[] = "EXISTS 
 				(SELECT 1 FROM N_ONE_ITEMS_TAGS it 
 				JOIN N_ONE_TAGS t on t.ID = it.TAG_ID
 				WHERE it.ITEM_ID = i.ID 
@@ -163,7 +168,7 @@ class ItemRepository extends Repository
 
 		$whereQueryBlock .= " WHERE " . implode(' AND ', $conditions);
 		$whereQueryBlock .= " $sortQueryBlock" ?? "";
-		var_dump($whereQueryBlock);
+
 		return $whereQueryBlock;
 	}
 
@@ -423,14 +428,7 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PRICE'],
-				$row['DESCRIPTION'],
-				$row['SORT_ORDER'],
-				[],
-				[],
-				[]
+				$row['ID'], $row['TITLE'], $row['PRICE'], $row['DESCRIPTION'], $row['SORT_ORDER'], [], [], []
 			);
 		}
 
