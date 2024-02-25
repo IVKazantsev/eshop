@@ -43,7 +43,7 @@ class OrderController extends BaseController
 	{
 		try
 		{
-			$itemId = ValidationService::validateEntryField($_POST['itemId']);
+			$itemId = (int)ValidationService::validateEntryField($_POST['itemId']);
 			$phone = ValidationService::validatePhoneNumber($_POST['phone']);
 			$name = ValidationService::validateEntryField($_POST['name']);
 			$email = ValidationService::validateEmailAddress($_POST['email']);
@@ -59,7 +59,8 @@ class OrderController extends BaseController
 			if (!$user)
 			{
 				$user = new User(null, 2, $name, $email, "", $phone, $address);
-				$user->setId($this->userRepository->add($user));
+				$this->userRepository->add($user);
+				$user = $this->userRepository->getByNumber($phone);
 			}
 			elseif ($name !== $user->getName() || $email !== $user->getEmail() || $address !== $user->getAddress())
 			{
@@ -69,10 +70,11 @@ class OrderController extends BaseController
 			}
 
 			$order = new Order(null, $user->getId(), $itemId, 1, 'обработка', $item->getPrice());
-			$orderId = $this->orderRepository->add($order);
+			$this->orderRepository->add($order);
+			$order = $this->orderRepository->getLastByUserItem($user->getId(), $itemId);
 
 			$content = TemplateEngine::render(
-				'pages/processOrder', ['orderNumber' => $orderId]
+				'pages/processOrder', ['orderNumber' => $order->getId()]
 			);
 		}
 		catch (ValidateException $e)
