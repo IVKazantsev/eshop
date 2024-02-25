@@ -137,7 +137,6 @@ class AdminController extends BaseController
 					foreach ($entity->getTags() as $tag)
 					{
 						$itemTags[$tag->getParentId()] = $tag->getId();
-
 					}
 					$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
 						'childrenTags' => $childrenTags,
@@ -195,8 +194,7 @@ class AdminController extends BaseController
 				{
 					$statuses = $this->orderRepository->getStatuses();
 					$specificFields = [
-						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]
-						),
+						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]),
 						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['order' => $entity]),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
@@ -210,7 +208,6 @@ class AdminController extends BaseController
 				{
 					$content = TemplateEngine::render('pages/adminEditPage');
 					break;
-
 				}
 			}
 		}
@@ -360,6 +357,12 @@ class AdminController extends BaseController
 				}
 				$fields[$field] = ValidationService::validateEntryField($value);
 			}
+
+			if ($_FILES['image']['size'] !== 0 && !$fields['parentId'])
+			{
+				$this->addTagLogo($_FILES, $entityId);
+			}
+
 		}
 		if ($entityType === 'attributes')
 		{
@@ -646,6 +649,33 @@ class AdminController extends BaseController
 		return true;
 	}
 
+	/**
+	 * @throws ValidateException
+	 */
+	public function addTagLogo($files, int $itemId): bool
+	{
+		ValidationService::validateImage($files);
+
+		$targetDir = ROOT . '/public' . Configurator::option('ICONS_PATH'); // директория для сохранения загруженных файлов
+		$fileExtension = pathinfo($files['image']['name'][0], PATHINFO_EXTENSION);
+		$finalPath = $targetDir . $itemId . ".$fileExtension";
+
+
+		if (file_exists($finalPath))// Проверяем, существует ли файл
+		{
+			unlink($finalPath); // Удаляем существующий файл
+		}
+
+		if (move_uploaded_file($files["image"]["tmp_name"][0], $finalPath))// Сохраняем файл по указанному пути
+		{
+			return true;// Файл успешно сохранен
+		}
+		else
+		{
+			return false;// Произошла ошибка при сохранении файла
+		}
+	}
+
 	public function renderAddPage(string $entityToAdd): string
 	{
 		try
@@ -791,15 +821,15 @@ class AdminController extends BaseController
 		{
 			if ($entityToAdd === 'tag')
 			{
-				foreach ($fields as $field => $value)
-				{
-					$fields[$field] = ValidationService::validateEntryField($value);
-				}
+				// foreach ($fields as $field => $value)
+				// {
+				// 	$fields[$field] = ValidationService::validateEntryField($value);
+				// }
 				if (!array_key_exists('parentId', $fields))
 				{
-					echo 'true';
 					$fields['parentId'] = null;
 				}
+
 			}
 		}
 		catch (ValidateException $e)
@@ -852,12 +882,13 @@ class AdminController extends BaseController
 			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
 			$item = $className::fromFields($fields);
 			$itemId = $repository->add($item);
-			if ($entityToAdd === 'item')
+			if ($entityToAdd === 'item' && $_FILES['image']['size'][0] !== 0)
 			{
-				if ($_FILES['image']['size'][0] !== 0)
-				{
-					$this->addBaseImages($_FILES, $itemId);
-				}
+				$this->addBaseImages($_FILES, $itemId);
+			}
+			if ($entityToAdd === 'tag' && $_FILES['image']['size'] !== 0 && !$fields['parentId'])
+			{
+				$this->addTagLogo($_FILES, $itemId);
 			}
 		}
 		catch (InvalidArgumentException)

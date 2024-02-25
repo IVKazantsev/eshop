@@ -66,10 +66,14 @@ class ValidationService
 	 */
 	public static function validateImage($image, int $i = 0): bool
 	{
-		$allowed_formats = ["jpg", "png", "jpeg",];
-		$allowed_mime_types = ['image/jpeg', 'image/png', 'image/jpg'];// Разрешенные форматы файлов
+		$allowed_formats = ["jpg", "png", "jpeg", "svg"];
+		$allowed_mime_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg'];// Разрешенные форматы файлов
 		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]),PATHINFO_EXTENSION));
 
+		if ($imageFileType === 'svg')
+		{
+			return true;
+		}
 		// Проверка наличия файла
 		if (isset($image["image"]))
 		{

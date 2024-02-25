@@ -290,7 +290,7 @@ class TagRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
-		return true;
+		return mysqli_insert_id($connection);
 	}
 
 	/**
