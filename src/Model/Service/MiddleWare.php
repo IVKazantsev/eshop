@@ -49,7 +49,8 @@ class MiddleWare
 				$finalAttributes[(int)$parentId]['from'] = (int)$from;
 				$finalAttributes[(int)$parentId]['to'] = (int)$to;
 			}
-
+			unset($finalTags[0]);
+			unset($finalAttributes[0]);
 			return $action($route, $finalTags, $finalAttributes);
 		};
 	}

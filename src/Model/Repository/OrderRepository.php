@@ -5,6 +5,7 @@ namespace N_ONE\App\Model\Repository;
 use mysqli_sql_exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 
 class OrderRepository extends Repository
@@ -17,9 +18,13 @@ class OrderRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
+		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
+		$currentLimit = $numItemsPerPage + 1;
+		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
+		$isActive = $filter['isActive'] ?? 1;
 		$orders = [];
 
-		$whereQueryBlock = $this->getWhereQueryBlock();
+		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
 
 		$result = mysqli_query(
 			$connection,
@@ -27,7 +32,8 @@ class OrderRepository extends Repository
 			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 			FROM N_ONE_ORDERS o
 			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-			$whereQueryBlock;"
+			$whereQueryBlock
+			LIMIT $currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -52,11 +58,9 @@ class OrderRepository extends Repository
 		return $orders;
 	}
 
-	private function getWhereQueryBlock(): string
+	private function getWhereQueryBlock(int $isActive): string
 	{
-		$whereQueryBlock = "WHERE o.IS_ACTIVE = 1";
-
-		return $whereQueryBlock;
+		return "WHERE o.IS_ACTIVE = $isActive";
 	}
 
 	/**

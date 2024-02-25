@@ -1,4 +1,7 @@
 <?php
+/**
+ * @var int $isActive
+ */
 
 use N_ONE\Core\Configurator\Configurator;
 
@@ -10,7 +13,7 @@ $iconsPath = Configurator::option('ICONS_PATH');
 		<img  class="success-img" src="<?= $iconsPath . 'checkmark.svg' ?>" alt="image of checkmark">
 	</div>
 	<div class="success-delete-title">
-		Вы успешно удалили сущность
+		Вы успешно <?= ($isActive === 0) ? 'удалили' : 'востановили';?> сущность
 	</div>
 </div>
 <meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

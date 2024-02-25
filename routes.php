@@ -13,11 +13,11 @@ Router::get(
 			$currentSearchRequest = $_GET['SearchRequest'] ?? null;
 			$currentPageNumber = (int)($_GET['page'] ?? null);
 
-			//TODO: ИСПОЛЬЗОВАТЬ FINALTAGS, FINALATTRIBUTES
 			return ($di->getComponent('catalogController'))->renderCatalog(
 				$currentPageNumber,
-
-				$currentSearchRequest
+				$currentSearchRequest,
+				$finalTags,
+				$finalAttributes
 			);
 			// $currentTag,
 			// $currentRange
@@ -51,7 +51,6 @@ Router::get(
 			// }
 			// var_dump($finalTags, $finalAttributes);
 			//
-
 			// );
 		}
 	)
@@ -107,8 +106,9 @@ Router::get('/admin/:string', MiddleWare::adminMiddleware(function(Route $route)
 	$di = Application::getDI();
 	$entityToEdit = $route->getVariables()[0];
 	$currentPageNumber = (int)($_GET['page'] ?? null);
+	$isActive = (int)($_GET['isActive'] ?? 1);
 
-	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit, $currentPageNumber);
+	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit, $currentPageNumber, $isActive);
 }));
 
 Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
@@ -126,12 +126,14 @@ Router::post('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Rou
 
 	return ($di->getComponent('adminController'))->updateEntity($entityToEdit, $itemId);
 }));
+
 Router::get('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderAddPage($entityToEdit);
 }));
+
 Router::post('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToAdd = $route->getVariables()[0];
 	$di = Application::getDI();
@@ -151,12 +153,34 @@ Router::get('/admin/add/success', MiddleWare::adminMiddleware(function() {
 	return ($di->getComponent('adminController'))->renderSuccessAddPage();
 }));
 
+Router::get('/admin/:entity/restore/:id', MiddleWare::adminMiddleware(function(Route $route) {
+	$entityToDelete = $route->getVariables()[0];
+	$entityId = (int)$route->getVariables()[1];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderConfirmPage($entityToDelete, $entityId, 'восстановить');
+}));
+
+Router::post('/admin/:entity/restore/:id', function(Route $route) {
+	$entityToDelete = $route->getVariables()[0];
+	$entityId = (int)$route->getVariables()[1];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->processChangeActive($entityToDelete, $entityId, 1);
+});
+
+Router::get('/admin/restore/success', MiddleWare::adminMiddleware(function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderSuccessPage(1);
+}));
+
 Router::get('/admin/:entity/delete/:id', MiddleWare::adminMiddleware(function(Route $route) {
 	$entityToDelete = $route->getVariables()[0];
 	$entityId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->renderConfirmDeletePage($entityToDelete, $entityId);
+	return ($di->getComponent('adminController'))->renderConfirmPage($entityToDelete, $entityId, 'удалить');
 }));
 
 Router::post('/admin/:entity/delete/:id', function(Route $route) {
@@ -164,13 +188,13 @@ Router::post('/admin/:entity/delete/:id', function(Route $route) {
 	$entityId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->processDeletion($entityToDelete, $entityId);
+	return ($di->getComponent('adminController'))->processChangeActive($entityToDelete, $entityId, 0);
 });
 
 Router::get('/admin/delete/success', MiddleWare::adminMiddleware(function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->renderSuccessDeletePage();
+	return ($di->getComponent('adminController'))->renderSuccessPage(0);
 }));
 
 //роуты доступные всем
@@ -185,6 +209,7 @@ Router::post('/login', function() {
 
 	return ($di->getComponent('adminController'))->login($_POST['email'], $_POST['password']);
 });
+
 Router::get('/logout', function() {
 	$di = Application::getDI();
 

@@ -2,6 +2,7 @@
 
 /**
  * @var Entity[] $entities
+ * @var int $isActive
  */
 
 use N_ONE\App\Model\Entity;
@@ -28,7 +29,25 @@ $iconsPath = Configurator::option('ICONS_PATH');
 			<?php foreach ($fieldNames as $fieldName): ?>
 				<th><?= $fieldName ?></th>
 			<?php endforeach; ?>
-			<th id="actions-column">Действия</th>
+
+			<td class="actions-field">
+				<a
+					href="<?= "/admin/{$classname}s/edit/" . $entity->getId() ?>">
+					<img src="<?= $iconsPath . 'settings.svg' ?>" alt="1">
+				</a>
+				<?php if ($isActive): ?>
+					<a
+						href="<?= "/admin/{$classname}s/delete/" . $entity->getId() ?>">
+						<img src="<?= $iconsPath . 'bin.svg' ?>" alt="1">
+					</a>
+				<?php else: ?>
+					<a
+						href="<?= "/admin/{$classname}s/restore/" . $entity->getId() ?>">
+						<img src="<?= $iconsPath . 'reactivate.svg' ?>" alt="1">
+					</a>
+				<?php endif; ?>
+
+			</td>
 		</tr>
 		<?php foreach ($entities as $entity): ?>
 			<tr class="admin-table-content-row">

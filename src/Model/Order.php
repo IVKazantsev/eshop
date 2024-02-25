@@ -6,8 +6,6 @@ namespace N_ONE\App\Model;
 
 class Order extends Entity
 {
-	// private string|null $dateCreate;
-
 	public function __construct(
 		protected int|null  $id,
 		private int|null    $userId,

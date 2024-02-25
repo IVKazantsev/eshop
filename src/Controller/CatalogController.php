@@ -11,15 +11,15 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(?int $pageNumber, ?string $SearchRequest,): string
+	public function renderCatalog(?int $pageNumber, ?string $SearchRequest, ?array $tags, ?array $attributes): string
 	{
 		try
 		{
 			$filter = [
-				// 'tag' => $itemsTag,
+				'tags' => $tags,
 				'title' => $SearchRequest,
 				'pageNumber' => $pageNumber,
-				// 'range' => $range,
+				'attributes' => $attributes,
 			];
 
 			$items = $this->itemRepository->getList($filter);

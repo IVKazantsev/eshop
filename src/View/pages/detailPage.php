@@ -34,7 +34,6 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 
 	<div class="item-specs">
 		<h1 class="item-title-details"><?= $item->getTitle() ?></h1>
-		<h3 class="year-title-details"> 2024</h3>
 		<hr>
 		<?= TemplateEngine::render('components/tags', [
 			'tags' => $item->getTags(),

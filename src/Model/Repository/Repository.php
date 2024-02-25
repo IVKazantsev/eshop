@@ -28,7 +28,7 @@ abstract class Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function delete(string $entities, int $entityId): bool
+	public function changeActive(string $entities, int $entityId, int $isActive): bool
 	{
 		$connection = $this->dbConnection->getConnection();
 		$entities = mysqli_real_escape_string($connection, $entities);
@@ -37,7 +37,31 @@ abstract class Repository
 			$connection,
 			"
 			UPDATE N_ONE_$entities 
-			SET IS_ACTIVE = 0
+			SET IS_ACTIVE = $isActive
+			WHERE ID = $entityId"
+		);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		return true;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 */
+	public function reactivate(string $entities, int $entityId): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+		$entities = mysqli_real_escape_string($connection, $entities);
+
+		$result = mysqli_query(
+			$connection,
+			"
+			UPDATE N_ONE_$entities 
+			SET IS_ACTIVE = 1
 			WHERE ID = $entityId"
 		);
 

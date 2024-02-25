@@ -17,12 +17,11 @@ class OrderController extends BaseController
 
 	public function renderOrderPage(string $itemId): string
 	{
-		$content = '';
 		try
 		{
 			$item = $this->itemRepository->getById($itemId);
 
-			$orderPage = TemplateEngine::render('pages/orderPage', [
+			$content = TemplateEngine::render('pages/orderPage', [
 				'item' => $item,
 			]);
 		}

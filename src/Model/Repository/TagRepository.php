@@ -5,6 +5,7 @@ namespace N_ONE\App\Model\Repository;
 use mysqli_sql_exception;
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\Entity;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 use RuntimeException;
 
@@ -12,22 +13,59 @@ class TagRepository extends Repository
 {
 	/**
 	 * @throws DatabaseException
-	 * @throws mysqli_sql_exception
 	 */
-	public function getList(array $filter = null): array
+	public function getAll(): array
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tags = [];
-
-		$whereQueryBlock = $this->getWhereQueryBlock();
+		$whereQueryBlock = $this->getWhereQueryBlock(1);
 
 		$result = mysqli_query(
 			$connection,
 			"
 			SELECT t.ID, t.TITLE, t.PARENT_ID 
 			FROM N_ONE_TAGS t
-			$whereQueryBlock;
+			$whereQueryBlock"
+		);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$tags[] = new Tag(
+				$row['ID'],
+				$row['TITLE'],
+				$row['PARENT_ID']
+			);
+		}
+
+		return $tags;
+	}
+	/**
+	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
+	 */
+	public function getList(array $filter = null): array
+	{
+		$connection = $this->dbConnection->getConnection();
+		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
+		$currentLimit = $numItemsPerPage + 1;
+		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
+		$isActive = $filter['isActive'] ?? 1;
+		$tags = [];
+
+		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
+
+		$result = mysqli_query(
+			$connection,
 			"
+			SELECT t.ID, t.TITLE, t.PARENT_ID 
+			FROM N_ONE_TAGS t
+			$whereQueryBlock
+			LIMIT $currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -47,11 +85,9 @@ class TagRepository extends Repository
 		return $tags;
 	}
 
-	private function getWhereQueryBlock(): string
+	private function getWhereQueryBlock(int $isActive): string
 	{
-		$whereQueryBlock = "WHERE t.IS_ACTIVE = 1";
-
-		return $whereQueryBlock;
+		return "WHERE t.IS_ACTIVE = $isActive";
 	}
 
 	/**
@@ -473,7 +509,7 @@ class TagRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function delete(string $entities, int $entityId): bool
+	public function changeActive(string $entities, int $entityId, int $isActive): bool
 	{
 		$connection = $this->dbConnection->getConnection();
 		$entities = mysqli_real_escape_string($connection, $entities);
@@ -485,7 +521,7 @@ class TagRepository extends Repository
 				$connection,
 				"
 				UPDATE N_ONE_$entities 
-				SET IS_ACTIVE = 0
+				SET IS_ACTIVE = $isActive
 				WHERE ID = $entityId"
 			);
 			//TODO удаление из ITEM_TAGS
@@ -502,6 +538,10 @@ class TagRepository extends Repository
 			{
 				$this->toggleParentTagIsActive($tag->getParentId(), false);
 			}
+			elseif ($countOfParentTags === 1)
+			{
+				$this->toggleParentTagIsActive($tag->getParentId(), true);
+			}
 		}
 		else //если родительский тег
 		{
@@ -509,7 +549,7 @@ class TagRepository extends Repository
 				$connection,
 				"
 				UPDATE N_ONE_$entities 
-				SET IS_ACTIVE = 0
+				SET IS_ACTIVE = $isActive
 				WHERE ID = $entityId or PARENT_ID = $entityId"
 			);
 		}

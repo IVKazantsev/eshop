@@ -61,11 +61,12 @@ class TemplateEngine
 		return ob_get_clean();
 	}
 
-	public static function renderTable(array $entities): string
+	public static function renderTable(array $entities, int $isActive): string
 	{
 		$tableViewFile = 'components/table';
 		$variables = [
 			'entities' => $entities,
+			'isActive' => $isActive,
 		];
 
 		return self::render($tableViewFile, $variables);

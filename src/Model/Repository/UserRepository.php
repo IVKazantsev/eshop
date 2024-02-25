@@ -6,6 +6,7 @@ use mysqli_result;
 use mysqli_sql_exception;
 use N_ONE\App\Model\User;
 use N_ONE\App\Model\Entity;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 
 class UserRepository extends Repository
@@ -58,8 +59,11 @@ class UserRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-
-		$whereQueryBlock = $this->getWhereQueryBlock();
+		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
+		$currentLimit = $numItemsPerPage + 1;
+		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
+		$isActive = $filter['isActive'] ?? 1;
+		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
 
 		$result = mysqli_query(
 			$connection,
@@ -67,7 +71,8 @@ class UserRepository extends Repository
 			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.ROLE_ID
 			FROM N_ONE_USERS u
 			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-			$whereQueryBlock;"
+			$whereQueryBlock
+			LIMIT $currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -78,11 +83,9 @@ class UserRepository extends Repository
 		return $this->getUsersFromResult($result);
 	}
 
-	private function getWhereQueryBlock(): string
+	private function getWhereQueryBlock(int $isActive): string
 	{
-		$whereQueryBlock = "WHERE u.IS_ACTIVE = 1";
-
-		return $whereQueryBlock;
+		return "WHERE u.IS_ACTIVE = $isActive";
 	}
 
 	/**
