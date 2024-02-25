@@ -280,7 +280,7 @@ class AdminController extends BaseController
 		return true;
 	}
 
-	public function renderEntityPage(string $entityToDisplay, ?int $pageNumber): string
+	public function renderEntityPage(string $entityToDisplay, ?int $pageNumber, int $isActive): string
 	{
 		try
 		{
@@ -288,6 +288,7 @@ class AdminController extends BaseController
 
 			$filter = [
 				'pageNumber' => $pageNumber,
+				'isActive' => $isActive,
 			];
 
 			$entities = $repository->getList($filter);
@@ -301,7 +302,7 @@ class AdminController extends BaseController
 				return $this->renderAdminView($content);
 			}
 
-			if ($entityToDisplay === 'items' && count($entities) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
+			if (count($entities) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
 			{
 				array_pop($entities);
 			}
@@ -310,6 +311,7 @@ class AdminController extends BaseController
 				'entities' => $entities,
 				'previousPageUri' => $previousPageUri,
 				'nextPageUri' => $nextPageUri,
+				'isActive' => $isActive,
 			]);
 
 		}
@@ -489,7 +491,7 @@ class AdminController extends BaseController
 		Router::redirect('/login');
 	}
 
-	public function renderConfirmDeletePage(string $entityType, int $entityId): string
+	public function renderConfirmPage(string $entityType, int $entityId, string $action): string
 	{
 		try
 		{
@@ -503,9 +505,10 @@ class AdminController extends BaseController
 			{
 				$entityName = substr($entityType, 0, -1);
 
-				$content = TemplateEngine::render('pages/confirmDeletePage', [
+				$content = TemplateEngine::render('pages/confirmPage', [
 					'entity' => $entityName,
 					'entityId' => $entityId,
+					'action' => $action,
 				]);
 			}
 		}
@@ -530,7 +533,7 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
-	public function processDeletion(string $entities, int $entityId): string
+	public function processChangeActive(string $entities, int $entityId, int $isActive): string
 	{
 		if (!$entityId)
 		{
@@ -539,7 +542,7 @@ class AdminController extends BaseController
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entities);
-			$repository->delete($entities, $entityId);
+			$repository->changeActive($entities, $entityId, $isActive);
 		}
 		catch (DatabaseException)
 		{
@@ -560,18 +563,20 @@ class AdminController extends BaseController
 
 		}
 
-		return $this->renderSuccessDeletePage();
+		return $this->renderSuccessPage($isActive);
 	}
 
-	public function renderSuccessDeletePage(): string
+	public function renderSuccessPage(int $isActive): string
 	{
-		if ($_SERVER['REQUEST_URI'] !== "/admin/delete/success")
+		$currentPage = ($isActive === 0) ? 'delete' : 'restore';
+		if ($_SERVER['REQUEST_URI'] !== "/admin/$currentPage/success")
 		{
-			Router::redirect("/admin/delete/success");
+			Router::redirect("/admin/$currentPage/success");
 		}
 
-		$successDeletePage = TemplateEngine::render(
-			'pages/successDeletePage'
+		$successDeletePage = TemplateEngine::render('pages/successPage', [
+				'isActive' => $isActive,
+			]
 		);
 
 		return $this->renderAdminView($successDeletePage);

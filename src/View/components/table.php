@@ -2,6 +2,7 @@
 
 /**
  * @var Entity[] $entities
+ * @var int $isActive
  */
 
 use N_ONE\App\Model\Entity;
@@ -28,10 +29,22 @@ $classname = $entities[0]->getClassname();
 			<?php endforeach; ?>
 
 			<td class="actions-field">
-				<a href="<?= "/admin/{$classname}s/edit/" . $entity->getId() ?>"><img src="<?= $iconsPath
-					. 'settings.png' ?>" alt="1"></a>
-				<a href="<?= "/admin/{$classname}s/delete/" . $entity->getId() ?>"><img src="<?= $iconsPath
-					. 'bin.png' ?>" alt="1"></a>
+				<a
+					href="<?= "/admin/{$classname}s/edit/" . $entity->getId() ?>">
+					<img src="<?= $iconsPath . 'settings.svg' ?>" alt="1">
+				</a>
+				<?php if ($isActive): ?>
+					<a
+						href="<?= "/admin/{$classname}s/delete/" . $entity->getId() ?>">
+						<img src="<?= $iconsPath . 'bin.svg' ?>" alt="1">
+					</a>
+				<?php else: ?>
+					<a
+						href="<?= "/admin/{$classname}s/restore/" . $entity->getId() ?>">
+						<img src="<?= $iconsPath . 'reactivate.svg' ?>" alt="1">
+					</a>
+				<?php endif; ?>
+
 			</td>
 		</tr>
 	<?php endforeach; ?>

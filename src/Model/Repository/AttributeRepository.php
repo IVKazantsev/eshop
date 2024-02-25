@@ -5,6 +5,7 @@ namespace N_ONE\App\Model\Repository;
 use mysqli_sql_exception;
 use N_ONE\App\Model\Attribute;
 use N_ONE\App\Model\Entity;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 use RuntimeException;
 
@@ -18,17 +19,21 @@ class AttributeRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
+		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
+		$currentLimit = $numItemsPerPage + 1;
+		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
+		$isActive = $filter['isActive'] ?? 1;
 		$attributes = [];
 
-		$whereQueryBlock = $this->getWhereQueryBlock();
+		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
 
 		$result = mysqli_query(
 			$connection,
 			"
 			SELECT a.ID, a.TITLE
 			FROM N_ONE_ATTRIBUTES a
-			$whereQueryBlock;
-			"
+			$whereQueryBlock
+			LIMIT $currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -48,11 +53,9 @@ class AttributeRepository extends Repository
 		return $attributes;
 	}
 
-	private function getWhereQueryBlock(): string
+	private function getWhereQueryBlock(int $isActive): string
 	{
-		$whereQueryBlock = "WHERE a.IS_ACTIVE = 1";
-
-		return $whereQueryBlock;
+		return "WHERE a.IS_ACTIVE = $isActive";
 	}
 
 	/**

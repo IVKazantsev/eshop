@@ -6,8 +6,6 @@ namespace N_ONE\App\Model;
 
 class Order extends Entity
 {
-	private string|null $dateCreate;
-
 	public function __construct(
 		protected int|null  $id,
 		private int|null    $userId,
@@ -21,14 +19,6 @@ class Order extends Entity
 	public function getExcludedFields(): array
 	{
 		return ['dateCreate', 'statusId'];
-	}
-
-	public function generateNumber(int $time): void
-	{
-		$this->dateCreate = date('Y-m-d H:i:s', $time);
-
-		// $hashString = Configurator::option('ORDER_HASH_PREFIX') . $this->userId . $this->itemId . $this->dateCreate;
-		// $this->number = hash(Configurator::option('ORDER_HASH_ALGO'), $hashString);
 	}
 
 	public function getClassname(): string

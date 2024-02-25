@@ -26,57 +26,6 @@ class ItemRepository extends Repository
 	}
 
 	/**
-	 * @param Item[] $items
-	 *
-	 * @return Item[]
-	 * @throws DatabaseException
-	 * @throws mysqli_sql_exception
-	 */
-	public function fillItemsWithOtherEntities(array $items): array
-	{
-		$itemsIds = array_map(static function($item) {
-			return $item->getId();
-		}, $items);
-
-		$tags = $this->tagRepository->getByItemsIds($itemsIds);
-		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
-		$images = $this->imageRepository->getList($itemsIds);
-
-		foreach ($items as $item)
-		{
-			$item->setTags($tags[$item->getId()] ?? []);
-			$item->setAttributes($attributes[$item->getId()] ?? []);
-			$item->setImages($images[$item->getId()] ?? []);
-		}
-
-		return $items;
-	}
-
-	/**
-	 * @return Item[]
-	 */
-	public function getItemsFromResult(mysqli_result $result): array
-	{
-		$items = [];
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$items[] = new Item(
-				$row['ID'],
-				$row['TITLE'],
-				$row['IS_ACTIVE'],
-				$row['PRICE'],
-				$row['DESCRIPTION'],
-				$row['SORT_ORDER'],
-				[],
-				[],
-				[]
-			);
-		}
-
-		return $items;
-	}
-
-	/**
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
@@ -129,11 +78,12 @@ class ItemRepository extends Repository
 		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
 		$currentLimit = $numItemsPerPage + 1;
 		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
-		$tag = $filter['tag'] ?? null;
+		$isActive = $filter['isActive'] ?? 1;
 		$title = $filter['title'] ?? null;
-		$range = $filter['range'] ?? null;
+		$tags = $filter['tags'] ?? null;
+		$attributes = $filter['attributes'] ?? null;
 
-		$whereQueryBlock = $this->getWhereQueryBlock($tag, $title, $range, $connection);
+		$whereQueryBlock = $this->getWhereQueryBlock($tags, $title, $attributes, $isActive, $connection);
 
 		$result = mysqli_query(
 			$connection,
@@ -158,43 +108,45 @@ class ItemRepository extends Repository
 		return $this->fillItemsWithOtherEntities($items);
 	}
 
-	private function getWhereQueryBlock(?string $tag, ?string $title, ?string $range, mysqli $connection): string
+	private function getWhereQueryBlock(?array $tags, ?string $title, ?array $attributes, ?int $isActive, mysqli $connection): string
 	{
-		$whereQueryBlock = "WHERE i.IS_ACTIVE = 1";
-		if ($range !== null)
-		{
-			[$attributeId, $from, $to] = TagService::reformatRangeTag($range);
-			$whereQueryBlock = "
-			JOIN N_ONE_ITEMS_ATTRIBUTES ia on i.ID = ia.ITEM_ID
-			WHERE ia.ATTRIBUTE_ID = $attributeId and (ia.VALUE BETWEEN $from and $to) and i.IS_ACTIVE = 1
-		";
-		}
-		elseif ($tag !== null && $title !== null)
-		{
-			$tagTitle = mysqli_real_escape_string($connection, $tag);
-			$itemTitle = mysqli_real_escape_string($connection, $title);
-			$whereQueryBlock = "
-			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
-			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
-			WHERE t.TITLE = '$tagTitle'  and i.TITLE LIKE '%$itemTitle%' and i.IS_ACTIVE = 1
-		";
-		}
-		elseif ($tag !== null)
-		{
-			$tagTitle = mysqli_real_escape_string($connection, $tag);
-			$whereQueryBlock = "
-			JOIN N_ONE_ITEMS_TAGS it on i.ID = it.ITEM_ID
-			JOIN N_ONE_TAGS t on it.TAG_ID = t.ID
-			WHERE t.TITLE = '$tagTitle' and i.IS_ACTIVE = 1
-		";
-		}
-		elseif ($title !== null)
+		$whereQueryBlock = "";
+		$conditions[] = "i.IS_ACTIVE = $isActive";
+		if ($title !== null)
 		{
 			$itemTitle = mysqli_real_escape_string($connection, $title);
-			$whereQueryBlock = "
-			WHERE i.TITLE LIKE '%$itemTitle%' and i.IS_ACTIVE = 1
-		";
+			$conditions[] = "i.TITLE LIKE '%$itemTitle%'";
 		}
+
+		foreach ($attributes as $key => $attribute)
+		{
+			$attributeId = $key;
+			$from = $attribute['from'];
+			$to = $attribute['to'];
+
+			$conditions[] =
+				"EXISTS
+				(SELECT 1 FROM N_ONE_ITEMS_ATTRIBUTES ia$attributeId
+				WHERE
+				ia$attributeId.ITEM_ID = i.ID AND
+				ia$attributeId.ATTRIBUTE_ID = $attributeId AND
+				ia$attributeId.VALUE BETWEEN $from AND $to)";
+		}
+
+		foreach ($tags as $parentId => $tagIds)
+		{
+			$tagIdsString = implode(',', $tagIds);
+
+			$conditions[] =
+				"EXISTS 
+				(SELECT 1 FROM N_ONE_ITEMS_TAGS it 
+				JOIN N_ONE_TAGS t on t.ID = it.TAG_ID
+				WHERE it.ITEM_ID = i.ID 
+				AND t.PARENT_ID = $parentId 
+				AND it.TAG_ID IN ($tagIdsString))";
+		}
+
+		$whereQueryBlock .= " WHERE " . implode(' AND ', $conditions);
 
 		return $whereQueryBlock;
 	}
@@ -421,4 +373,56 @@ class ItemRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 	}
+
+	/**
+	 * @param Item[] $items
+	 *
+	 * @return Item[]
+	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
+	 */
+	public function fillItemsWithOtherEntities(array $items): array
+	{
+		$itemsIds = array_map(static function($item) {
+			return $item->getId();
+		}, $items);
+
+		$tags = $this->tagRepository->getByItemsIds($itemsIds);
+		$attributes = $this->attributeRepository->getByItemsIds($itemsIds);
+		$images = $this->imageRepository->getList($itemsIds);
+
+		foreach ($items as $item)
+		{
+			$item->setTags($tags[$item->getId()] ?? []);
+			$item->setAttributes($attributes[$item->getId()] ?? []);
+			$item->setImages($images[$item->getId()] ?? []);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * @return Item[]
+	 */
+	public function getItemsFromResult(mysqli_result $result): array
+	{
+		$items = [];
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$items[] = new Item(
+				$row['ID'],
+				$row['TITLE'],
+				$row['IS_ACTIVE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
+				[],
+				[],
+				[]
+			);
+		}
+
+		return $items;
+	}
+
 }

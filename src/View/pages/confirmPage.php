@@ -2,15 +2,16 @@
 /**
  * @var string $entity
  * @var int $entityId
+ * @var string $action
  */
 
 ?>
 
 <div class="confirm-delete-container">
 	<form class="confirm-delete-form" action="" method="post">
-		Вы уверены, что хотите удалить <?= $entity ?> #<?= $entityId ?>?
+		Вы уверены, что хотите <?= $action ?> <?= $entity ?> № <?= $entityId ?>?
 		<div class="buttons-container">
-			<button class="confirm-delete-button" type="submit">Удалить</button>
+			<button class="confirm-delete-button" type="submit"><?= $action ?></button>
 			<a class="cancel-delete-link" href="/admin/items">Отмена</a>
 		</div>
 	</form>

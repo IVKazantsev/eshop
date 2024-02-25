@@ -24,7 +24,6 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 		<?php endif;?>
 		<div class="description">
 			<h2 class="item-name"><?= $item->getTitle() ?></h2>
-			<p class="item-year">2024</p>
 			<?= TemplateEngine::render('components/tags', [
 				'tags' => $item->getTags(),
 				'attributes' => $item->getAttributes(),

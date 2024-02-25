@@ -33,7 +33,7 @@ abstract class BaseController
 	{
 		try
 		{
-			$tags = TagService::reformatTags($this->tagRepository->getList());
+			$tags = TagService::reformatTags($this->tagRepository->getAll());
 			$attributes = $this->attributeRepository->getList();
 		}
 		catch (DatabaseException)
