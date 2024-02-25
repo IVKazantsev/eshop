@@ -15,7 +15,7 @@ class Item extends Entity
 	public function __construct(
 		protected int|null  $id,
 		private string|null $title,
-		// private bool|null   $isActive,
+
 		private int|null    $price,
 		private string|null $description,
 		private int|null    $sortOrder,
@@ -31,7 +31,6 @@ class Item extends Entity
 		$new = new static(
 			$fields['id'],
 			$fields['title'],
-			// $fields['isActive'],
 			$fields['price'],
 			$fields['description'],
 			$fields['sortOrder'],

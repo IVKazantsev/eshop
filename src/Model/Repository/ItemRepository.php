@@ -53,7 +53,6 @@ class ItemRepository extends Repository
 			$item = new Item(
 				$row['ID'],
 				$row['TITLE'],
-				// $row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
 				$row['SORT_ORDER'],
@@ -191,7 +190,6 @@ class ItemRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
-		// $isActive = $entity->isActive() ? 1 : 0;
 		$price = $entity->getPrice();
 		$description = mysqli_real_escape_string($connection, $entity->getDescription());
 		$sortOrder = $entity->getSortOrder();
@@ -200,7 +198,6 @@ class ItemRepository extends Repository
 
 		$result = mysqli_query(
 			$connection,
-			//IS_ACTIVE,// $isActive,
 			"
 			INSERT INTO N_ONE_ITEMS (TITLE,  PRICE, DESCRIPTION, SORT_ORDER) 
 			VALUES (
@@ -239,7 +236,6 @@ class ItemRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 		$itemId = $entity->getId();
-		// $isActive = $entity->isActive() ? 1 : 0;
 		$sortOrder = $entity->getSortOrder();
 		$tags = $entity->getTags();
 		$attributes = $entity->getAttributes();
@@ -249,8 +245,6 @@ class ItemRepository extends Repository
 
 		$result = mysqli_query(
 			$connection,
-
-			//IS_ACTIVE = $isActive,
 			"
 			UPDATE N_ONE_ITEMS 
 			SET 
@@ -414,7 +408,6 @@ class ItemRepository extends Repository
 			$items[] = new Item(
 				$row['ID'],
 				$row['TITLE'],
-				$row['IS_ACTIVE'],
 				$row['PRICE'],
 				$row['DESCRIPTION'],
 				$row['SORT_ORDER'],
