@@ -15,7 +15,7 @@ class Item extends Entity
 	public function __construct(
 		protected int|null  $id,
 		private string|null $title,
-		private bool|null   $isActive,
+		// private bool|null   $isActive,
 		private int|null    $price,
 		private string|null $description,
 		private int|null    $sortOrder,
@@ -24,6 +24,23 @@ class Item extends Entity
 		private array|null  $images,
 	)
 	{
+	}
+
+	public static function fromFields(array $fields): static
+	{
+		$new = new static(
+			$fields['id'],
+			$fields['title'],
+			// $fields['isActive'],
+			$fields['price'],
+			$fields['description'],
+			$fields['sortOrder'],
+			$fields['tags'],
+			$fields['attributes'],
+			$fields['images']
+		);
+
+		return $new;
 	}
 
 	public function getAttributes(): ?array
@@ -76,7 +93,7 @@ class Item extends Entity
 
 	public function getExcludedFields(): array
 	{
-		return ['isActive', 'tags', 'images', 'attributes'];
+		return ['tags', 'images', 'attributes'];
 	}
 
 	public function getClassname(): string
@@ -89,6 +106,7 @@ class Item extends Entity
 	public function getField(string $fieldName)
 	{
 		$fw = $this->$fieldName;
+
 		return $this->$fieldName;
 	}
 
@@ -112,15 +130,15 @@ class Item extends Entity
 		$this->title = $title;
 	}
 
-	public function isActive(): bool
-	{
-		return $this->isActive;
-	}
-
-	public function setIsActive(bool $isActive): void
-	{
-		$this->isActive = $isActive;
-	}
+	// public function isActive(): bool
+	// {
+	// 	return $this->isActive;
+	// }
+	//
+	// public function setIsActive(bool $isActive): void
+	// {
+	// 	$this->isActive = $isActive;
+	// }
 
 	public function getPrice(): int
 	{
@@ -152,7 +170,7 @@ class Item extends Entity
 		$this->sortOrder = $sortOrder;
 	}
 
-	public function getTags(): array
+	public function getTags(): ?array
 	{
 		return $this->tags;
 	}

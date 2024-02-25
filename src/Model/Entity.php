@@ -34,8 +34,13 @@ abstract class Entity
 		{
 			return $result;
 		}
+		$excludedFields = $this->getExcludedFields();
 
-		return array_flip(array_diff_key(array_flip($result), array_flip($this->getExcludedFields())));
+		$filteredResult = array_filter($result, function($field) use ($excludedFields) {
+			return !in_array($field, $excludedFields);
+		});
+
+		return $filteredResult;
 	}
 
 	/**
@@ -48,7 +53,8 @@ abstract class Entity
 
 		$stubObject = $reflection->newInstanceWithoutConstructor();
 
-		foreach ($properties as $property) {
+		foreach ($properties as $property)
+		{
 			$property->setValue($stubObject, null);
 		}
 

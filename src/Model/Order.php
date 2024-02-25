@@ -14,11 +14,26 @@ class Order extends Entity
 		private string|null $status,
 		private int|null    $price,
 	)
-	{}
+	{
+	}
+
+	public static function fromFields(array $fields): static
+	{
+		$new = new static(
+			$fields['id'],
+			$fields['userId'],
+			$fields['itemId'],
+			$fields['statusId'],
+			$fields['status'],
+			$fields['price'],
+		);
+
+		return $new;
+	}
 
 	public function getExcludedFields(): array
 	{
-		return ['dateCreate', 'statusId'];
+		return ['statusId'];
 	}
 
 	public function getClassname(): string
@@ -81,15 +96,5 @@ class Order extends Entity
 	public function setPrice(int $price): void
 	{
 		$this->price = $price;
-	}
-
-	public function getDateCreate(): string
-	{
-		return $this->dateCreate;
-	}
-
-	public function setDateCreate(string $dateCreate): void
-	{
-		$this->dateCreate = $dateCreate;
 	}
 }
