@@ -49,9 +49,14 @@ class MiddleWare
 				$finalAttributes[(int)$parentId]['from'] = (int)$from;
 				$finalAttributes[(int)$parentId]['to'] = (int)$to;
 			}
+
+			$sortField = $_GET['sortOrder'] ?? null;
+			[$attributeId, $sortDirection] = explode('-', $sortField);
+			$sortOrder = ['column' => $attributeId, 'direction' => $sortDirection];
 			unset($finalTags[0]);
 			unset($finalAttributes[0]);
-			return $action($route, $finalTags, $finalAttributes);
+
+			return $action($route, $finalTags, $finalAttributes, $sortOrder);
 		};
 	}
 }

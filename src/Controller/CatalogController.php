@@ -38,10 +38,12 @@ class CatalogController extends BaseController
 			{
 				array_pop($items);
 			}
+			$sortAttributes = $this->attributeRepository->getList();
 			$content = TemplateEngine::render('pages/catalogPage', [
 				'items' => $items,
 				'previousPageUri' => $previousPageUri,
 				'nextPageUri' => $nextPageUri,
+				'attributes' => $sortAttributes,
 			]);
 
 		}

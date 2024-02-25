@@ -1,5 +1,5 @@
 .catalog {
-	margin-top: 50px;
+	margin-top: 30px;
 	display: flex;
 	padding: 10px 0 40px;
 	flex-wrap: wrap;
@@ -107,14 +107,13 @@
 }
 
 
-
-
 .pagination {
 	display: flex;
 	justify-content: space-evenly;
 	margin-bottom: 50px;
 	width: 100%;
 }
+
 .pagination a {
 	text-decoration: none;
 	font-size: 50px;
@@ -124,6 +123,6 @@
 .pagination a:hover {
 	text-decoration: none;
 	font-size: 53px;
-	color: #666666;
+	color: #666;
 	transition: .3s;
 }
