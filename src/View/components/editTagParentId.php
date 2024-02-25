@@ -22,10 +22,18 @@ use N_ONE\App\Model\Tag;
 			<?php endforeach; ?>
 		</select>
 	</label>
+	<div class="add-images-section" hidden>
+		<p>Для загрзки логотипа категории</p>
+		<input type="file" name="image[]" accept="image/*" class="choose-file-button" >
+	</div>
 <?php elseif (!$tag->getParentId()): ?>
 	<label hidden for="parentId">
 		<input type="hidden" name="parentId" value="">
 	</label>
+	<div class="add-images-section">
+		<p>Для смены логотипа категории</p>
+		<input type="file" name="image[]" accept="image/*" class="choose-file-button" >
+	</div>
 <?php else: ?>
 	<label for="parentId">
 		parentId:
@@ -41,11 +49,13 @@ use N_ONE\App\Model\Tag;
 	const checkbox = document.getElementById('isParent');
 	const parentIdLabel = document.getElementById('parentId');
 	const parentIdSelect = document.querySelector('select[name="parentId"]');
+	const addImagesSection = document.querySelector('.add-images-section');
 
 	checkbox.addEventListener('change', () => {
 		if (!checkbox.checked)
 		{
 			parentIdLabel.removeAttribute('hidden');
+			addImagesSection.setAttribute('hidden', '');
 			if (parentIdSelect)
 			{
 				parentIdSelect.setAttribute('name', 'parentId');
@@ -54,6 +64,7 @@ use N_ONE\App\Model\Tag;
 		else
 		{
 			parentIdLabel.setAttribute('hidden', '');
+			addImagesSection.removeAttribute('hidden');
 			if (parentIdSelect)
 			{
 				parentIdSelect.removeAttribute('name');
