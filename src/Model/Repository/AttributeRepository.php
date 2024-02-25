@@ -62,7 +62,7 @@ class AttributeRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Attribute|null
+	public function getById(int $id): ?Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
 		$attribute = null;
@@ -96,7 +96,7 @@ class AttributeRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getByTitle(string $title): Attribute|null
+	public function getByTitle(string $title): ?Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
 		$title = mysqli_real_escape_string($connection, $title);

@@ -2,7 +2,6 @@
 
 namespace N_ONE\Core\DbConnector;
 
-use Exception;
 use mysqli;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;

@@ -11,7 +11,7 @@ use N_ONE\Core\Exceptions\DatabaseException;
 
 class UserRepository extends Repository
 {
-	public function getUserFromResult(mysqli_result $result): User|null
+	public function getUserFromResult(mysqli_result $result): ?User
 	{
 		$user = null;
 		while ($row = mysqli_fetch_assoc($result))
@@ -92,7 +92,7 @@ class UserRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getByEmail(string $email): User|null
+	public function getByEmail(string $email): ?User
 	{
 		$connection = $this->dbConnection->getConnection();
 		$escapedEmail = mysqli_real_escape_string($connection, $email);
@@ -117,7 +117,7 @@ class UserRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): User|null
+	public function getById(int $id): ?User
 	{
 		$connection = $this->dbConnection->getConnection();
 
@@ -142,7 +142,7 @@ class UserRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getByNumber(string $phone): User|null
+	public function getByNumber(string $phone): ?User
 	{
 		$connection = $this->dbConnection->getConnection();
 		$phone = mysqli_real_escape_string($connection, $phone);

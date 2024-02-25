@@ -5,9 +5,9 @@ namespace N_ONE\App\Model;
 class Attribute extends Entity
 {
 	public function __construct(
-		protected int|null  $id,
-		private string|null $title,
-		private float|null  $value,
+		protected ?int  $id,
+		private ?string $title,
+		private ?float  $value,
 	)
 	{
 	}

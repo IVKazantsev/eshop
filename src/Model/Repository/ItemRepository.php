@@ -28,7 +28,7 @@ class ItemRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Item|null
+	public function getById(int $id): ?Item
 	{
 		$connection = $this->dbConnection->getConnection();
 

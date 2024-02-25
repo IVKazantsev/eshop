@@ -12,7 +12,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class Application
 {
-	private static null|DependencyInjection $di = null;
+	private static ?DependencyInjection $di = null;
 
 	public static function run(): void
 	{

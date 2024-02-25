@@ -7,12 +7,12 @@ namespace N_ONE\App\Model;
 class Order extends Entity
 {
 	public function __construct(
-		protected int|null  $id,
-		private int|null    $userId,
-		private int|null    $itemId,
-		private int|null    $statusId,
-		private string|null $status,
-		private int|null    $price,
+		protected ?int  $id,
+		private ?int    $userId,
+		private ?int    $itemId,
+		private ?int    $statusId,
+		private ?string $status,
+		private ?int    $price,
 	)
 	{
 	}

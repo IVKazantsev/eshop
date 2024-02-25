@@ -67,7 +67,7 @@ class OrderRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Order|null
+	public function getById(int $id): ?Order
 	{
 		$connection = $this->dbConnection->getConnection();
 

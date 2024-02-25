@@ -13,15 +13,15 @@ class Item extends Entity
 	 * @param Attribute[] $attributes
 	 */
 	public function __construct(
-		protected int|null  $id,
-		private string|null $title,
+		protected ?int  $id,
+		private ?string $title,
 
-		private int|null    $price,
-		private string|null $description,
-		private int|null    $sortOrder,
-		private array|null  $tags,
-		private array|null  $attributes,
-		private array|null  $images,
+		private ?int    $price,
+		private ?string $description,
+		private ?int    $sortOrder,
+		private ?array  $tags,
+		private ?array  $attributes,
+		private ?array  $images,
 	)
 	{
 	}

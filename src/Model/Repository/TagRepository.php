@@ -168,7 +168,7 @@ class TagRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getByTitle(string $title): Tag|null
+	public function getByTitle(string $title): ?Tag
 	{
 		$connection = $this->dbConnection->getConnection();
 		$title = mysqli_real_escape_string($connection, $title);

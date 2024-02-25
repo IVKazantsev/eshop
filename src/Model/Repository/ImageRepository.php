@@ -54,7 +54,7 @@ class ImageRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Image|null
+	public function getById(int $id): ?Image
 	{
 		$connection = $this->dbConnection->getConnection();
 
