@@ -89,20 +89,6 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 					</li>
 				<?php endforeach; ?>
 
-				<label>
-					<select name="select">
-						<?php foreach ($attributes as $attribute): ?>
-							<option value="<?=$attribute->getId()?>-ASC">
-								по возрастанию <?=$attribute->getTitle()?>
-							</option>
-							<option value="<?=$attribute->getId()?>-DESC">
-								по убыванию <?=$attribute->getTitle()?>
-							</option>
-						<?php endforeach; ?>
-						<option value="PRICE-ASC">по возрастанию цены</option>
-						<option value="PRICE-DESK">по убыванию цены</option>
-					</select>
-				</label>
 
 			</ul>
 			<button id="collect-data-btn">Фильтровать</button>

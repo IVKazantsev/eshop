@@ -151,3 +151,21 @@ function applyStateFromUrl()
 }
 
 document.addEventListener('DOMContentLoaded', applyStateFromUrl);
+const sortSelect = document.getElementById('sort');
+console.log(sortSelect);
+sortSelect.addEventListener('change', (event) => {
+	console.log(sortSelect.value);
+	let getRequestString = collectCheckedData();
+	let sortQuery = 'sortOrder=' + sortSelect.value;
+
+	if (!getRequestString)
+	{
+		getRequestString = sortQuery;
+	}
+	else
+	{
+		getRequestString += '&' + sortQuery;
+	}
+	// console.log(window.location.pathname + '?' + getRequestString);
+	window.location.href = '/?' + getRequestString;
+});
