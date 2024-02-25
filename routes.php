@@ -57,7 +57,7 @@ Router::get('/checkOrder', function() {
 
 Router::get('/orderInfo', function() {
 	$di = Application::getDI();
-	$orderNumber = (int)($_GET['number'] ?? null);
+	$orderNumber = (int)($_GET['number'] ?? 0);
 
 	return ($di->getComponent('orderController'))->renderOrderInfoPage($orderNumber);
 });
@@ -69,7 +69,7 @@ Router::get('/admin', MiddleWare::adminMiddleware(function() {
 	return ($di->getComponent('adminController'))->renderDashboard();
 }));
 
-Router::get('/admin/:string', MiddleWare::adminMiddleware(function(Route $route) {
+Router::get('/admin/:entity', MiddleWare::adminMiddleware(function(Route $route) {
 	$di = Application::getDI();
 	$entityToEdit = $route->getVariables()[0];
 	$currentPageNumber = (int)($_GET['page'] ?? null);

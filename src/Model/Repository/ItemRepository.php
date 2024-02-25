@@ -77,12 +77,12 @@ class ItemRepository extends Repository
 		$currentLimit = $numItemsPerPage + 1;
 		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
 		$isActive = $filter['isActive'] ?? 1;
-		$title = $filter['title'] ?? null;
+		$fulltext = $filter['title, description'] ?? null;
 		$tags = $filter['tags'] ?? null;
 		$attributes = $filter['attributes'] ?? null;
 		$sortOrder = $filter['sortOrder'] ?? null;
 
-		$whereQueryBlock = $this->getWhereQueryBlock($tags, $title, $attributes, $isActive, $sortOrder, $connection);
+		$whereQueryBlock = $this->getWhereQueryBlock($tags, $fulltext, $attributes, $isActive, $sortOrder, $connection);
 
 		$result = mysqli_query(
 			$connection,
@@ -109,7 +109,7 @@ class ItemRepository extends Repository
 
 	private function getWhereQueryBlock(
 		?array  $tags,
-		?string $title,
+		?string $fulltext,
 		?array  $attributes,
 		?int    $isActive,
 		?array  $sortOrder,
@@ -134,10 +134,11 @@ class ItemRepository extends Repository
 		}
 
 		$conditions[] = "i.IS_ACTIVE = $isActive";
-		if ($title !== null)
+		if ($fulltext !== null)
 		{
-			$itemTitle = mysqli_real_escape_string($connection, $title);
-			$conditions[] = "i.TITLE LIKE '%$itemTitle%'";
+			$itemFulltext = mysqli_real_escape_string($connection, $fulltext);
+			$conditions[] = "MATCH (title,description) AGAINST ('+$itemFulltext*' IN BOOLEAN MODE)";
+			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('+$itemFulltext*' IN BOOLEAN MODE) DESC";
 		}
 
 		foreach ($attributes as $key => $attribute)

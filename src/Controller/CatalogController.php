@@ -17,7 +17,7 @@ class CatalogController extends BaseController
 		{
 			$filter = [
 				'tags' => $tags,
-				'title' => $SearchRequest,
+				'title, description' => $SearchRequest,
 				'pageNumber' => $pageNumber,
 				'attributes' => $attributes,
 				// 'sortOrder' => ['column' => 1, 'direction' => 'ASC']
