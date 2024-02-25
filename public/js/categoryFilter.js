@@ -80,7 +80,6 @@ function collectCheckedData()
 	const tagData = collectTagData();
 	const rangeData = collectRangeFieldData();
 	return [tagData, rangeData].filter(Boolean).join('&');
-	// return getRequestString;
 }
 
 document.getElementById('collect-data-btn').addEventListener('click', function() {
@@ -88,3 +87,67 @@ document.getElementById('collect-data-btn').addEventListener('click', function()
 	// console.log(window.location.pathname + '?' + getRequestString);
 	window.location.href = '/?' + getRequestString;
 });
+
+function applyStateFromUrl()
+{
+	const urlParams = new URLSearchParams(window.location.search);
+	const selectedTagsParam = urlParams.get('selectedTags');
+	const attributesParam = urlParams.get('attributes');
+	if (selectedTagsParam)
+	{
+		const selectedTags = selectedTagsParam.replaceAll('[', '').replaceAll(']', '');
+		let selectedTagsGroups = selectedTags.split(';');
+		let tagsResult = [];
+		selectedTagsGroups.map((value, index) => {
+			let [parentId, childId] = selectedTagsGroups[index].split(':');
+			childId = childId.split(',');
+			tagsResult.push({ parentId: parentId, childId: childId });
+		});
+		if (tagsResult)
+		{
+			tagsResult.forEach((element) => {
+				const dropdown = document.getElementById(`dropdown-content-${element.parentId}`);
+				const dropdownIcon = document.getElementById(`chevron-${element.parentId}`);
+				dropdown.style.display = 'flex';
+				dropdownIcon.classList.remove('chevron-up');
+				dropdownIcon.classList.add('chevron-down');
+
+				element.childId.forEach((childId) => {
+					const checkbox = document.querySelector(`input[type="checkbox"][value="${childId}"]`);
+					checkbox.checked = true;
+				});
+			});
+		}
+	}
+
+	if (attributesParam)
+	{
+		const attributes = attributesParam.replaceAll('[', '').replaceAll(']', '');
+		let selectedAttributesGroups = attributes.split(';');
+		let attributesResult = [];
+		selectedAttributesGroups.map((value, index) => {
+			let [parentId, values] = selectedAttributesGroups[index].split('=');
+			let [fromValue, toValue] = values.split('-');
+			attributesResult.push({ parentId: parentId, fromValue: fromValue, toValue: toValue });
+		});
+		if (attributesResult)
+		{
+			attributesResult.forEach((element) => {
+				const fromInput = document.getElementById(`input1_${element.parentId}`);
+				const toInput = document.getElementById(`input2_${element.parentId}`);
+				const dropdown = document.getElementById(`dropdown-content-${element.parentId}`);
+				const dropdownIcon = document.getElementById(`chevron-${element.parentId}`);
+				if (fromInput)
+				{
+					dropdown.style.display = 'flex';
+					fromInput.value = element.fromValue;
+					toInput.value = element.toValue;
+					dropdownIcon.classList.remove('chevron-up');
+					dropdownIcon.classList.add('chevron-down');
+				}
+			});
+		}
+	}
+}
+
+document.addEventListener('DOMContentLoaded', applyStateFromUrl);

@@ -40,7 +40,9 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 					<?php foreach ($tags[""] as $parentTag): ?>
 						<li class="tag-item dropdown" onclick="toggleDropdown(event)">
 							<a class="dropdown-toggle" href="#" data-parent-id="<?= $parentTag->getId() ?>">
-								<?= $parentTag->getTitle() ?> <i class="Chevron dropdown-icon chevron-up "></i>
+								<?= $parentTag->getTitle() ?>
+								<i class="Chevron dropdown-icon chevron-up " id="chevron-<?= $parentTag->getId(
+								) ?>"></i>
 							</a>
 							<div class="dropdown-content" id="dropdown-content-<?= $parentTag->getId() ?>">
 								<?php foreach ($tags[$parentTag->getId()] as $childTag): ?>
@@ -61,7 +63,8 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 				<?php foreach ($attributes as $attribute): ?>
 					<li class="tag-item dropdown" onclick="toggleDropdown(event)">
 						<a class="dropdown-toggle" href="#" data-parent-id="<?= $attribute->getId() ?>">
-							<?= $attribute->getTitle() ?> <i class="Chevron dropdown-icon chevron-up "></i>
+							<?= $attribute->getTitle() ?>
+							<i class="Chevron dropdown-icon chevron-up " id="chevron-<?= $attribute->getId() ?>"></i>
 						</a>
 						<div class="dropdown-content attributes" id="dropdown-content-<?= $attribute->getId() ?>">
 							<input
