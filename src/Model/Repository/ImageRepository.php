@@ -184,5 +184,4 @@ class ImageRepository extends Repository
 
 		return true;
 	}
-
 }

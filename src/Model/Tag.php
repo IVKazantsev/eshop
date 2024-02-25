@@ -14,11 +14,9 @@ class Tag extends Entity
 
 	public static function fromFields(array $fields): static
 	{
-		$new = new static(
+		return new static(
 			$fields['id'], $fields['title'], $fields['parentId'],
 		);
-
-		return $new;
 	}
 
 	public function getParentId(): ?int
@@ -57,5 +55,4 @@ class Tag extends Entity
 	{
 		$this->title = $title;
 	}
-
 }

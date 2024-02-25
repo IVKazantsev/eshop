@@ -53,8 +53,7 @@ class MiddleWare
 			$sortField = $_GET['sortOrder'] ?? null;
 			[$attributeId, $sortDirection] = explode('-', $sortField);
 			$sortOrder = ['column' => $attributeId, 'direction' => $sortDirection];
-			unset($finalTags[0]);
-			unset($finalAttributes[0]);
+			unset($finalTags[0], $finalAttributes[0]);
 
 			return $action($route, $finalTags, $finalAttributes, $sortOrder);
 		};

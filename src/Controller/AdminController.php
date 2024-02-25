@@ -194,7 +194,8 @@ class AdminController extends BaseController
 				{
 					$statuses = $this->orderRepository->getStatuses();
 					$specificFields = [
-						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]),
+						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]
+						),
 						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['order' => $entity]),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
@@ -576,10 +577,7 @@ class AdminController extends BaseController
 			Router::redirect("/admin/$currentPage/success");
 		}
 
-		$successDeletePage = TemplateEngine::render('pages/successPage', [
-				'isActive' => $isActive,
-			]
-		);
+		$successDeletePage = TemplateEngine::render('pages/successPage', ['isActive' => $isActive]);
 
 		return $this->renderAdminView($successDeletePage);
 	}
@@ -656,10 +654,11 @@ class AdminController extends BaseController
 	{
 		ValidationService::validateImage($files);
 
-		$targetDir = ROOT . '/public' . Configurator::option('ICONS_PATH'); // директория для сохранения загруженных файлов
+		$targetDir = ROOT . '/public' . Configurator::option(
+				'ICONS_PATH'
+			); // директория для сохранения загруженных файлов
 		$fileExtension = pathinfo($files['image']['name'][0], PATHINFO_EXTENSION);
 		$finalPath = $targetDir . $itemId . ".$fileExtension";
-
 
 		if (file_exists($finalPath))// Проверяем, существует ли файл
 		{
@@ -670,10 +669,8 @@ class AdminController extends BaseController
 		{
 			return true;// Файл успешно сохранен
 		}
-		else
-		{
-			return false;// Произошла ошибка при сохранении файла
-		}
+
+		return false;// Произошла ошибка при сохранении файла
 	}
 
 	public function renderAddPage(string $entityToAdd): string
@@ -806,7 +803,6 @@ class AdminController extends BaseController
 
 	public function addEntity(string $entityToAdd): string
 	{
-
 		$fields = $_POST;
 		$fields['id'] = null;
 		// foreach ($fields as $field)
@@ -915,5 +911,4 @@ class AdminController extends BaseController
 
 		return $this->renderSuccessAddPage();
 	}
-
 }

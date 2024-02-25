@@ -10,7 +10,6 @@ use N_ONE\Core\Exceptions\DatabaseException;
 
 class OrderRepository extends Repository
 {
-
 	/**
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
@@ -44,12 +43,7 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'],
-				$row['USER_ID'],
-				$row['ITEM_ID'],
-				$row['STATUS_ID'],
-				$row['TITLE'],
-				$row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
 
 			$orders[] = $order;
@@ -89,12 +83,7 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'],
-				$row['USER_ID'],
-				$row['ITEM_ID'],
-				$row['STATUS_ID'],
-				$row['TITLE'],
-				$row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
 		}
 
@@ -189,12 +178,7 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'],
-				$row['USER_ID'],
-				$row['ITEM_ID'],
-				$row['STATUS_ID'],
-				$row['TITLE'],
-				$row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
 			);
 		}
 

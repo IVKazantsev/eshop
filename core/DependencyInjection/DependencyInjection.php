@@ -11,6 +11,7 @@ use ReflectionClass;
 class DependencyInjection
 {
 	private array $components = [];
+
 	private string $configurationPath;
 
 	public function __construct(string $configurationPath)
@@ -21,7 +22,6 @@ class DependencyInjection
 
 	private function configure(): void
 	{
-
 		if (!file_exists($this->configurationPath))
 		{
 			return;
@@ -87,6 +87,5 @@ class DependencyInjection
 		}
 
 		throw new InvalidArgumentException("There is no service $serviceName");
-
 	}
 }

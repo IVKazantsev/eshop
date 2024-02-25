@@ -44,9 +44,7 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attributes[] = new Attribute(
-				$row['ID'],
-				$row['TITLE'],
-				null
+				$row['ID'], $row['TITLE'], null
 			);
 		}
 
@@ -83,9 +81,7 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attribute = new Attribute(
-				$row['ID'],
-				$row['TITLE'],
-				null
+				$row['ID'], $row['TITLE'], null
 			);
 		}
 
@@ -158,9 +154,7 @@ class AttributeRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attributes[$row['ITEM_ID']][] = new Attribute(
-				$row['ID'],
-				$row['TITLE'],
-				$row['VALUE'],
+				$row['ID'], $row['TITLE'], $row['VALUE'],
 			);
 		}
 

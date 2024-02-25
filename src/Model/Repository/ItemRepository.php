@@ -13,7 +13,6 @@ use N_ONE\Core\Exceptions\DatabaseException;
 
 class ItemRepository extends Repository
 {
-
 	public function __construct(
 		DbConnector                          $dbConnection,
 		private readonly TagRepository       $tagRepository,
@@ -343,7 +342,6 @@ class ItemRepository extends Repository
 	 */
 	private function addItemTags(bool|mysqli $connection, int $itemId, array $tags): void
 	{
-
 		$itemTags = "";
 		foreach ($tags as $tag)
 		{
@@ -435,5 +433,4 @@ class ItemRepository extends Repository
 
 		return $items;
 	}
-
 }

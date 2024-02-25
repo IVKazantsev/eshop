@@ -11,7 +11,12 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class CatalogController extends BaseController
 {
-	public function renderCatalog(?int $pageNumber, ?string $SearchRequest, ?array $tags, ?array $attributes, ?array $sortOrder): string
+	public function renderCatalog(?int    $pageNumber,
+								  ?string $SearchRequest,
+								  ?array  $tags,
+								  ?array  $attributes,
+								  ?array  $sortOrder
+	): string
 	{
 		try
 		{
@@ -20,7 +25,7 @@ class CatalogController extends BaseController
 				'title, description' => $SearchRequest,
 				'pageNumber' => $pageNumber,
 				'attributes' => $attributes,
-				'sortOrder' => $sortOrder
+				'sortOrder' => $sortOrder,
 			];
 
 			$items = $this->itemRepository->getList($filter);
@@ -45,7 +50,6 @@ class CatalogController extends BaseController
 				'nextPageUri' => $nextPageUri,
 				'attributes' => $sortAttributes,
 			]);
-
 		}
 		catch (DatabaseException)
 		{

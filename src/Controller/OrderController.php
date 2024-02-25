@@ -14,7 +14,6 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class OrderController extends BaseController
 {
-
 	public function renderOrderPage(string $itemId): string
 	{
 		try

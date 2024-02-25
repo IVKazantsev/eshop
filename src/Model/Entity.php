@@ -74,16 +74,15 @@ abstract class Entity
 		{
 			return $type->getName();
 		}
-		elseif ($type instanceof ReflectionUnionType)
+
+		if ($type instanceof ReflectionUnionType)
 		{
 			// Обработка объединенных типов, например, "int|null"
 			return implode('|', array_map(function($type) {
 				return $type->getName();
 			}, $type->getTypes()));
 		}
-		else
-		{
-			return null; // Тип не определен или неизвестен
-		}
+
+		return null; // Тип не определен или неизвестен
 	}
 }

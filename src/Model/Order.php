@@ -19,7 +19,7 @@ class Order extends Entity
 
 	public static function fromFields(array $fields): static
 	{
-		$new = new static(
+		return new static(
 			$fields['id'],
 			$fields['userId'],
 			$fields['itemId'],
@@ -27,8 +27,6 @@ class Order extends Entity
 			$fields['status'],
 			$fields['price'],
 		);
-
-		return $new;
 	}
 
 	public function getExcludedFields(): array

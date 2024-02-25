@@ -78,6 +78,5 @@ class ImageController extends BaseController
 	// 	return 'files has been uploaded';
 	// }
 	//TODO переименовку main image и изменение записи в бд
-
 }
 

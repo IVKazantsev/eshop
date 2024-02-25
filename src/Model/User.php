@@ -20,7 +20,7 @@ class User extends Entity
 
 	public static function fromFields(array $fields): static
 	{
-		$new = new static(
+		return new static(
 			$fields['id'],
 			$fields['roleId'],
 			$fields['name'],
@@ -29,8 +29,6 @@ class User extends Entity
 			$fields['number'],
 			$fields['address'],
 		);
-
-		return $new;
 	}
 
 	public function getExcludedFields(): array
@@ -109,5 +107,4 @@ class User extends Entity
 	{
 		$this->address = $address;
 	}
-
 }

@@ -19,11 +19,13 @@ class DetailController extends BaseController
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 			$content = TemplateEngine::renderPublicError(':(', 'Что-то пошло не так');
+
 			return $this->renderPublicView($content);
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -31,6 +33,7 @@ class DetailController extends BaseController
 		{
 			http_response_code(404);
 			$content = TemplateEngine::renderPublicError(404, "Page not found");
+
 			return $this->renderPublicView($content);
 		}
 

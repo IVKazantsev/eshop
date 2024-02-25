@@ -50,7 +50,7 @@ class TagService
 			$intVars = explode(",", $parts[1]);
 
 			// Проверка корректности формата для целых чисел
-			if (count($intVars) == 2)
+			if (count($intVars) === 2)
 			{
 				// Извлечение целых чисел
 				$intVar1 = (int)$intVars[0];
@@ -59,16 +59,12 @@ class TagService
 				// Возвращение массива значений
 				return [$idVar, $intVar1, $intVar2];
 			}
-			else
-			{
-				// Некорректный формат для целых чисел
-				return [null, null, null];
-			}
-		}
-		else
-		{
-			// Некорректный формат для диапазона
+
+			// Некорректный формат для целых чисел
 			return [null, null, null];
 		}
+
+		// Некорректный формат для диапазона
+		return [null, null, null];
 	}
 }

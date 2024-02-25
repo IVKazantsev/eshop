@@ -36,6 +36,5 @@ class RepositoryFactory
 		$array = explode("\\", $className);
 
 		return lcfirst(end($array));
-
 	}
 }

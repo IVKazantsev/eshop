@@ -15,7 +15,6 @@ class Item extends Entity
 	public function __construct(
 		protected ?int  $id,
 		private ?string $title,
-
 		private ?int    $price,
 		private ?string $description,
 		private ?int    $sortOrder,
@@ -28,7 +27,7 @@ class Item extends Entity
 
 	public static function fromFields(array $fields): static
 	{
-		$new = new static(
+		return new static(
 			$fields['id'],
 			$fields['title'],
 			$fields['price'],
@@ -38,8 +37,6 @@ class Item extends Entity
 			$fields['attributes'],
 			$fields['images']
 		);
-
-		return $new;
 	}
 
 	public function getAttributes(): ?array
@@ -104,8 +101,6 @@ class Item extends Entity
 
 	public function getField(string $fieldName)
 	{
-		$fw = $this->$fieldName;
-
 		return $this->$fieldName;
 	}
 

@@ -47,10 +47,11 @@ class ValidationService
 	public static function validateEntryField(string $field): string
 	{
 		$validatedField = trim($field);
-		if($validatedField === "")
+		if ($validatedField === "")
 		{
 			throw new ValidateException("No field should be empty");
 		}
+
 		return $validatedField;
 	}
 
@@ -58,7 +59,6 @@ class ValidationService
 	{
 		return htmlspecialchars($value, ENT_QUOTES);
 	}
-
 
 	/**
 	 * @throws ValidateException
@@ -68,7 +68,7 @@ class ValidationService
 	{
 		$allowed_formats = ["jpg", "png", "jpeg", "svg"];
 		$allowed_mime_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg'];// Разрешенные форматы файлов
-		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]),PATHINFO_EXTENSION));
+		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]), PATHINFO_EXTENSION));
 
 		if ($imageFileType === 'svg')
 		{
@@ -114,14 +114,11 @@ class ValidationService
 	public static function validateMetaTag($html, $tagName)
 	{
 		$pattern = '/<meta\s+name="' . preg_quote($tagName, '/') . '"\s+content="([^"]*)"\s*\/?>/i';
-		if (preg_match($pattern, $html, $matches)) {
-
+		if (preg_match($pattern, $html, $matches))
+		{
 			return $matches[1];
 		}
-		else
-		{
 
-			return null;
-		}
+		return null;
 	}
 }

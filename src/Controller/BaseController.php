@@ -18,16 +18,16 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 abstract class BaseController
 {
 	public function __construct(
-
-		protected TagRepository     $tagRepository,
-		protected ImageRepository   $imageRepository,
-		protected ItemRepository    $itemRepository,
-		protected UserRepository    $userRepository,
-		protected OrderRepository   $orderRepository,
+		protected TagRepository       $tagRepository,
+		protected ImageRepository     $imageRepository,
+		protected ItemRepository      $itemRepository,
+		protected UserRepository      $userRepository,
+		protected OrderRepository     $orderRepository,
 		protected AttributeRepository $attributeRepository,
-		protected RepositoryFactory $repositoryFactory
+		protected RepositoryFactory   $repositoryFactory
 	)
-	{}
+	{
+	}
 
 	public function renderPublicView($content, string $currentSearchRequest = null): string
 	{
@@ -39,17 +39,19 @@ abstract class BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+
 			return TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
-			'attributes' =>$attributes,
+			'attributes' => $attributes,
 			'content' => $content,
 			'currentSearchRequest' => $currentSearchRequest,
 		]);
@@ -69,11 +71,13 @@ abstract class BaseController
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
+
 			return TemplateEngine::renderAdminError(';(', "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
+
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -82,5 +86,4 @@ abstract class BaseController
 			'content' => $content,
 		]);
 	}
-
 }

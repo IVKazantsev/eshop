@@ -8,51 +8,11 @@ use N_ONE\Core\Configurator\Configurator;
 class Logger
 {
 	private static string $rootLogDir;
-	public static function setRootLogDir(string $rootLogDir):void
+
+	public static function setRootLogDir(string $rootLogDir): void
 	{
 		self::$rootLogDir = $rootLogDir;
 	}
-	// /**
-	//  * @throws Exception
-	//  */
-	// public function __construct(
-	// 	private string $logPath
-	// )
-	// {
-	// 	if (empty(self::$rootLogDir))
-	// 	{
-	// 		throw new Exception('Must set root log dir');
-	// 	}
-	//
-	// 	$path = $this->getValidPath($this->logPath);
-	// 	$this->logPath = self::$rootLogDir . '/' . $path;
-	//
-	// 	if (!file_exists($this->logPath))
-	// 	{
-	// 		$pathInArray = explode('/', $path);
-	// 		$currentPathString = self::$rootLogDir . '/';
-	// 		foreach ($pathInArray as $key => $value)
-	// 		{
-	// 			$currentPathString .= $value . '/';
-	// 			if($key === count($pathInArray) - 1)
-	// 			{
-	// 				continue;
-	// 			}
-	//
-	// 			if (!mkdir($currentPathString) && !is_dir($currentPathString))
-	// 			{
-	// 				throw new \RuntimeException(sprintf('Directory "%s" was not created', $currentPathString));
-	// 			}
-	// 		}
-	// 	}
-	// }
-	//
-	// private function getValidPath(string $path): string
-	// {
-	// 	$path = str_replace('\\', '/', $path);
-	//
-	// 	return trim($path, " /");
-	// }
 
 	public static function log(string $level, string $message, string $callPlace): void
 	{

@@ -9,6 +9,7 @@ use N_ONE\Core\Exceptions\DatabaseException;
 class DbConnector
 {
 	static private ?DbConnector $instance = null;
+
 	private static mysqli|false $connection;
 
 	/**
@@ -36,6 +37,7 @@ class DbConnector
 
 		return static::$instance = new self();
 	}
+
 	/**
 	 * @throws DatabaseException
 	 */

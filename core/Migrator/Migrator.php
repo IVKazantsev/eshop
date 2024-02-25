@@ -11,8 +11,11 @@ use N_ONE\Core\Exceptions\FileException;
 class Migrator
 {
 	static private ?Migrator $instance = null;
+
 	private DbConnector $dbConnector;
+
 	private string $migrationTable;
+
 	private string $migrationPath;
 
 	private function __construct(DbConnector $dbConnector)
@@ -23,7 +26,8 @@ class Migrator
 	}
 
 	private function __clone()
-	{}
+	{
+	}
 
 	public static function getInstance(): Migrator
 	{
@@ -31,8 +35,8 @@ class Migrator
 		{
 			return static::$instance;
 		}
-
 		$dbConnector = DbConnector::getInstance();
+
 		return static::$instance = new self($dbConnector);
 	}
 
@@ -42,7 +46,6 @@ class Migrator
 	 */
 	public function migrate(): void
 	{
-
 		// 1. смотрим последнюю применённую миграцию, которая записана в таблице migration (если таблица пуста то делаем все миграции)
 		$lastMigration = $this->getLastMigration();
 
@@ -102,6 +105,7 @@ class Migrator
 			{
 				$migrations[] = basename($file);
 			}
+
 			return $migrations;
 		}
 
@@ -132,7 +136,6 @@ class Migrator
 	 */
 	private function executeMigration($migration): void
 	{
-
 		// Получение соединения с базой данных
 		$connection = $this->dbConnector->getConnection();
 
@@ -179,7 +182,6 @@ class Migrator
 			throw new DatabaseException(mysqli_error($connection));
 		}
 	}
-
 }
 
 

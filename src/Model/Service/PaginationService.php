@@ -25,6 +25,7 @@ class PaginationService
 
 			return $currentUrl . "?page=$newPageNumber";
 		}
+
 		return null;
 	}
 

@@ -7,8 +7,8 @@ use N_ONE\Core\Exceptions\NotFoundException;
 
 class Router
 {
-
 	public static array $routes = [];
+
 	static private ?Router $instance = null;
 
 	private function __construct()
@@ -76,5 +76,4 @@ class Router
 		$host = Configurator::option('HOST_NAME');
 		header("Location: http://$host$url");
 	}
-
 }

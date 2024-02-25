@@ -36,14 +36,13 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID']
 			);
 		}
 
 		return $tags;
 	}
+
 	/**
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
@@ -76,9 +75,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID']
 			);
 		}
 
@@ -115,9 +112,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				null,
+				$row['ID'], $row['TITLE'], null,
 			);
 		}
 
@@ -155,9 +150,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID']
 			);
 		}
 
@@ -190,9 +183,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID']
+				$row['ID'], $row['TITLE'], $row['PARENT_ID']
 			);
 		}
 
@@ -200,7 +191,6 @@ class TagRepository extends Repository
 	}
 
 	/**
-	 * @
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
@@ -229,9 +219,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$row['PARENT_ID'],
+				$row['ID'], $row['TITLE'], $row['PARENT_ID'],
 			);
 		}
 
@@ -366,9 +354,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				$id,
+				$row['ID'], $row['TITLE'], $id,
 			);
 		}
 
@@ -464,9 +450,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'],
-				$row['TITLE'],
-				null,
+				$row['ID'], $row['TITLE'], null,
 			);
 		}
 
