@@ -49,7 +49,14 @@ class Router
 		if (str_ends_with($path, '/') && strlen($path) !== 1)
 		{
 			$path = rtrim($path, "/");
-			self::redirect($path . '?' . $getParams);
+			if($getParams !== null)
+			{
+				self::redirect($path . '?' . $getParams);
+			}
+			else
+			{
+				self::redirect($path);
+			}
 		}
 		foreach (self::$routes as $route)
 		{

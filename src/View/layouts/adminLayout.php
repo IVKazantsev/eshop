@@ -33,10 +33,10 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 
 		<a href="/logout"><img src=<?= $iconsPath . 'close.png' ?> alt=""></a>
 	</header>
+	<div id="dashboard-logo">
+		<img src="<?= $iconsPath . 'logo.svg' ?>" alt="">
+	</div>
 	<div class="sidebar">
-		<div id="dashboard-logo">
-			<img src="<?= $iconsPath . 'logo.svg' ?>" alt="">
-		</div>
 		<div class="tags-container">
 			<div class="tags-title">Просмотр сущностей</div>
 			<ul class="tags">

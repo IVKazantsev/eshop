@@ -120,6 +120,7 @@ class ItemRepository extends Repository
 		if ($fulltext !== null && $fulltext !== "")
 		{
 			$itemFulltext = mysqli_real_escape_string($connection, $fulltext);
+			$itemFulltext = preg_replace('/\s+/', ' ', $itemFulltext);
 			$preparedString = implode(' ', array_map(function($word) {
 				return "+" . $word . "*";
 			}, explode(' ', $itemFulltext)));
