@@ -9,7 +9,7 @@ use N_ONE\Core\Configurator\Configurator;
  * @var array $additionalSections
  * @var array $specificFields
  */
-$fields = array_flip($entity->getFieldNames(true));
+$fields = array_flip($entity->getFieldNames());
 foreach ($fields as $field => $value)
 {
 	if (

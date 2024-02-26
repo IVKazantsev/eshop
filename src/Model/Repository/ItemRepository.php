@@ -225,7 +225,6 @@ class ItemRepository extends Repository
 			INSERT INTO N_ONE_ITEMS (TITLE,  PRICE, DESCRIPTION, SORT_ORDER) 
 			VALUES (
 				'$title',
-				
 				$price,
 				'$description',
 				$sortOrder
@@ -370,12 +369,9 @@ class ItemRepository extends Repository
 	private function addItemAttributes(bool|mysqli $connection, int $itemId, array $attributes): void
 	{
 		$itemAttributes = "";
+		$attributes = array_filter($attributes, function($value) {return is_numeric($value);});
 		foreach ($attributes as $attributeId => $attribute)
 		{
-			if (!trim($attribute))
-			{
-				$attribute = 'null';
-			}
 			$itemAttributes .= '(' . $itemId . ', ' . $attributeId . ', ' . $attribute . '),';
 		}
 		$itemAttributes = substr($itemAttributes, 0, -1);

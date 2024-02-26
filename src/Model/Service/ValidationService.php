@@ -44,8 +44,21 @@ class ValidationService
 	/**
 	 * @throws ValidateException
 	 */
-	public static function validateEntryField(string $field): string
+	public static function validateEntryField(array|string|null $field): array|string
 	{
+		if (is_array($field))
+		{
+			$result = [];
+			foreach ($field as $key => $value)
+			{
+				$validatedField = trim($value);
+				if ($validatedField !== "")
+				{
+					$result[$key] = $validatedField;
+				}
+			}
+			return $result;
+		}
 		$validatedField = trim($field);
 		if ($validatedField === "")
 		{
@@ -111,7 +124,7 @@ class ValidationService
 		return true;
 	}
 
-	public static function validateMetaTag($html, $tagName)
+	public static function validateMetaTag($html, $tagName): ?string
 	{
 		$pattern = '/<meta\s+name="' . preg_quote($tagName, '/') . '"\s+content="([^"]*)"\s*\/?>/i';
 		if (preg_match($pattern, $html, $matches))

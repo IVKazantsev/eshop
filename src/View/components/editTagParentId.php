@@ -27,9 +27,6 @@ use N_ONE\App\Model\Tag;
 		<input type="file" name="image[]" accept="image/*" class="choose-file-button" >
 	</div>
 <?php elseif (!$tag->getParentId()): ?>
-	<label hidden for="parentId">
-		<input type="hidden" name="parentId" value="">
-	</label>
 	<div class="add-images-section">
 		<p>Для смены логотипа категории</p>
 		<input type="file" name="image[]" accept="image/*" class="choose-file-button" >
