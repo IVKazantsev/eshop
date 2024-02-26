@@ -43,7 +43,7 @@ header {
 	overflow-y: auto;
 	width: 100%;
 	/*margin: 0 auto;*/
-	/*margin-top: 60px;*/
+	margin-top: 70px;
 }
 
 .tags-container::-webkit-scrollbar {
@@ -88,8 +88,9 @@ header {
 	grid-row: 1;
 	grid-column: 2;
 	max-height: 90%;
-	width: 100%;
+	width: 75%;
 	margin: 0 auto;
+	margin-top: 20px;
 }
 
 #dashboard-logo img {
@@ -468,7 +469,7 @@ label input[type="text"] {
 	right: 30%;
 	justify-content: space-evenly;
 	margin-bottom: 50px;
-/*!* width: 100%;*/
+	/*!* width: 100%;*/
 }
 
 .pagination a {
@@ -479,21 +480,21 @@ label input[type="text"] {
 }
 
 .pagination a:hover {
-text-decoration: none;
-font-size: 53px;
-color: #666;
-transition: .3s;
+	text-decoration: none;
+	font-size: 53px;
+	color: #666;
+	transition: .3s;
 }
 
-.show-delete, .show-active{
-position: fixed;
-right: 10%;
-display: block;
-text-align: center;
-border-radius: 10px;
-background-color: #ee753b;
-text-decoration: none;
-color: white;
-width: 100px;
-padding: 6px;
+.show-delete, .show-active {
+	position: fixed;
+	right: 10%;
+	display: block;
+	text-align: center;
+	border-radius: 10px;
+	background-color: #ee753b;
+	text-decoration: none;
+	color: white;
+	width: 100px;
+	padding: 6px;
 }
