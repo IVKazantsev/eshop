@@ -30,7 +30,7 @@
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
-	z-index: 1000;
+	z-index: 2;
 	left: 10px;
 	background-color: transparent; /* Убираем фон */
 	border: none; /* Убираем границу */
@@ -43,7 +43,7 @@
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
-	z-index: 1000;
+	z-index: 2;
 	right: 10px;
 	background-color: transparent; /* Убираем фон */
 	border: none; /* Убираем границу */
@@ -145,4 +145,53 @@ hr {
 	margin-top: 25px;
 	cursor: pointer;
 	line-height: 1.8;
+}
+
+@media (max-width: 750px) {
+	main {
+		display: flex;
+		justify-content: center;
+	}
+
+	.item-info {
+		grid-template-columns: 1fr;
+		grid-template-rows: 300px fit-content(40%) 1fr;
+		width: 90%;
+	}
+
+	.detail-price {
+		margin-top: 20px;
+		margin-left: 0;
+	}
+
+	.item-description h2 {
+		font-size: 24px;
+	}
+
+	.item-description-text {
+		font-size: 20px;
+		text-align: justify;
+	}
+
+	.detail-item {
+		margin-top: 10px;
+		font-size: 20px;
+	}
+
+	.item-image-gallery {
+		grid-row: 1;
+	}
+
+	.item-specs {
+		margin: 0;
+		grid-row: 2;
+	}
+
+	.item-title-details {
+		font-size: 28px;
+	}
+
+	.item-description {
+		grid-row: 3;
+	}
 }

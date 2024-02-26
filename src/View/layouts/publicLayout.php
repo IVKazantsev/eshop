@@ -32,9 +32,16 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 </head>
 <body>
 <div class="container">
+	<div class="menu-button-container">
+		<button class="burger-button">
+			<span></span>
+		</button>
+	</div>
 	<div class="sidebar">
 		<div class="tags-container">
-			<div class="tags-title">КАТЕГОРИИ</div>
+			<a id="phone-home-link" href="/">Домой</a>
+			<a id="phone-check-order-link" href="/checkOrder">Проверить заказ</a>
+			<div class="tags-title">Категории</div>
 			<ul class="tags">
 				<?php if (isset($tags[""])): ?>
 					<?php foreach ($tags[""] as $parentTag): ?>
@@ -98,20 +105,18 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 		<a class="logo-link" href="/"><img src="<?= $iconsPath . 'logo.svg' ?>" alt=""></a>
 	</div>
 	<header>
-		<div class="bar">
-			<div class="searchbar">
-				<form id="search-form" method="get">
-					<div class="search-icon-and-input">
-						<input name="searchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe(
-							$currentSearchRequest ?? ''
-						) ?>" id="search-input" required>
-					</div>
-					<button type="submit" class="btn" id="search-button">
-						<img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
-				</form>
-				<a class="check-order-link" href="/checkOrder">Проверить заказ</a>
-			</div>
+		<div class="searchbar">
+			<form id="search-form" method="get">
+				<div class="search-icon-and-input">
+					<input name="searchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe(
+						$currentSearchRequest ?? ''
+					) ?>" id="search-input" required>
+				</div>
+				<button type="submit" class="btn" id="search-button">
+					<img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>
+			</form>
 		</div>
+		<a class="check-order-link" href="/checkOrder">Проверить заказ</a>
 	</header>
 
 	<main>
@@ -127,5 +132,6 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 	const tagsData = <?php echo json_encode($tags); ?>;
 </script>
 <script src="/js/categoryFilter.js"></script>
+<script src="/js/burger.js"></script>
 </body>
 </html>

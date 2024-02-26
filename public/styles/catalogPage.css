@@ -128,3 +128,52 @@
 	color: #666;
 	transition: .3s;
 }
+
+@media (max-width: 900px) {
+	.catalog {
+		justify-content: center;
+	}
+}
+
+@media (max-width: 550px) {
+	.catalog {
+		justify-content: center;
+		gap: 0;
+	}
+
+	.item-card {
+		width: 100%;
+		margin-bottom: 0;
+		border-radius: 0;
+	}
+
+	.item-card-link {
+		align-items: center;
+	}
+
+	.item-details {
+		display: none;
+	}
+
+	.item-image {
+		border-radius: 7px;
+		width: 280px;
+		margin-top: 10px;
+	}
+
+	.item-name {
+		font-size: 15px;
+	}
+
+	.description {
+		border-radius: 0;
+		background-color: white;
+		text-align: center;
+	}
+
+	.price {
+		font-size: 16px;
+		text-wrap: nowrap;
+		margin-left: 0;
+	}
+}

@@ -8,6 +8,10 @@
 "user-info-container order-info-container";
 }
 
+.user-info-container {
+	padding-right: 5%;
+}
+
 .order-title {
 	font-size: 32px;
 	font-weight: bold;
@@ -28,6 +32,7 @@
 
 .order-table {
 	border: none;
+	width: 100%;
 }
 
 .order-th {
@@ -52,7 +57,7 @@
 }
 
 .order-td {
-	padding: 20px;
+	padding: 20px 0 20px 20px;
 	width: 50%;
 }
 
@@ -123,4 +128,30 @@
 	border: none;
 	outline: none;
 	border-top: 1px solid #bdbdbd;
+}
+
+@media (max-width: 1150px) {
+	.order-item-info {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		padding: 0;
+	}
+}
+
+@media (max-width: 750px) {
+	#order-form {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.user-info-container {
+		padding-right: 0;
+	}
+
+	.user-info-item_input {
+		width: calc(100% - 20px);
+	}
 }

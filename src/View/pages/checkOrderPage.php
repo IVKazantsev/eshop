@@ -8,3 +8,5 @@
 		</div>
 	</form>
 </div>
+
+<meta name="css" content="/styles/checkOrder.css">

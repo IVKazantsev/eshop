@@ -19,7 +19,7 @@ $priceString = $item->getPrice();
 		<th class="order-td order-info-td order-th gray-cell order-id">
 			Заказ
 		</th>
-		<th class="order-td order-info-td order-th gray-cell">
+		<th class="order-td order-info-td order-th gray-cell order-item-info">
 			Товар
 		</th>
 		<th class="order-td order-info-td order-th gray-cell">
@@ -32,7 +32,7 @@ $priceString = $item->getPrice();
 	</thead>
 	<tbody>
 	<tr class="order-info-tr">
-		<td class="order-td order-info-td order-item-info order-id">
+		<td class="order-td order-info-td order-id">
 			<?= $order->getId() ?>
 		</td>
 		<td class="order-td order-info-td order-item-info">
@@ -59,3 +59,4 @@ $priceString = $item->getPrice();
 	</tr>
 	</tbody>
 </table>
+<meta name="css" content="<?= '/styles/orderInfo.css' ?>">
