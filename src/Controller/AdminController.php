@@ -340,82 +340,27 @@ class AdminController extends BaseController
 	{
 		$fields = $_POST;
 		$fields['id'] = $entityId;
-		// foreach ($fields as $field)
-		// {
-		// 	$fields[$field] = ValidationService::validateEntryField($field);
-		// }
-		$className = 'N_ONE\App\Model\\' . ucfirst(
-				substr_replace($entityType, '', -1)
-			); //Костыль на приведение названия типа сущности из URL к названию класса
-		if ($entityType === 'tags')
-		{
-			foreach ($fields as $field => $value)
-			{
-				if ($field === 'parentId' && $value === '')
-				{
-					$fields[$field] = null;
-					continue;
-				}
-				$fields[$field] = ValidationService::validateEntryField($value);
-			}
-
-			if ($_FILES['image']['size'] !== 0 && !$fields['parentId'])
-			{
-				$this->addTagLogo($_FILES, $entityId);
-			}
-
-		}
-		if ($entityType === 'attributes')
-		{
-			$fields['value'] = null;
-			// foreach ($fields as $field => $value)
-			// {
-			// $fields[$field] = ValidationService::validateEntryField($value);
-			// }
-		}
-		if ($entityType === 'items')
-		{
-			// $tags = [];
-			if (array_key_exists('imageIds', $fields))
-			{
-				$this->deleteImages($fields['imageIds']);
-			}
-			if ($_FILES['image']['size'][0] !== 0)
-			{
-				$this->addBaseImages($_FILES, $entityId);
-			}
-
-			foreach ($fields as $field => $value)
-			{
-				if (
-					($field === 'isActive' || $field === 'sortOrder')
-					&& $value === '0'
-				) //РАЗРЕШЕНИЕ НА ИСПОЛЬЗОВАНИЕ FALSY ДЛЯ УКАЗАННЫХ ПОЛЕЙ
-				{
-					continue;
-				}
-			}
-
-			$fields['images'] = [];
-			if (!isset($fields["tags"]))
-			{
-				array_splice($fields, array_search("attributes", array_keys($fields)), 0, ["tags" => []]);
-			}
-			$fields["attributes"] = array_filter($fields["attributes"], function($value) {
-				return is_numeric($value);
-			});
-		}
-		// foreach ($fields as $field => $value)
-		// {
-		// 	if (!trim($value))
-		// 	{
-		// 		return TemplateEngine::renderAdminError(404, "Missing required field: {$field}");
-		// 	}
-		// 	$fields[$field] = trim($value);
-		// }
+		//Костыль на приведение названия типа сущности из URL к названию класса
+		$className = 'N_ONE\App\Model\\' . ucfirst(substr_replace($entityType, '', -1));
 
 		try
 		{
+			foreach ($fields as $field => $value)
+			{
+				$fields[$field] = ValidationService::validateEntryField($value);
+			}
+			if (array_key_exists('imageIds', $fields) && $entityType === 'items')
+			{
+				$this->deleteImages($fields['imageIds']);
+			}
+			if ($_FILES['image']['size'][0] !== 0 && $entityType === 'items')
+			{
+				$this->addBaseImages($_FILES, $entityId);
+			}
+			if ($_FILES['image']['size'][0] !== 0 && !$fields['parentId'] && $entityType === 'tags')
+			{
+				$this->addTagLogo($_FILES, $entityId);
+			}
 			$repository = $this->repositoryFactory->createRepository($entityType);
 			$entity = $className::fromFields($fields);
 			$repository->update($entity);
@@ -804,77 +749,14 @@ class AdminController extends BaseController
 	public function addEntity(string $entityToAdd): string
 	{
 		$fields = $_POST;
-		$fields['id'] = null;
-		// foreach ($fields as $field)
-		// {
-		// 	$fields[$field] = ValidationService::validateEntryField($field);
-		// }
-		$className = 'N_ONE\App\Model\\' . ucfirst(
-				$entityToAdd
-			); //Костыль на приведение названия типа сущности из URL к названию класса
+		$className = 'N_ONE\App\Model\\' . ucfirst($entityToAdd); //Костыль на приведение названия типа сущности из URL к названию класса
 
 		try
-		{
-			if ($entityToAdd === 'tag')
-			{
-				// foreach ($fields as $field => $value)
-				// {
-				// 	$fields[$field] = ValidationService::validateEntryField($value);
-				// }
-				if (!array_key_exists('parentId', $fields))
-				{
-					$fields['parentId'] = null;
-				}
-
-			}
-		}
-		catch (ValidateException $e)
-		{
-			return TemplateEngine::renderAdminError(400, $e->getMessage());
-		}
-		if ($entityToAdd === 'attribute')
-		{
-			$fields['value'] = null;
-			// foreach ($fields as $field => $value)
-			// {
-			// $fields[$field] = ValidationService::validateEntryField($value);
-			// }
-		}
-		if ($entityToAdd === 'item')
 		{
 			foreach ($fields as $field => $value)
 			{
-				if (
-					($field === 'isActive' || $field === 'sortOrder')
-					&& $value === '0'
-				) //РАЗРЕШЕНИЕ НА ИСПОЛЬЗОВАНИЕ FALSY ДЛЯ УКАЗАННЫХ ПОЛЕЙ
-				{
-					continue;
-				}
+				$fields[$field] = ValidationService::validateEntryField($value);
 			}
-
-			$fields['images'] = [];
-
-			if (!isset($fields["tags"]))
-			{
-				array_splice($fields, array_search("attributes", array_keys($fields)), 0, ["tags" => []]);
-			}
-			$fields["attributes"] = array_filter($fields["attributes"], function($value) {
-				return is_numeric($value);
-			});
-
-		}
-		// foreach ($fields as $field => $value)
-		// {
-		// 	if (!trim($value))
-		// 	{
-		// 		return TemplateEngine::renderAdminError(404, "Missing required field: {$field}");
-		// 	}
-		// 	$fields[$field] = trim($value);
-		// }
-
-		try
-		{
 			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
 			$item = $className::fromFields($fields);
 			$itemId = $repository->add($item);
@@ -882,7 +764,7 @@ class AdminController extends BaseController
 			{
 				$this->addBaseImages($_FILES, $itemId);
 			}
-			if ($entityToAdd === 'tag' && $_FILES['image']['size'] !== 0 && !$fields['parentId'])
+			if ($entityToAdd === 'tag' && $_FILES['image']['size'][0] !== 0 && !$fields['parentId'])
 			{
 				$this->addTagLogo($_FILES, $itemId);
 			}
