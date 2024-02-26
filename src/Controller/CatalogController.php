@@ -12,7 +12,7 @@ use N_ONE\Core\TemplateEngine\TemplateEngine;
 class CatalogController extends BaseController
 {
 	public function renderCatalog(?int    $pageNumber,
-								  ?string $SearchRequest,
+								  ?string $searchRequest,
 								  ?array  $tags,
 								  ?array  $attributes,
 								  ?array  $sortOrder
@@ -20,9 +20,11 @@ class CatalogController extends BaseController
 	{
 		try
 		{
+			$searchRequest = trim($searchRequest);
+			$searchRequest = preg_replace('/\s+/', ' ', $searchRequest);
 			$filter = [
 				'tags' => $tags,
-				'title, description' => $SearchRequest,
+				'title, description' => $searchRequest,
 				'pageNumber' => $pageNumber,
 				'attributes' => $attributes,
 				'sortOrder' => $sortOrder,
@@ -36,7 +38,7 @@ class CatalogController extends BaseController
 			{
 				$content = TemplateEngine::renderPublicError(':(', 'Товары не найдены');
 
-				return $this->renderPublicView($content, $SearchRequest);
+				return $this->renderPublicView($content, $searchRequest);
 			}
 
 			if (count($items) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
@@ -63,6 +65,6 @@ class CatalogController extends BaseController
 			return TemplateEngine::renderFinalError();
 		}
 
-		return $this->renderPublicView($content, $SearchRequest);
+		return $this->renderPublicView($content, $searchRequest);
 	}
 }
