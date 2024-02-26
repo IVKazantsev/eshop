@@ -81,7 +81,7 @@ class ItemRepository extends Repository
 		$attributes = $filter['attributes'] ?? null;
 		$sortOrder = $filter['sortOrder'] ?? null;
 
-		$whereQueryBlock = $this->getWhereQueryBlock($tags, $fulltext, $attributes, $isActive, $sortOrder, $connection);
+		$whereQueryBlock = $this->getConditionQueryBlock($tags, $fulltext, $attributes, $isActive, $sortOrder, $connection);
 
 		$result = mysqli_query(
 			$connection,
@@ -106,7 +106,7 @@ class ItemRepository extends Repository
 		return $this->fillItemsWithOtherEntities($items);
 	}
 
-	private function getWhereQueryBlock(
+	private function getConditionQueryBlock(
 		?array  $tags,
 		?string $fulltext,
 		?array  $attributes,
@@ -117,6 +117,13 @@ class ItemRepository extends Repository
 	{
 		$whereQueryBlock = "";
 		$conditions = [];
+		if ($fulltext !== null && $fulltext !== "")
+		{
+			$itemFulltext = mysqli_real_escape_string($connection, $fulltext);
+			$conditions[] = "MATCH (title,description) AGAINST ('$itemFulltext*' IN BOOLEAN MODE)";
+			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('$itemFulltext*' IN BOOLEAN MODE) DESC";
+		}
+
 		if ($sortOrder === null)
 		{
 			$sortQueryBlock = "ORDER BY i.SORT_ORDER DESC";
@@ -133,12 +140,6 @@ class ItemRepository extends Repository
 		}
 
 		$conditions[] = "i.IS_ACTIVE = $isActive";
-		if ($fulltext !== null && $fulltext !== "")
-		{
-			$itemFulltext = mysqli_real_escape_string($connection, $fulltext);
-			$conditions[] = "MATCH (title,description) AGAINST ('$itemFulltext*' IN BOOLEAN MODE)";
-			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('$itemFulltext*' IN BOOLEAN MODE) DESC";
-		}
 
 		foreach ($attributes as $key => $attribute)
 		{
