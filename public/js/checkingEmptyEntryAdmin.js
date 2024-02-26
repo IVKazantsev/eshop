@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			const value = input.value.trim();
 			if (value === '') {
 				input.setCustomValidity('Поле не может быть пустым');
-			} else if (!/^\d+$/.test(value)) {
-				input.setCustomValidity('Поле должно содержать только числа');
+			} else if (!/^\d+$/.test(value) || parseInt(value) > 1000000000) {
+				input.setCustomValidity('не коректное число');
 			} else {
 				input.setCustomValidity('');
 			}
@@ -36,9 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (value === '') {
 				isValid = false;
 				input.setCustomValidity('Поле не может быть пустым');
-			} else if (!/^\d+$/.test(value)) {
+			} else if (!/^\d+$/.test(value) || parseInt(value) > 1000000000) {
 				isValid = false;
-				input.setCustomValidity('Поле должно содержать только числа');
+				input.setCustomValidity('не коректное число');
 			}
 		});
 
