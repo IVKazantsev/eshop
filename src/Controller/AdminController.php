@@ -6,9 +6,7 @@ use Exception;
 use InvalidArgumentException;
 use mysqli_sql_exception;
 use N_ONE\App\Model\Attribute;
-use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Item;
-use N_ONE\App\Model\Service\ImageService;
 use N_ONE\App\Model\Service\PaginationService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -283,8 +281,8 @@ class AdminController extends BaseController
 			];
 
 			$entities = $repository->getList($filter);
-			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
-			$nextPageUri = PaginationService::getNextPageUri(count($entities), $pageNumber);
+			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber, $_SERVER['REQUEST_URI']);
+			$nextPageUri = PaginationService::getNextPageUri(count($entities), $pageNumber, $_SERVER['REQUEST_URI']);
 
 			if (empty($entities))
 			{
@@ -351,15 +349,15 @@ class AdminController extends BaseController
 			}
 			if (array_key_exists('imageIds', $fields) && $entityType === 'items')
 			{
-				$this->deleteImages($fields['imageIds']);
+				$this->imageService->deleteImages($fields['imageIds']);
 			}
 			if ($_FILES['image']['size'][0] !== 0 && $entityType === 'items')
 			{
-				$this->addBaseImages($_FILES, $entityId);
+				$this->imageService->addBaseImages($_FILES, $entityId);
 			}
 			if ($_FILES['image']['size'][0] !== 0 && !$fields['parentId'] && $entityType === 'tags')
 			{
-				$this->addTagLogo($_FILES, $entityId);
+				$this->imageService->addTagLogo($_FILES, $entityId);
 			}
 			$repository = $this->repositoryFactory->createRepository($entityType);
 			$entity = $className::fromFields($fields);
@@ -527,97 +525,6 @@ class AdminController extends BaseController
 		return $this->renderAdminView($successDeletePage);
 	}
 
-	/**
-	 * @throws DatabaseException
-	 */
-	public function deleteImages(array $imagesIds): bool
-	{
-		$imagesIds = array_map('intval', $imagesIds);
-		$images = $this->imageRepository->getList($imagesIds, true);
-		$path = ROOT . '/public' . Configurator::option('IMAGES_PATH');
-
-		$this->imageRepository->permanentDeleteByIds($imagesIds);
-
-		foreach ($imagesIds as $id)
-		{
-			unlink($path . $images[$id][0]->getPath());
-		}
-
-		return true;
-	}
-
-	/**
-	 * @throws ValidateException
-	 * @throws DatabaseException
-	 */
-	public function addBaseImages($files, $itemId): bool
-	{
-		$fileCount = count($files['image']['name']);
-
-		for ($i = 0; $i < $fileCount; $i++)
-		{
-			ValidationService::validateImage($files, $i);
-
-			$targetDir = ROOT
-				. '/public'
-				. Configurator::option('IMAGES_PATH')
-				. "$itemId/"; // директория для сохранения загруженных файлов
-			$targetFile = $targetDir . basename($files["image"]["name"][$i]);
-			$file_extension = pathinfo($files['image']['name'][$i], PATHINFO_EXTENSION);
-
-			ImageService::createDirIfNotExist($targetDir);
-
-			$fullSizeImageId = $this->imageRepository->add(
-				new Image(null, $itemId, false, 1, 1200, 900, $file_extension)
-			);
-			$previewImageId = $this->imageRepository->add(
-				new Image(null, $itemId, false, 2, 640, 480, $file_extension)
-			);
-
-			$finalFullSizePath = $targetDir . $fullSizeImageId . "_1200_900_fullsize_base" . ".$file_extension";
-			$finalPreviewPath = $targetDir . $previewImageId . '_640_480_preview_base' . ".$file_extension";
-			// Попытка загрузки файла на сервер
-			if (move_uploaded_file($files["image"]["tmp_name"][$i], $targetFile))
-			{
-				ImageService::resizeImage($targetFile, $finalFullSizePath, 1200, 900);
-				ImageService::resizeImage($targetFile, $finalPreviewPath, 640, 480);
-				unlink($targetFile);
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * @throws ValidateException
-	 */
-	public function addTagLogo($files, int $itemId): bool
-	{
-		ValidationService::validateImage($files);
-
-		$targetDir = ROOT . '/public' . Configurator::option(
-				'ICONS_PATH'
-			); // директория для сохранения загруженных файлов
-		$fileExtension = pathinfo($files['image']['name'][0], PATHINFO_EXTENSION);
-		$finalPath = $targetDir . $itemId . ".$fileExtension";
-
-		if (file_exists($finalPath))// Проверяем, существует ли файл
-		{
-			unlink($finalPath); // Удаляем существующий файл
-		}
-
-		if (move_uploaded_file($files["image"]["tmp_name"][0], $finalPath))// Сохраняем файл по указанному пути
-		{
-			return true;// Файл успешно сохранен
-		}
-
-		return false;// Произошла ошибка при сохранении файла
-	}
-
 	public function renderAddPage(string $entityToAdd): string
 	{
 		try
@@ -762,17 +669,17 @@ class AdminController extends BaseController
 			$itemId = $repository->add($item);
 			if ($entityToAdd === 'item' && $_FILES['image']['size'][0] !== 0)
 			{
-				$this->addBaseImages($_FILES, $itemId);
+				$this->imageService->addBaseImages($_FILES, $itemId);
 			}
 			if ($entityToAdd === 'tag' && $_FILES['image']['size'][0] !== 0 && !$fields['parentId'])
 			{
-				$this->addTagLogo($_FILES, $itemId);
+				$this->imageService->addTagLogo($_FILES, $itemId);
 			}
 		}
 		catch (InvalidArgumentException)
 		{
 			// Не получилось создать репозиторий. Логирование не нужно
-			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (ValidateException $e)
 		{

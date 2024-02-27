@@ -13,7 +13,7 @@ abstract class Repository
 	{
 	}
 
-	abstract public function getById(int $id): ?Entity;
+	abstract public function getById(int $id, bool $isPublic = false): ?Entity;
 
 	abstract public function add(Entity $entity): int;
 

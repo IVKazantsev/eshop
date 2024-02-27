@@ -6,11 +6,10 @@ use N_ONE\Core\Configurator\Configurator;
 
 class PaginationService
 {
-	public static function getNextPageUri(int $numCars, ?int $pageNumber): ?string
+	public static function getNextPageUri(int $numCars, ?int $pageNumber, string $currentUrl): ?string
 	{
 		if ($numCars === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
 		{
-			$currentUrl = $_SERVER['REQUEST_URI'];
 			$newPageNumber = ($pageNumber + 1);
 
 			if (mb_strpos($currentUrl, "page"))
@@ -29,14 +28,13 @@ class PaginationService
 		return null;
 	}
 
-	public static function getPreviousPageUri(?int $pageNumber): ?string
+	public static function getPreviousPageUri(?int $pageNumber, string $currentUrl): ?string
 	{
 		if ($pageNumber === null || $pageNumber <= 0)
 		{
 			return null;
 		}
 
-		$currentUrl = $_SERVER['REQUEST_URI'];
 		$newPageNumber = ($pageNumber - 1);
 
 		if (mb_strpos($currentUrl, "page"))

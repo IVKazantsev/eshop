@@ -27,17 +27,23 @@ class ItemRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): ?Item
+	public function getById(int $id, bool $isPublic = false): ?Item
 	{
 		$connection = $this->dbConnection->getConnection();
-
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
 		$result = mysqli_query(
 			$connection,
 			"
 			SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 			FROM N_ONE_ITEMS i
-			WHERE i.ID = $id;
-			"
+			WHERE i.ID = $id and i.IS_ACTIVE in $isActive;"
 		);
 
 		if (!$result)
@@ -128,7 +134,7 @@ class ItemRepository extends Repository
 			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('$preparedFulltext' IN BOOLEAN MODE) DESC";
 		}
 
-		if ($sortOrder === null)
+		if ($sortOrder['direction'] === null)
 		{
 			$sortQueryBlock = "ORDER BY i.SORT_ORDER DESC";
 		}
@@ -173,7 +179,6 @@ class ItemRepository extends Repository
 
 		$whereQueryBlock .= " WHERE " . implode(' AND ', $conditions);
 		$whereQueryBlock .= " $sortQueryBlock" ?? "";
-
 		return $whereQueryBlock;
 	}
 

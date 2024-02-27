@@ -54,16 +54,15 @@ class ImageRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): ?Image
+	public function getById(int $id, bool $isPublic = false): ?Image
 	{
 		$connection = $this->dbConnection->getConnection();
-
 		$result = mysqli_query(
 			$connection,
 			"
-			SELECT id, item_id, height, width, is_main, type, extension
+			SELECT ID, item_id, height, width, is_main, type, extension
 			FROM N_ONE_IMAGES 
-			WHERE id = $id;
+			WHERE ID = $id;
 			"
 		);
 

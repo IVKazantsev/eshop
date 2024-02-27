@@ -6,6 +6,7 @@
 
 use N_ONE\App\Model\Item;
 use N_ONE\App\Model\Service\PriceFormatService;
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
@@ -33,7 +34,7 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 
 
 	<div class="item-specs">
-		<h1 class="item-title-details"><?= $item->getTitle() ?></h1>
+		<h1 class="item-title-details"><?= ValidationService::safe($item->getTitle()) ?></h1>
 		<hr>
 		<?= TemplateEngine::render('components/tags', [
 			'tags' => $item->getTags(),
@@ -45,7 +46,7 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 	<div class="item-description">
 		<h2>ОПИСАНИЕ  МАШИНЫ</h2>
 		<hr>
-		<p class="item-description-text"> <?= $item->getDescription() ?>
+		<p class="item-description-text"> <?= ValidationService::safe($item->getDescription()) ?>
 		</p>
 	</div>
 </div>

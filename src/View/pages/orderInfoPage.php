@@ -6,6 +6,7 @@
 
 use N_ONE\App\Model\Item;
 use N_ONE\App\Model\Order;
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\Core\Configurator\Configurator;
 
 $imagesPath = Configurator::option('IMAGES_PATH');
@@ -39,22 +40,26 @@ $priceString = $item->getPrice();
 			<div class="order-img-container">
 
 				<?php if ($item->getImages()): ?>
-					<img class="order-image" src="<?= $imagesPath . $item->getPreviewImage()->getPath(
-					) ?>" alt="image of an item">
+					<img
+						class="order-image"
+						src="<?= $imagesPath . $item->getPreviewImage()->getPath() ?>"
+						alt="image of an item">
 				<?php else: ?>
-					<img class="order-image" src="<?= $imagesPath
-					. 'plugs/imageNotFound.jpeg' ?>" alt="image of an item">
+					<img
+						class="order-image"
+						src="<?= $imagesPath . 'plugs/imageNotFound.jpeg' ?>"
+						alt="image of an item">
 				<?php endif; ?>
 			</div>
 			<div class="order-item-title">
-				<?= $item->getTitle() ?>
+				<?= ValidationService::safe($item->getTitle()) ?>
 			</div>
 		</td>
 		<td class="order-td order-info-td order-info-price">
 			<?= $priceString ?> ₽
 		</td>
 		<td class="order-td order-info-td order-status">
-			<?= $order->getStatus() ?>
+			<?= ValidationService::safe($order->getStatus()) ?>
 		</td>
 	</tr>
 	</tbody>

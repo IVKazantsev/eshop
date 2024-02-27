@@ -6,6 +6,7 @@
 
 use N_ONE\App\Model\Item;
 use N_ONE\App\Model\Service\PriceFormatService;
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
@@ -23,7 +24,7 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 			<img class="item-image" src="<?= $imagesPath . 'plugs/imageNotFound.jpeg' ?>" alt="image of an item">
 		<?php endif;?>
 		<div class="description">
-			<h2 class="item-name"><?= $item->getTitle() ?></h2>
+			<h2 class="item-name"><?= ValidationService::safe($item->getTitle()) ?></h2>
 			<?= TemplateEngine::render('components/tags', [
 				'tags' => $item->getTags(),
 				'attributes' => $item->getAttributes(),

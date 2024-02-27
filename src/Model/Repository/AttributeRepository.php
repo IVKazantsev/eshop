@@ -60,17 +60,24 @@ class AttributeRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): ?Attribute
+	public function getById(int $id, bool $isPublic = false): ?Attribute
 	{
 		$connection = $this->dbConnection->getConnection();
 		$attribute = null;
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
 		$result = mysqli_query(
 			$connection,
 			"
 			SELECT a.ID, a.TITLE 
 			FROM N_ONE_ATTRIBUTES a 
-			WHERE a.ID = $id;
-			"
+			WHERE a.ID = $id and a.IS_ACTIVE in $isActive;"
 		);
 
 		if (!$result)

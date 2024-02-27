@@ -18,7 +18,7 @@ class OrderController extends BaseController
 	{
 		try
 		{
-			$item = $this->itemRepository->getById($itemId);
+			$item = $this->itemRepository->getById($itemId, 21);
 
 			$content = TemplateEngine::render('pages/orderPage', [
 				'item' => $item,
@@ -48,7 +48,7 @@ class OrderController extends BaseController
 			$email = ValidationService::validateEmailAddress($_POST['email']);
 			$address = ValidationService::validateEntryField($_POST['address']);
 
-			$item = $this->itemRepository->getById($itemId);
+			$item = $this->itemRepository->getById($itemId, true);
 			if (!$item)
 			{
 				throw new NotFoundException("There is no item with id $itemId");
@@ -135,7 +135,7 @@ class OrderController extends BaseController
 		}
 		try
 		{
-			$order = $this->orderRepository->getById($orderNumber);
+			$order = $this->orderRepository->getById($orderNumber, true);
 			if ($order === null)
 			{
 				$content = TemplateEngine::renderPublicError(";(", "Заказ не найден");
@@ -143,7 +143,7 @@ class OrderController extends BaseController
 				return $this->renderPublicView($content);
 			}
 
-			$item = $this->itemRepository->getById($order->getItemId());
+			$item = $this->itemRepository->getById($order->getItemId(), true);
 		}
 		catch (DatabaseException)
 		{

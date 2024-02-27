@@ -1,6 +1,7 @@
 <?php
 
 use N_ONE\App\Model\Entity;
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\Core\Configurator\Configurator;
 
 /**
@@ -36,7 +37,7 @@ foreach ($fields as $field => $value)
 						class="specific-input-<?= $entity->getPropertyType($field) ?>"
 						id="<?= $field ?>"
 						type="text" name="<?= $field ?>"
-						value="<?= $entity->getField($field) ?>"
+						value="<?= ValidationService::safe($entity->getField($field)) ?>"
 					>
 				</label>
 			<?php endforeach; ?>
@@ -46,14 +47,13 @@ foreach ($fields as $field => $value)
 			<?php endforeach; ?>
 
 		</div>
-		<?php if (!empty($additionalSections))
-		{
-			foreach ($additionalSections as $section)
-			{
-				echo $section;
-			}
-		}
-		?>
+		<?php if (!empty($additionalSections)):?>
+			<?php foreach ($additionalSections as $section): ?>
+				<?= $section ?>
+			<?php endforeach; ?>
+		<?php endif;?>
+
+
 		<div class="form-section">
 			<button class="submit-button" type="submit">Сохранить</button>
 		</div>

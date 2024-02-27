@@ -128,17 +128,24 @@ class TagRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Tag
+	public function getById(int $id, bool $isPublic = false): Tag
 	{
 		$connection = $this->dbConnection->getConnection();
-
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
 		$result = mysqli_query(
 			$connection,
 			"
 			SELECT t.ID, t.TITLE, t.PARENT_ID
 			FROM N_ONE_TAGS t
 			LEFT JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
-			WHERE t.ID = $id ;"
+			WHERE t.ID = $id and t.IS_ACTIVE in $isActive;"
 		);
 
 		if (!$result)

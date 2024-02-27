@@ -6,6 +6,7 @@
  */
 
 use N_ONE\App\Model\Entity;
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\Core\Configurator\Configurator;
 
 if (isset($entities['dummy']))
@@ -21,7 +22,10 @@ else
 }
 $iconsPath = Configurator::option('ICONS_PATH');
 ?>
+
+<?php if ($isActive === 1): ?>
 	<a href="<?= "/admin/{$classname}/add" ?>" class="add-entity-button">Добавить</a>
+<?php endif;?>
 <?php if (!isset($entities['dummy'])): ?>
 	<table class="admin-table">
 
@@ -35,7 +39,7 @@ $iconsPath = Configurator::option('ICONS_PATH');
 			<tr class="admin-table-content-row">
 
 				<?php foreach ($fieldNames as $fieldName): ?>
-					<td class="<?= $fieldName ?>-field"><?= $entity->getField($fieldName) ?></td>
+					<td class="<?= $fieldName ?>-field"><?= ValidationService::safe($entity->getField($fieldName)) ?></td>
 				<?php endforeach; ?>
 
 				<td class="actions-field">

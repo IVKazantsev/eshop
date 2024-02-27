@@ -31,8 +31,8 @@ class CatalogController extends BaseController
 			];
 
 			$items = $this->itemRepository->getList($filter);
-			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
-			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber);
+			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber, $_SERVER['REQUEST_URI']);
+			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber, $_SERVER['REQUEST_URI']);
 
 			if (empty($items))
 			{

@@ -29,7 +29,7 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 <body>
 <div class="container">
 	<header class="dashboard-header">
-		<p><?= $user->getName() ?></p>
+		<p><?= ValidationService::safe($user->getName()) ?></p>
 
 		<a href="/logout"><img src=<?= $iconsPath . 'close.png' ?> alt=""></a>
 	</header>

@@ -117,17 +117,24 @@ class UserRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): ?User
+	public function getById(int $id, bool $isPublic = false): ?User
 	{
 		$connection = $this->dbConnection->getConnection();
-
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
 		$result = mysqli_query(
 			$connection,
 			"
 			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
 			FROM N_ONE_USERS u
 			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
-			WHERE u.ID = $id ;"
+			WHERE u.ID = $id and u.IS_ACTIVE in $isActive;"
 		);
 
 		if (!$result)

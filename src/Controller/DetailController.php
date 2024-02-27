@@ -13,7 +13,7 @@ class DetailController extends BaseController
 	{
 		try
 		{
-			$item = $this->itemRepository->getById($itemId);
+			$item = $this->itemRepository->getById($itemId, true);
 		}
 		catch (DatabaseException)
 		{

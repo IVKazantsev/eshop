@@ -47,7 +47,7 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 					<?php foreach ($tags[""] as $parentTag): ?>
 						<li class="tag-item dropdown" onclick="toggleDropdown(event)">
 							<a class="dropdown-toggle" href="#" data-parent-id="<?= $parentTag->getId() ?>">
-								<?= $parentTag->getTitle() ?>
+								<?= ValidationService::safe($parentTag->getTitle()) ?>
 								<i class="Chevron dropdown-icon chevron-up " id="chevron-<?= $parentTag->getId(
 								) ?>"></i>
 							</a>
@@ -60,7 +60,7 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 											data-parent-id="<?= $parentTag->getId() ?>"
 											value="<?= $childTag->getId() ?>"
 											id="input-<?= $childTag->getId() ?>">
-										<?= $childTag->getTitle() ?>
+										<?= ValidationService::safe($childTag->getTitle()) ?>
 									</label>
 								<?php endforeach; ?>
 							</div>
@@ -70,7 +70,7 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 				<?php foreach ($attributes as $attribute): ?>
 					<li class="tag-item dropdown" onclick="toggleDropdown(event)">
 						<a class="dropdown-toggle" href="#" data-parent-id="<?= $attribute->getId() ?>">
-							<?= $attribute->getTitle() ?>
+							<?= ValidationService::safe($attribute->getTitle()) ?>
 							<i class="Chevron dropdown-icon chevron-up " id="chevron-<?= $attribute->getId() ?>"></i>
 						</a>
 						<div class="dropdown-content attributes" id="dropdown-content-<?= $attribute->getId() ?>">
@@ -82,7 +82,7 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 								max="999"
 								name=""
 								placeholder="От..."
-								data-attribute-title="<?= $attribute->getTitle() ?>">-&nbsp;
+								data-attribute-title="<?= ValidationService::safe($attribute->getTitle()) ?>">-&nbsp;
 							<input
 								class="range_input"
 								id="input2_<?= $attribute->getId() ?>"
@@ -90,7 +90,7 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 								min="0"
 								max="999"
 								placeholder="До..."
-								data-attribute-title="<?= $attribute->getTitle() ?>">
+								data-attribute-title="<?= ValidationService::safe($attribute->getTitle()) ?>">
 						</div>
 
 					</li>
@@ -108,9 +108,14 @@ $cssFile = isset($content) ? ValidationService::validateMetaTag($content, 'css')
 		<div class="searchbar">
 			<form id="search-form" method="get">
 				<div class="search-icon-and-input">
-					<input name="searchRequest" type="text" placeholder="Поиск" value="<?= ValidationService::safe(
-						$currentSearchRequest ?? ''
-					) ?>" id="search-input" required>
+					<input
+						name="searchRequest"
+						type="text"
+						placeholder="Поиск"
+						value="<?= ValidationService::safe($currentSearchRequest ?? '') ?>"
+						id="search-input"
+						required
+					>
 				</div>
 				<button type="submit" class="btn" id="search-button">
 					<img class="search-icon" src="<?= $iconsPath ?>search.svg" alt="search-icon"/></button>

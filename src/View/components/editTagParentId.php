@@ -4,6 +4,7 @@
  * @var array $parentTags
  */
 
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\Tag;
 
 ?>
@@ -18,7 +19,7 @@ use N_ONE\App\Model\Tag;
 		parentId:
 		<select id="statusSelect" name="parentId">
 			<?php foreach ($parentTags as $parentTag): ?>
-				<option value="<?= $parentTag->getId() ?>"><?= $parentTag->getTitle() ?></option>
+				<option value="<?= $parentTag->getId() ?>"><?= ValidationService::safe($parentTag->getTitle()) ?></option>
 			<?php endforeach; ?>
 		</select>
 	</label>
@@ -36,7 +37,7 @@ use N_ONE\App\Model\Tag;
 		parentId:
 		<select id="statusSelect" name="parentId">
 			<?php foreach ($parentTags as $parentTag): ?>
-				<option value="<?= $parentTag->getId() ?>"><?= $parentTag->getTitle() ?></option>
+				<option value="<?= $parentTag->getId() ?>"><?= ValidationService::safe($parentTag->getTitle()) ?></option>
 			<?php endforeach; ?>
 		</select>
 	</label>

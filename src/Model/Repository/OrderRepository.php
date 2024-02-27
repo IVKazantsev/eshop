@@ -61,17 +61,24 @@ class OrderRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): ?Order
+	public function getById(int $id, bool $isPublic = false): ?Order
 	{
 		$connection = $this->dbConnection->getConnection();
-
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
 		$result = mysqli_query(
 			$connection,
 			"
 			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
 			FROM N_ONE_ORDERS o
 			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-			WHERE o.ID = $id;"
+			WHERE o.ID = $id and o.IS_ACTIVE in $isActive;"
 		);
 
 		if (!$result)

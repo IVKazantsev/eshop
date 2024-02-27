@@ -5,6 +5,8 @@
  * @var array $itemTags
  */
 
+use N_ONE\App\Model\Service\ValidationService;
+
 ?>
 
 <div class="form-section">
@@ -13,7 +15,7 @@
 
 	<?php foreach ($childrenTags as $parentName => $childTag): ?>
 		<div class="tag-group">
-			<p><?= $parentName ?>:</p>
+			<p><?= ValidationService::safe($parentName) ?>:</p>
 
 			<?php foreach ($childTag as $tag): ?>
 				<label for="<?= $tag->getParentId() ?>">
@@ -27,7 +29,7 @@
 						name="tags[<?= $tag->getParentId() ?>]"
 						value="<?= $tag->getId() ?>"
 					>
-					<?= $tag->getTitle() ?>
+					<?=  ValidationService::safe($tag->getTitle()) ?>
 				</label>
 
 			<?php endforeach; ?>

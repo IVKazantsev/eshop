@@ -80,45 +80,39 @@ class ValidationService
 	public static function validateImage($image, int $i = 0): bool
 	{
 		$allowed_formats = ["jpg", "png", "jpeg", "svg"];
-		$allowed_mime_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg'];// Разрешенные форматы файлов
+		$allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];;// Разрешенные форматы файлов
 		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]), PATHINFO_EXTENSION));
+		$fileMimeType = mime_content_type($image["image"]["tmp_name"][$i]);
+		$fileInfo = @getimagesize($image["image"]["tmp_name"][$i]);
 
-		if ($imageFileType === 'svg')
-		{
-			return true;
-		}
 		// Проверка наличия файла
-		if (isset($image["image"]))
+		if (!isset($image["image"]))
 		{
-			if (!getimagesize($image["image"]["tmp_name"][$i]))
-			{
-				throw new FileException("image ");
-			}
+			throw new FileException("image {$image["image"]["tmp_name"][$i]}");
+		}
+
+		if (!in_array($fileMimeType, $allowedMimeTypes))
+		{
+			throw new FileException("image {$image["image"]["tmp_name"][$i]}");
 		}
 
 		// Проверка размера файла
 		if ($image["image"]["size"][$i] > 500000)
 		{
-			throw new ValidateException("image $image");
+			throw new ValidateException("image {$image["image"]["tmp_name"][$i]}");
 		}
+
 
 		if (!in_array($imageFileType, $allowed_formats))
 		{
-			throw new ValidateException("image $image");
+			throw new ValidateException("image {$image["image"]["tmp_name"][$i]}");
 		}
 
-		$file_info = @getimagesize($image["image"]["tmp_name"][$i]);
-		if ($file_info === false)
+
+		if ($fileInfo === false && $imageFileType !== "svg")
 		{
 			// Файл не является изображением
-			throw new ValidateException("image $image");
-		}
-
-		// Проверяем MIME-тип изображения (допустимые MIME-типы можно дополнительно проверять)
-		if (!in_array($file_info['mime'], $allowed_mime_types, true))
-		{
-			// Недопустимый MIME-тип изображения
-			throw new ValidateException("image $image");
+			throw new ValidateException("image {$image["image"]["tmp_name"][$i]}");
 		}
 
 		return true;

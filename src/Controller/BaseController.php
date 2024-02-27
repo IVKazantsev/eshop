@@ -10,6 +10,7 @@ use N_ONE\App\Model\Repository\OrderRepository;
 use N_ONE\App\Model\Repository\RepositoryFactory;
 use N_ONE\App\Model\Repository\TagRepository;
 use N_ONE\App\Model\Repository\UserRepository;
+use N_ONE\App\Model\Service\ImageService;
 use N_ONE\App\Model\Service\TagService;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Log\Logger;
@@ -24,7 +25,8 @@ abstract class BaseController
 		protected UserRepository      $userRepository,
 		protected OrderRepository     $orderRepository,
 		protected AttributeRepository $attributeRepository,
-		protected RepositoryFactory   $repositoryFactory
+		protected RepositoryFactory   $repositoryFactory,
+		protected ImageService        $imageService
 	)
 	{
 	}
@@ -66,7 +68,7 @@ abstract class BaseController
 
 		try
 		{
-			$user = $this->userRepository->getById($_SESSION['user_id']);
+			$user = $this->userRepository->getById($_SESSION['user_id'], true);
 		}
 		catch (DatabaseException)
 		{
