@@ -21,7 +21,7 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 	<div class="item-image-gallery" id="slider">
 		<?php if($item->getImages()):?>
 			<?php foreach ($item->getFullSizeImages() as $image): ?>
-			<div class="slide"><img src="<?= $imagesPath . $image->getPath() ?>" alt="Изображение"></div>
+			<div class="slide"><img src="<?= $imagesPath . $image->getPath() ?>" alt="image of an item"></div>
 		<?php endforeach; ?>
 			<script src="/js/slider.js"></script>
 			<button id="prev">&#10094</button>

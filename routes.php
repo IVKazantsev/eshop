@@ -64,8 +64,9 @@ Router::get('/checkOrder', function() {
 Router::get('/orderInfo', function() {
 	$di = Application::getDI();
 	$orderNumber = (int)($_GET['number'] ?? 0);
+	$phoneNumber = (string)($_GET['phone'] ?? "");
 
-	return ($di->getComponent('orderController'))->renderOrderInfoPage($orderNumber);
+	return ($di->getComponent('orderController'))->renderOrderInfoPage($phoneNumber, $orderNumber);
 });
 
 //роуты с защитой

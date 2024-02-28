@@ -192,9 +192,18 @@ class AdminController extends BaseController
 				{
 					$statuses = $this->orderRepository->getStatuses();
 					$specificFields = [
-						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]
+						'status' => TemplateEngine::render(
+							'components/editOrderStatusField',
+							['statuses' => $statuses]
 						),
-						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['order' => $entity]),
+						'statusId' => TemplateEngine::render(
+							'components/editOrderStatusIdField',
+							['order' => $entity]
+						),
+						'orderNumber' => TemplateEngine::render(
+							'components/editOrderNumberField',
+							['orderNumber' => $entity->getNumber()]
+						),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'entity' => $entity,
@@ -583,7 +592,7 @@ class AdminController extends BaseController
 				}
 				case Tag::class:
 				{
-					$parentTags = $repository->getAllParentTags();
+					$parentTags = $this->tagRepository->getAllParentTags();
 					$specificFields = [
 						'parentId' => TemplateEngine::render('components/editTagParentId', [
 							'tag' => $entity,
@@ -656,7 +665,9 @@ class AdminController extends BaseController
 	public function addEntity(string $entityToAdd): string
 	{
 		$fields = $_POST;
-		$className = 'N_ONE\App\Model\\' . ucfirst($entityToAdd); //Костыль на приведение названия типа сущности из URL к названию класса
+		$className = 'N_ONE\App\Model\\' . ucfirst(
+				$entityToAdd
+			); //Костыль на приведение названия типа сущности из URL к названию класса
 
 		try
 		{

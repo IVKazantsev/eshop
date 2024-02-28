@@ -28,7 +28,7 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE, o.NUMBER
 			FROM N_ONE_ORDERS o
 			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
 			$whereQueryBlock
@@ -43,7 +43,7 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'], $row['NUMBER']
 			);
 
 			$orders[] = $order;
@@ -75,7 +75,7 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE, o.NUMBER
 			FROM N_ONE_ORDERS o
 			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
 			WHERE o.ID = $id and o.IS_ACTIVE in $isActive;"
@@ -90,7 +90,7 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'], $row['NUMBER']
 			);
 		}
 
@@ -135,16 +135,18 @@ class OrderRepository extends Repository
 		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
+		$orderNumber = $entity->getNumber();
 
 		$result = mysqli_query(
 			$connection,
 			"
-			INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
+			INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE, NUMBER) 
 			VALUES (
 				$userId,
 				$itemId,
 				$statusId,
-				$price
+				$price,
+				$orderNumber
 			);"
 		);
 
@@ -154,42 +156,6 @@ class OrderRepository extends Repository
 		}
 
 		return mysqli_insert_id($connection);
-	}
-
-	/**
-	 * @throws DatabaseException
-	 * @throws mysqli_sql_exception
-	 */
-	public function getLastByUserItem(int $userId, int $itemId): ?Order
-	{
-		$connection = $this->dbConnection->getConnection();
-
-		$result = mysqli_query(
-			$connection,
-			"
-			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
-			FROM N_ONE_ORDERS o
-			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-			WHERE o.USER_ID = $userId
-			AND o.ITEM_ID = $itemId
-			ORDER BY o.DATE_CREATE DESC
-			LIMIT 1;"
-		);
-
-		if (!$result)
-		{
-			throw new DatabaseException(mysqli_error($connection));
-		}
-
-		$order = null;
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
-			);
-		}
-
-		return $order;
 	}
 
 	/**
@@ -223,5 +189,45 @@ class OrderRepository extends Repository
 		}
 
 		return true;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
+	 */
+	public function getByNumber(string $number, bool $isPublic = false): ?Order
+	{
+		$connection = $this->dbConnection->getConnection();
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
+		$result = mysqli_query(
+			$connection,
+			"
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE
+			FROM N_ONE_ORDERS o
+			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+			WHERE o.NUMBER = '$number' and o.IS_ACTIVE in $isActive;"
+		);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		$order = null;
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$order = new Order(
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'], $number
+			);
+		}
+
+		return $order;
 	}
 }

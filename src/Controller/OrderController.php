@@ -6,6 +6,7 @@ use mysqli_sql_exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\App\Model\User;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Exceptions\NotFoundException;
 use N_ONE\Core\Exceptions\ValidateException;
@@ -67,13 +68,16 @@ class OrderController extends BaseController
 				$updatedUser->setId($user->getId());
 				$this->userRepository->update($updatedUser);
 			}
-
-			$order = new Order(null, $user->getId(), $itemId, 1, 'обработка', $item->getPrice());
+			$hashAlgo = Configurator::option('ORDER_HASH_ALGO');
+			$hashPrefix = Configurator::option('ORDER_HASH_PREFIX');
+			$userId = $user->getId();
+			$time = time();
+			$orderNumber = hash($hashAlgo, "$hashPrefix $userId $itemId $time");
+			$order = new Order(null, $user->getId(), $itemId, 1, 'обработка', $item->getPrice(), $orderNumber);
 			$this->orderRepository->add($order);
-			$order = $this->orderRepository->getLastByUserItem($user->getId(), $itemId);
 
 			$content = TemplateEngine::render(
-				'pages/processOrder', ['orderNumber' => $order->getId()]
+				'pages/processOrder', ['orderNumber' => $orderNumber]
 			);
 		}
 		catch (ValidateException $e)
@@ -125,17 +129,20 @@ class OrderController extends BaseController
 		return $this->renderPublicView($checkOrderPage);
 	}
 
-	public function renderOrderInfoPage(?int $orderNumber): string
+	public function renderOrderInfoPage(?string $phoneNumber, ?int $orderNumber): string
 	{
-		if (!$orderNumber)
-		{
-			$content = TemplateEngine::renderPublicError(";(", "Заказ не найден");
-
-			return $this->renderPublicView($content);
-		}
 		try
 		{
-			$order = $this->orderRepository->getById($orderNumber, true);
+			$phoneNumber = ValidationService::validatePhoneNumber($phoneNumber);
+			$user = $this->userRepository->getByNumber($phoneNumber);
+			if (!$user || !$orderNumber)
+			{
+				$content = TemplateEngine::renderPublicError(";(", "Заказ не найден");
+
+				return $this->renderPublicView($content);
+			}
+
+			$order = $this->orderRepository->getByNumber($orderNumber, true);
 			if ($order === null)
 			{
 				$content = TemplateEngine::renderPublicError(";(", "Заказ не найден");
@@ -144,24 +151,28 @@ class OrderController extends BaseController
 			}
 
 			$item = $this->itemRepository->getById($order->getItemId(), true);
+
+			$content = TemplateEngine::render('pages/orderInfoPage', [
+				'order' => $order,
+				'item' => $item,
+			]);
+		}
+		catch (ValidateException $e)
+		{
+			$content = TemplateEngine::renderPublicError(400, $e->getMessage());
 		}
 		catch (DatabaseException)
 		{
 			Logger::error("Failed to fetch data from repository", __METHOD__);
 
-			return TemplateEngine::renderPublicError(":(", "Что-то пошло не так");
+			$content = TemplateEngine::renderPublicError(":(", "Что-то пошло не так");
 		}
 		catch (mysqli_sql_exception)
 		{
 			Logger::error("Failed to run query", __METHOD__);
 
-			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
-
-		$content = TemplateEngine::render('pages/orderInfoPage', [
-			'order' => $order,
-			'item' => $item,
-		]);
 
 		return $this->renderPublicView($content);
 	}

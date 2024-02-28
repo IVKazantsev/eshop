@@ -13,6 +13,7 @@ class Order extends Entity
 		private ?int    $statusId,
 		private ?string $status,
 		private ?int    $price,
+		private ?string    $orderNumber,
 	)
 	{
 	}
@@ -26,6 +27,7 @@ class Order extends Entity
 			$fields['statusId'],
 			$fields['status'],
 			$fields['price'],
+			$fields['orderNumber']
 		);
 	}
 
@@ -94,5 +96,10 @@ class Order extends Entity
 	public function setPrice(int $price): void
 	{
 		$this->price = $price;
+	}
+
+	public function getNumber(): string
+	{
+		return $this->orderNumber;
 	}
 }

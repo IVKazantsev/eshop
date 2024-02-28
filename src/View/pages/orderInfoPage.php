@@ -34,7 +34,7 @@ $priceString = $item->getPrice();
 	<tbody>
 	<tr class="order-info-tr">
 		<td class="order-td order-info-td order-id">
-			<?= $order->getId() ?>
+			<?= $order->getNumber() ?>
 		</td>
 		<td class="order-td order-info-td order-item-info">
 			<div class="order-img-container">
