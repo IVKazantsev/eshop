@@ -38,12 +38,12 @@ class TagService
 		return $groupedTags;
 	}
 
-	public static function reformatRangeTag(string $range)
+	public static function reformatRangeTag(string $range): array
 	{
 		$parts = explode(":", $range);
 
 		// Проверка корректности формата
-		if (count($parts) == 2)
+		if (count($parts) === 2)
 		{
 			// Извлечение переменных
 			$idVar = (int)$parts[0];

@@ -21,6 +21,11 @@ class OrderController extends BaseController
 		{
 			$item = $this->itemRepository->getById($itemId, 21);
 
+			if(!$item)
+			{
+				throw new NotFoundException("There is no item with id $itemId");
+			}
+
 			$content = TemplateEngine::render('pages/orderPage', [
 				'item' => $item,
 			]);
@@ -35,6 +40,11 @@ class OrderController extends BaseController
 			Logger::error("Failed to run query", __METHOD__);
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
+		catch (NotFoundException)
+		{
+			$content = TemplateEngine::renderPublicError(404, "Страница не найдена");
+		}
+
 
 		return $this->renderPublicView($content);
 	}

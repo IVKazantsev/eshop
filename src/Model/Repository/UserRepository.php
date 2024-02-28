@@ -180,8 +180,6 @@ class UserRepository extends Repository
 				$row['PHONE_NUMBER'],
 				$row['ADDRESS'],
 			);
-
-			$user->setId($row['ID']);
 		}
 
 		return $user;

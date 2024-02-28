@@ -36,7 +36,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID']
+				$row['ID'], $row['TITLE'], ($row['PARENT_ID'] === '0') ? null : $row['PARENT_ID']
 			);
 		}
 
@@ -75,7 +75,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID']
+				$row['ID'], $row['TITLE'], ($row['PARENT_ID'] === '0') ? null : $row['PARENT_ID']
 			);
 		}
 
@@ -101,7 +101,7 @@ class TagRepository extends Repository
 			"
 			SELECT t.ID, t.TITLE 
 			FROM N_ONE_TAGS t
-			WHERE t.PARENT_ID IS NULL AND t.IS_ACTIVE != 0;"
+			WHERE t.PARENT_ID = 0 AND t.IS_ACTIVE != 0;"
 		);
 
 		if (!$result)
@@ -157,7 +157,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID']
+				$row['ID'], $row['TITLE'], ($row['PARENT_ID'] === '0') ? null : $row['PARENT_ID']
 			);
 		}
 
@@ -190,7 +190,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tag = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID']
+				$row['ID'], $row['TITLE'], ($row['PARENT_ID'] === '0') ? null : $row['PARENT_ID']
 			);
 		}
 
@@ -226,7 +226,7 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[$row['ITEM_ID']][] = new Tag(
-				$row['ID'], $row['TITLE'], $row['PARENT_ID'],
+				$row['ID'], $row['TITLE'], ($row['PARENT_ID'] === '0') ? null : $row['PARENT_ID'],
 			);
 		}
 
@@ -307,7 +307,7 @@ class TagRepository extends Repository
 				UPDATE N_ONE_TAGS 
 				SET 
 				TITLE = '$title',
-				PARENT_ID = null
+				PARENT_ID = 0
 				WHERE ID = $tagId"
 			);
 		}
@@ -445,7 +445,7 @@ class TagRepository extends Repository
 			"
 			SELECT t.ID, t.TITLE 
 			FROM N_ONE_TAGS t
-			WHERE t.PARENT_ID IS NULL;
+			WHERE t.PARENT_ID = 0;
 		"
 		);
 

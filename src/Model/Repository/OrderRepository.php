@@ -146,7 +146,7 @@ class OrderRepository extends Repository
 				$itemId,
 				$statusId,
 				$price,
-				$orderNumber
+				'$orderNumber'
 			);"
 		);
 
