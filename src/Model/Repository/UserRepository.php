@@ -296,9 +296,65 @@ class UserRepository extends Repository
 			WHERE ID = $userId ;"
 			);
 		}
-		//
-		// var_dump();
-		// exit();
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		return true;
+	}
+
+	public function getUserByToken(string $token): int
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+			SELECT ID FROM N_ONE_USERS 
+			WHERE TOKEN = '$token' ;"
+		);
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$userId = $row['ID'];
+		}
+
+		return $userId;
+	}
+
+	public function addToken(int $userId, string $token): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+			UPDATE N_ONE_USERS 
+			SET 
+				TOKEN = '$token'
+			WHERE ID = $userId ;"
+		);
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		return true;
+	}
+
+	public function deleteToken(int $userId): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+			UPDATE N_ONE_USERS 
+			SET 
+				TOKEN = null
+			WHERE ID = $userId ;"
+		);
 		if (!$result)
 		{
 			throw new DatabaseException(mysqli_error($connection));
