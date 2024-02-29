@@ -29,7 +29,11 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 				'tags' => $item->getTags(),
 				'attributes' => $item->getAttributes(),
 			]) ?>
-			<p class="price"><?= $priceString ?> </p>
+			<div class="price">
+				<hr>
+				<p><?= $priceString ?> </p>
+			</div>
+
 		</div>
 	</a>
 </div>

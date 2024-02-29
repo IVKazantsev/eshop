@@ -149,7 +149,7 @@ class UserRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	public function getByNumber(string $phone): ?User
+	public function getByNumber(string $phone): bool|User
 	{
 		$connection = $this->dbConnection->getConnection();
 		$phone = mysqli_real_escape_string($connection, $phone);
@@ -157,7 +157,7 @@ class UserRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS
+			SELECT u.ID, u.NAME, u.ROLE_ID, u.EMAIL, u.PASSWORD, u.PHONE_NUMBER, u.ADDRESS, u.IS_ACTIVE
 			FROM N_ONE_USERS u
 			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 			WHERE u.PHONE_NUMBER = '$phone';"
@@ -171,6 +171,11 @@ class UserRepository extends Repository
 		$user = null;
 		while ($row = mysqli_fetch_assoc($result))
 		{
+			if ($row['IS_ACTIVE'] == 0)
+			{
+
+				return false;
+			}
 			$user = new User(
 				$row['ID'],
 				$row['ROLE_ID'],
@@ -180,6 +185,10 @@ class UserRepository extends Repository
 				$row['PHONE_NUMBER'],
 				$row['ADDRESS'],
 			);
+		}
+		if (!$user)
+		{
+			return true;
 		}
 
 		return $user;

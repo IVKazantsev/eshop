@@ -89,29 +89,29 @@ class ValidationService
 		// Проверка наличия файла
 		if (!isset($image["image"]))
 		{
-			throw new FileException("image {$image["image"]["tmp_name"][$i]}");
+			throw new ValidateException("incorrect image");
 		}
 
 		if (!in_array($fileMimeType, $allowedMimeTypes))
 		{
-			throw new FileException("image {$image["image"]["tmp_name"][$i]}");
+			throw new ValidateException("incorrect image");
 		}
 
 		// Проверка размера файла
 		if ($image["image"]["size"][$i] > 500000)
 		{
-			throw new ValidateException("image {$image["image"]["tmp_name"][$i]}");
+			throw new ValidateException("incorrect image");
 		}
 
 		if (!in_array($imageFileType, $allowed_formats))
 		{
-			throw new ValidateException("image {$image["image"]["tmp_name"][$i]}");
+			throw new ValidateException("incorrect image");
 		}
 
 		if ($fileInfo === false && $imageFileType !== "svg")
 		{
 			// Файл не является изображением
-			throw new ValidateException("image {$image["image"]["tmp_name"][$i]}");
+			throw new ValidateException("incorrect image");
 		}
 
 		return true;

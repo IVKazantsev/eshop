@@ -296,10 +296,10 @@ class TagRepository extends Repository
 	{
 		$connection = $this->dbConnection->getConnection();
 		$tagId = $entity->getId();
-		$oldParentId = $this->getParentById($tagId);
+		$oldParentId = $this->getParentIdById($tagId);
 		$title = mysqli_real_escape_string($connection, $entity->getTitle());
 
-		if ($oldParentId === null)
+		if ($oldParentId === 0)
 		{
 			$result = mysqli_query(
 				$connection,
@@ -361,7 +361,9 @@ class TagRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], $id,
+				$row['ID'],
+				$row['TITLE'],
+				$id,
 			);
 		}
 
@@ -413,7 +415,7 @@ class TagRepository extends Repository
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
 	 */
-	private function getParentById(int $id): ?int
+	private function getParentIdById(int $id): ?int
 	{
 		$connection = $this->dbConnection->getConnection();
 		$result = mysqli_query(
