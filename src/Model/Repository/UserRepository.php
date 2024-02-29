@@ -220,7 +220,7 @@ class UserRepository extends Repository
 		$roleId = $entity->getRoleId();
 		$name = mysqli_real_escape_string($connection, $entity->getName());
 		$email = mysqli_real_escape_string($connection, $entity->getEmail());
-		$password = mysqli_real_escape_string($connection, $entity->getPass());
+		$password = password_hash(mysqli_real_escape_string($connection, $entity->getPass()), PASSWORD_DEFAULT);
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
 
@@ -252,18 +252,24 @@ class UserRepository extends Repository
 	 */
 	public function update(User|Entity $entity): bool
 	{
+
 		$connection = $this->dbConnection->getConnection();
 		$userId = $entity->getId();
 		$roleId = $entity->getRoleId();
 		$name = mysqli_real_escape_string($connection, $entity->getName());
 		$email = mysqli_real_escape_string($connection, $entity->getEmail());
-		$password = mysqli_real_escape_string($connection, $entity->getPass());
+		$password = $entity->getPass() !== 'null' ? password_hash(
+			mysqli_real_escape_string($connection, $entity->getPass()),
+			PASSWORD_DEFAULT
+		) : '';
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
 
-		$result = mysqli_query(
-			$connection,
-			"
+		if (!empty($password))
+		{
+			$result = mysqli_query(
+				$connection,
+				"
 			UPDATE N_ONE_USERS 
 			SET 
 				ROLE_ID = $roleId,
@@ -273,8 +279,26 @@ class UserRepository extends Repository
 				PHONE_NUMBER = '$phoneNumber', 
 				ADDRESS = '$address'
 			WHERE ID = $userId ;"
-		);
-
+			);
+		}
+		else
+		{
+			$result = mysqli_query(
+				$connection,
+				"
+			UPDATE N_ONE_USERS 
+			SET 
+				ROLE_ID = $roleId,
+				NAME = '$name', 
+				EMAIL = '$email', 
+				PHONE_NUMBER = '$phoneNumber', 
+				ADDRESS = '$address'
+			WHERE ID = $userId ;"
+			);
+		}
+		//
+		// var_dump();
+		// exit();
 		if (!$result)
 		{
 			throw new DatabaseException(mysqli_error($connection));

@@ -47,11 +47,11 @@ foreach ($fields as $field => $value)
 			<?php endforeach; ?>
 
 		</div>
-		<?php if (!empty($additionalSections)):?>
+		<?php if (!empty($additionalSections)): ?>
 			<?php foreach ($additionalSections as $section): ?>
 				<?= $section ?>
 			<?php endforeach; ?>
-		<?php endif;?>
+		<?php endif; ?>
 
 
 		<div class="form-section">

@@ -267,6 +267,7 @@ main::-webkit-scrollbar {
 
 /* Input field styles */
 .form-section input[type="text"],
+.form-section input[type="password"],
 	/*.form-section input[type="checkbox"],*/
 .form-section textarea,
 .form-section select {
