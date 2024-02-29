@@ -1,3 +1,9 @@
+hr {
+	border: none;
+	border-top: 1px solid rgba(204, 204, 204, 1);
+	margin: 17px 5px 15px 5px;
+}
+
 .catalog {
 	margin-top: 30px;
 	display: flex;
@@ -89,8 +95,9 @@
 	font-size: 28px;
 	margin-top: auto;
 	margin-bottom: 10px;
-	margin-left: 10px;
+	/*margin-left: 10px;*/
 	font-weight: 300;
+	text-align: center;
 }
 
 .detail-item {

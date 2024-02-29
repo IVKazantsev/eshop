@@ -66,11 +66,17 @@ class OrderController extends BaseController
 			}
 			$user = $this->userRepository->getByNumber($phone);
 
-			if (!$user)
+			if ($user === true)
 			{
 				$user = new User(null, 2, $name, $email, "", $phone, $address);
 				$this->userRepository->add($user);
 				$user = $this->userRepository->getByNumber($phone);
+			}
+			elseif ($user === false)
+			{
+				return $this->renderPublicView(TemplateEngine::renderPublicError(
+					";(",
+					"Ваш аккаунт временно заблокирован"));
 			}
 			elseif ($name !== $user->getName() || $email !== $user->getEmail() || $address !== $user->getAddress())
 			{
@@ -145,7 +151,13 @@ class OrderController extends BaseController
 		{
 			$phoneNumber = ValidationService::validatePhoneNumber($phoneNumber);
 			$user = $this->userRepository->getByNumber($phoneNumber);
-			if (!$user || !$orderNumber)
+			if ($user === false)
+			{
+				return $this->renderPublicView(TemplateEngine::renderPublicError(
+					";(",
+					"Ваш аккаунт временно заблокирован"));
+			}
+			elseif (!$user || !$orderNumber)
 			{
 				$content = TemplateEngine::renderPublicError(";(", "Заказ не найден");
 

@@ -375,7 +375,7 @@ class AdminController extends BaseController
 		catch (InvalidArgumentException)
 		{
 			// Не получилось создать репозиторий. Логирование не нужно
-			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
 		catch (ValidateException $e)
 		{

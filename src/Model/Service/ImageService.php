@@ -88,16 +88,20 @@ class ImageService
 	{
 		ValidationService::validateImage($files);
 
-		$targetDir = ROOT . '/public' . Configurator::option(
-				'ICONS_PATH'
-			); // директория для сохранения загруженных файлов
+		$targetDir =
+			ROOT .
+			'/public' .
+			Configurator::option('ICONS_PATH'); // директория для сохранения загруженных файлов
 		$fileExtension = pathinfo($files['image']['name'][0], PATHINFO_EXTENSION);
 		$finalPath = $targetDir . $itemId . ".$fileExtension";
 
-		if (file_exists($finalPath))// Проверяем, существует ли файл
+		$images = glob($targetDir . $itemId . '.*');
+
+		foreach ($images as $image)
 		{
-			unlink($finalPath); // Удаляем существующий файл
+			unlink($image);
 		}
+
 
 		if (move_uploaded_file($files["image"]["tmp_name"][0], $finalPath))// Сохраняем файл по указанному пути
 		{
@@ -106,6 +110,7 @@ class ImageService
 
 		return false;// Произошла ошибка при сохранении файла
 	}
+
 	public static function resizeImage($source, $destination, $width, $height): bool
 	{
 		// Получаем размеры и тип изображения
@@ -163,7 +168,26 @@ class ImageService
 		}
 	}
 
-	public static function changeMainImage()
+	public static function getTagIcon(string $path): string
 	{
+		// Проверяем, существует ли файл с заданным путем без расширения
+		if (file_exists(ROOT . '/public' . $path))
+		{
+			return $path; // Если файл существует, возвращаем его путь без изменений
+		}
+
+		// Получаем список файлов в директории
+		$files = glob(ROOT . '/public' . $path . '.*');
+
+		// Если найден хотя бы один файл с расширением, возвращаем путь к первому найденному файлу
+		if (count($files) > 0)
+		{
+			$extension = pathinfo($files[0], PATHINFO_EXTENSION);
+			return $path . '.' . $extension;
+		}
+		else
+		{
+			return false; // Если файлы не найдены, возвращаем false
+		}
 	}
 }

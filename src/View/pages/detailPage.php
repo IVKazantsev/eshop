@@ -40,7 +40,11 @@ $priceString = PriceFormatService::formatPrice($item->getPrice())
 			'tags' => $item->getTags(),
 			'attributes' => $item->getAttributes(),
 		]) ?>
-		<p class="detail-price"><?= $priceString ?> </p>
+		<div class="detail-price">
+			<hr>
+			<p><?= $priceString ?> </p>
+		</div>
+
 		<a class="buy-link" href="<?= '/products/' . $item->getId() . '/order' ?>">КУПИТЬ</a>
 	</div>
 	<div class="item-description">
