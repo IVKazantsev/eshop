@@ -7,7 +7,7 @@
 		</div>
 		<div class="check-order-input-container">
 			<label class="check-order-label" for="number"> Номер заказа</label>
-			<input class="check-order-input" type="number" name="number" required>
+			<input class="check-order-input" type="text" name="number" required>
 		</div>
 		<button class="order-submit check-order-submit" type="submit">Проверить</button>
 	</form>
