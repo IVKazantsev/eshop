@@ -78,7 +78,7 @@ class User extends Entity
 		$this->email = $email;
 	}
 
-	public function getPass(): string
+	public function getPass(): ?string
 	{
 		return $this->pass;
 	}

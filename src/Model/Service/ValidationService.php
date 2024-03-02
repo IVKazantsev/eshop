@@ -57,6 +57,7 @@ class ValidationService
 					$result[$key] = $validatedField;
 				}
 			}
+
 			return $result;
 		}
 		$validatedField = trim($field);
@@ -102,12 +103,10 @@ class ValidationService
 			throw new ValidateException("incorrect image");
 		}
 
-
 		if (!in_array($imageFileType, $allowed_formats))
 		{
 			throw new ValidateException("incorrect image");
 		}
-
 
 		if ($fileInfo === false && $imageFileType !== "svg")
 		{

@@ -36,13 +36,15 @@ class AdminController extends BaseController
 		}
 	}
 
-	public function login(string $email, ?string $password): void
+	public function login(string $email, ?string $password, ?bool $rememberMe = false): void
 	{
 		$trimmedEmail = filter_var(trim($email), FILTER_SANITIZE_EMAIL);
 		$trimmedPassword = trim($password);
 		if (session_status() === PHP_SESSION_NONE)
 		{
 			session_start();
+			setcookie(session_name(), session_id(), time() + 1800); //Сгорание сессии через 30 минут после начала
+
 		}
 
 		try
@@ -52,8 +54,8 @@ class AdminController extends BaseController
 				$_SESSION['login_error'] = 'Please enter both email and password.';
 				throw new LoginException();
 			}
-
 			$user = $this->userRepository->getByEmail($trimmedEmail);
+
 			if (!$user)
 			{
 				throw new LoginException();
@@ -65,8 +67,9 @@ class AdminController extends BaseController
 				throw new LoginException();
 			}
 
-			if ($trimmedPassword !== $user->getPass())
+			if (!password_verify($trimmedPassword, $user->getPass()))
 			{
+
 				$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
 				throw new LoginException();
 			}
@@ -92,8 +95,15 @@ class AdminController extends BaseController
 			Router::redirect('/login');
 			exit(401);
 		}
-		ob_start();
+
+		if ($rememberMe)
+		{
+			$token = bin2hex(random_bytes(32));
+			$this->userRepository->addToken($user->getId(), $token);
+			setcookie('remember_me', $token, time() + (86400), "/");
+		}
 		$_SESSION['user_id'] = $user->getId();
+		ob_start();
 		Router::redirect('/admin');
 		ob_end_flush();
 		exit();
@@ -179,8 +189,19 @@ class AdminController extends BaseController
 					break;
 
 				}
-				case Attribute::class:
 				case User::class:
+				{
+					$specificFields = [
+						'password' => TemplateEngine::render('components/editPasswordField', ['user' => $entity]),
+					];
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
+						'specificFields' => $specificFields,
+					]);
+					break;
+
+				}
+				case Attribute::class:
 				{
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'entity' => $entity,
@@ -193,16 +214,13 @@ class AdminController extends BaseController
 					$statuses = $this->orderRepository->getStatuses();
 					$specificFields = [
 						'status' => TemplateEngine::render(
-							'components/editOrderStatusField',
-							['statuses' => $statuses]
+							'components/editOrderStatusField', ['statuses' => $statuses]
 						),
 						'statusId' => TemplateEngine::render(
-							'components/editOrderStatusIdField',
-							['order' => $entity]
+							'components/editOrderStatusIdField', ['order' => $entity]
 						),
 						'orderNumber' => TemplateEngine::render(
-							'components/editOrderNumberField',
-							['orderNumber' => $entity->getNumber()]
+							'components/editOrderNumberField', ['orderNumber' => $entity->getNumber()]
 						),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
@@ -248,10 +266,7 @@ class AdminController extends BaseController
 
 	public function renderDashboard(): string
 	{
-		if (!$this->checkIfLoggedIn())
-		{
-			Router::redirect('/login');
-		}
+
 		try
 		{
 			$content = TemplateEngine::render('pages/adminDashboard');
@@ -262,20 +277,6 @@ class AdminController extends BaseController
 		}
 
 		return $this->renderAdminView($content);
-	}
-
-	public function checkIfLoggedIn(): bool
-	{
-		if (session_status() === PHP_SESSION_NONE)
-		{
-			session_start();
-		}
-		if (!isset($_SESSION['user_id']))
-		{
-			return false;
-		}
-
-		return true;
 	}
 
 	public function renderEntityPage(string $entityToDisplay, ?int $pageNumber, int $isActive): string
@@ -428,22 +429,13 @@ class AdminController extends BaseController
 	public function logout(): void
 	{
 		session_start();
-		$_SESSION = [];
-		if (ini_get("session.use_cookies"))
-		{
-			$params = session_get_cookie_params();
-			setcookie(
-				session_name(),
-				'',
-				time() - 42000,
-				$params["path"],
-				$params["domain"],
-				$params["secure"],
-				$params["httponly"]
-			);
-		}
+		session_unset();
 		session_destroy();
+
+		setcookie('remember_me', '', time() - 3600, '/'); // Set the cookie's expiration to a time in the past
+
 		Router::redirect('/login');
+		exit();
 	}
 
 	public function renderConfirmPage(string $entityType, int $entityId, string $action): string
@@ -606,8 +598,19 @@ class AdminController extends BaseController
 					break;
 
 				}
-				case Attribute::class:
 				case User::class:
+				{
+					$specificFields = [
+						'password' => TemplateEngine::render('components/editPasswordField', ['user' => $entity]),
+					];
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
+						'specificFields' => $specificFields,
+					]);
+					break;
+
+				}
+				case Attribute::class:
 				{
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'entity' => $entity,

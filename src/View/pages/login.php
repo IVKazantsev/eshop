@@ -1,4 +1,5 @@
 <?php
+
 ?>
 
 <!doctype html>
@@ -21,10 +22,10 @@
 			Password
 			<input type="password" name="password" id="login-password" placeholder="Введите пароль..." required>
 		</label>
-		<button type="submit" class = "submit-button">Войти</button>
+		<button type="submit" class="submit-button">Войти</button>
 		<div class="remember-container">
-			<label class="checkbox-label" for="remember">
-				<input type="checkbox" name="remember" id="login-password">
+			<label class="checkbox-label" for="rememberMe">
+				<input type="checkbox" name="rememberMe" id="login-password">
 				Запомнить меня
 			</label>
 		</div>

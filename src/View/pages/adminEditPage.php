@@ -47,11 +47,11 @@ foreach ($fields as $field => $value)
 			<?php endforeach; ?>
 
 		</div>
-		<?php if (!empty($additionalSections)):?>
+		<?php if (!empty($additionalSections)): ?>
 			<?php foreach ($additionalSections as $section): ?>
 				<?= $section ?>
 			<?php endforeach; ?>
-		<?php endif;?>
+		<?php endif; ?>
 
 
 		<div class="form-section">
@@ -60,6 +60,5 @@ foreach ($fields as $field => $value)
 	</form>
 </div>
 <meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">
-<script src='/js/statusChange.js'></script>
 <script src="/js/checkingEmptyEntryAdmin.js"></script>
 <script src="/js/validateNumber.js"></script>

@@ -3,6 +3,7 @@
 namespace N_ONE\App\Model\Service;
 
 use Closure;
+use N_ONE\App\Application;
 use N_ONE\Core\Routing\Route;
 use N_ONE\Core\Routing\Router;
 
@@ -11,16 +12,42 @@ class MiddleWare
 	public static function adminMiddleware(callable $action): Closure
 	{
 		return static function(Route $route) use ($action) {
+			$di = Application::getDI();
+			$userRepo = $di->getComponent('userRepository');
 			session_start();
-			if (!isset($_SESSION['user_id']))
+			if (!isset($_SESSION['user_id'])) //Проверяем есть ли сессия с пользователем
 			{
-				Router::redirect('/login');
-				exit();
+				if (isset($_COOKIE['remember_me'])) //проверяем есть ли кука с токеном
+				{
+					$userId = $userRepo->getUserByToken($_COOKIE['remember_me']); //Ищем пользователя по токену
+					if ($userId) //Пользователь есть, начинаем/продляем сессию
+					{
+						$_SESSION['user_id'] = $userId;
+					}
+				}
+				if (!isset($_SESSION['user_id'])) //Пользователя нет, перенаправляем на логин
+				{
+					Router::redirect('/login');
+					exit();
+				}
 			}
 
 			return $action($route);
 		};
 	}
+	// public static function adminMiddleware(callable $action): Closure
+	// {
+	// 	return static function(Route $route) use ($action) {
+	// 		session_start();
+	// 		if (!isset($_SESSION['user_id']))
+	// 		{
+	// 			Router::redirect('/login');
+	// 			exit();
+	// 		}
+	//
+	// 		return $action($route);
+	// 	};
+	// }
 
 	public static function processFilters(callable $action): Closure
 	{

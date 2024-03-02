@@ -181,7 +181,7 @@ Router::get('/login', function() {
 Router::post('/login', function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->login($_POST['email'], $_POST['password']);
+	return ($di->getComponent('adminController'))->login($_POST['email'], $_POST['password'], $_POST['rememberMe']);
 });
 
 Router::get('/logout', function() {

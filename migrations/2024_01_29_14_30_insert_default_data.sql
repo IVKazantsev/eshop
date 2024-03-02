@@ -3,10 +3,14 @@ VALUES (1, 'administrator'),
        (2, 'customer');
 
 insert into N_ONE_USERS (ROLE_ID, NAME, EMAIL, PASSWORD, PHONE_NUMBER, ADDRESS)
-VALUES (1, 'Алексей Лаурент', 'alex@mail.ru', '12345', '88005553535', 'Калининград, Московский проспект, д. 5'),
-       (1, 'Илья Казанцев', 'ilya@gmail.com', 'qwerty', '8800888888', 'Москва, ул. Старый Арбат д. 15'),
-       (2, 'Сергей Александров', 'serj@yandex.ru', 'q1w2e3r4t5y6', '89997924950', 'Хабаровск, ул. строительная д. 4'),
-       (2, 'Игорь Константинов', 'igor@mail.ru', '11111', '88004445656', 'Калининград, ул Калинина, д. 16');
+VALUES (1, 'Алексей Лаурент', 'alex@mail.ru', '$2y$10$NqZIpVlkQjXGv/i6ZmwCJu4oKz6u.o4RZGTQGlr.YhXaFPKk0vETe',
+        '88005553535', 'Калининград, Московский проспект, д. 5'),
+       (1, 'Илья Казанцев', 'ilya@gmail.com', '$2y$10$i8GKx9FmOf/wbRJfQp22LuP0j8wwJTWQ6pS5J9Oj1k3szn4gPBZNS',
+        '8800888888', 'Москва, ул. Старый Арбат д. 15'),
+       (2, 'Сергей Александров', 'serj@yandex.ru', '$2y$10$ETamutI9pOPcnNPzddrNauaOoSPgZ9Y1R.VEIsT9ZczQbSCc8wjka',
+        '89997924950', 'Хабаровск, ул. строительная д. 4'),
+       (2, 'Игорь Константинов', 'igor@mail.ru', '$2y$10$z6AE5OYNmV0JOSkeYfW0UOdYqUP4uxKygrpN/f5ats/YFWSWcs1V2',
+        '88004445656', 'Калининград, ул Калинина, д. 16');
 
 insert into N_ONE_TAGS (TITLE)
 VALUES ('Передний'),

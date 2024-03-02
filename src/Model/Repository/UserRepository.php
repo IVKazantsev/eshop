@@ -229,7 +229,7 @@ class UserRepository extends Repository
 		$roleId = $entity->getRoleId();
 		$name = mysqli_real_escape_string($connection, $entity->getName());
 		$email = mysqli_real_escape_string($connection, $entity->getEmail());
-		$password = mysqli_real_escape_string($connection, $entity->getPass());
+		$password = password_hash(mysqli_real_escape_string($connection, $entity->getPass()), PASSWORD_DEFAULT);
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
 
@@ -266,13 +266,17 @@ class UserRepository extends Repository
 		$roleId = $entity->getRoleId();
 		$name = mysqli_real_escape_string($connection, $entity->getName());
 		$email = mysqli_real_escape_string($connection, $entity->getEmail());
-		$password = mysqli_real_escape_string($connection, $entity->getPass());
+		$password = $entity->getPass() ? password_hash(
+			mysqli_real_escape_string($connection, $entity->getPass()),
+			PASSWORD_DEFAULT
+		) : '';
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
-
-		$result = mysqli_query(
-			$connection,
-			"
+		if (!empty($password))
+		{
+			$result = mysqli_query(
+				$connection,
+				"
 			UPDATE N_ONE_USERS 
 			SET 
 				ROLE_ID = $roleId,
@@ -282,8 +286,82 @@ class UserRepository extends Repository
 				PHONE_NUMBER = '$phoneNumber', 
 				ADDRESS = '$address'
 			WHERE ID = $userId ;"
-		);
+			);
+		}
+		else
+		{
+			$result = mysqli_query(
+				$connection,
+				"
+			UPDATE N_ONE_USERS 
+			SET 
+				ROLE_ID = $roleId,
+				NAME = '$name', 
+				EMAIL = '$email', 
+				PHONE_NUMBER = '$phoneNumber', 
+				ADDRESS = '$address'
+			WHERE ID = $userId ;"
+			);
+		}
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
 
+		return true;
+	}
+
+	public function getUserByToken(string $token): int
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+			SELECT ID FROM N_ONE_USERS 
+			WHERE TOKEN = '$token' ;"
+		);
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$userId = $row['ID'];
+		}
+
+		return $userId;
+	}
+
+	public function addToken(int $userId, string $token): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+			UPDATE N_ONE_USERS 
+			SET 
+				TOKEN = '$token'
+			WHERE ID = $userId ;"
+		);
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		return true;
+	}
+
+	public function deleteToken(int $userId): bool
+	{
+		$connection = $this->dbConnection->getConnection();
+		$result = mysqli_query(
+			$connection,
+			"
+			UPDATE N_ONE_USERS 
+			SET 
+				TOKEN = null
+			WHERE ID = $userId ;"
+		);
 		if (!$result)
 		{
 			throw new DatabaseException(mysqli_error($connection));
