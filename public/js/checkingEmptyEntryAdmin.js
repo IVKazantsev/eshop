@@ -73,7 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				input.setCustomValidity('Поле не может быть пустым');
 			}
 		});
-
+		const passValue = passInput.value.trim();
+		if (passValue === '' && !passInput.hidden)
+		{
+			isValid = false;
+			passInput.setCustomValidity('Поле не может быть пустым');
+		}
 		if (!isValid)
 		{
 			event.preventDefault(); // Предотвращаем отправку формы, если есть некорректные поля ввода

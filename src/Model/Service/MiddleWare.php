@@ -15,18 +15,17 @@ class MiddleWare
 			$di = Application::getDI();
 			$userRepo = $di->getComponent('userRepository');
 			session_start();
-			if (!isset($_SESSION['user_id']))
+			if (!isset($_SESSION['user_id'])) //Проверяем есть ли сессия с пользователем
 			{
-				if (isset($_COOKIE['remember_me']))
+				if (isset($_COOKIE['remember_me'])) //проверяем есть ли кука с токеном
 				{
-					$token = $_COOKIE['remember_me'];
-					$userId = $userRepo->getUserByToken($token);
-					if ($userId)
+					$userId = $userRepo->getUserByToken($_COOKIE['remember_me']); //Ищем пользователя по токену
+					if ($userId) //Пользователь есть, начинаем/продляем сессию
 					{
 						$_SESSION['user_id'] = $userId;
 					}
 				}
-				if (!isset($_SESSION['user_id']))
+				if (!isset($_SESSION['user_id'])) //Пользователя нет, перенаправляем на логин
 				{
 					Router::redirect('/login');
 					exit();

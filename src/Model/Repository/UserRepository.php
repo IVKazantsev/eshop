@@ -252,19 +252,17 @@ class UserRepository extends Repository
 	 */
 	public function update(User|Entity $entity): bool
 	{
-
 		$connection = $this->dbConnection->getConnection();
 		$userId = $entity->getId();
 		$roleId = $entity->getRoleId();
 		$name = mysqli_real_escape_string($connection, $entity->getName());
 		$email = mysqli_real_escape_string($connection, $entity->getEmail());
-		$password = $entity->getPass() !== 'null' ? password_hash(
+		$password = $entity->getPass() ? password_hash(
 			mysqli_real_escape_string($connection, $entity->getPass()),
 			PASSWORD_DEFAULT
 		) : '';
 		$phoneNumber = mysqli_real_escape_string($connection, $entity->getNumber());
 		$address = mysqli_real_escape_string($connection, $entity->getAddress());
-
 		if (!empty($password))
 		{
 			$result = mysqli_query(

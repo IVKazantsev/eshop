@@ -60,6 +60,5 @@ foreach ($fields as $field => $value)
 	</form>
 </div>
 <meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">
-<script src='/js/statusChange.js'></script>
 <script src="/js/checkingEmptyEntryAdmin.js"></script>
 <script src="/js/validateNumber.js"></script>

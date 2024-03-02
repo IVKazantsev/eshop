@@ -43,10 +43,7 @@ class AdminController extends BaseController
 		if (session_status() === PHP_SESSION_NONE)
 		{
 			session_start();
-			if (!$rememberMe)
-			{
-				setcookie(session_name(), session_id(), time() + 1800);
-			}
+			setcookie(session_name(), session_id(), time() + 1800); //Сгорание сессии через 30 минут после начала
 
 		}
 
@@ -195,7 +192,7 @@ class AdminController extends BaseController
 				case User::class:
 				{
 					$specificFields = [
-						'password' => TemplateEngine::render('components/editPasswordField', []),
+						'password' => TemplateEngine::render('components/editPasswordField', ['user' => $entity]),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'entity' => $entity,
@@ -262,8 +259,6 @@ class AdminController extends BaseController
 
 	public function renderLoginPage(string $view, array $params): string
 	{
-		// var_dump(session_get_cookie_params());
-		// var_dump($_SESSION);
 		static::displayLoginError();
 
 		return TemplateEngine::render("pages/$view", $params);
@@ -272,10 +267,6 @@ class AdminController extends BaseController
 	public function renderDashboard(): string
 	{
 
-		// if (!$this->checkIfLoggedIn())
-		// {
-		// 	Router::redirect('/login');
-		// }
 		try
 		{
 			$content = TemplateEngine::render('pages/adminDashboard');
@@ -287,20 +278,6 @@ class AdminController extends BaseController
 
 		return $this->renderAdminView($content);
 	}
-
-	// public function checkIfLoggedIn(): bool
-	// {
-	// 	if (session_status() === PHP_SESSION_NONE)
-	// 	{
-	// 		session_start();
-	// 	}
-	// 	if (!isset($_SESSION['user_id']))
-	// 	{
-	// 		return false;
-	// 	}
-	//
-	// 	return true;
-	// }
 
 	public function renderEntityPage(string $entityToDisplay, ?int $pageNumber, int $isActive): string
 	{
@@ -451,23 +428,7 @@ class AdminController extends BaseController
 
 	public function logout(): void
 	{
-		// session_start();
-		// $_SESSION = [];
-		// if (ini_get("session.use_cookies"))
-		// {
-		// 	$params = session_get_cookie_params();
-		// 	setcookie(
-		// 		session_name(),
-		// 		'',
-		// 		time() - 42000,
-		// 		$params["path"],
-		// 		$params["domain"],
-		// 		$params["secure"],
-		// 		$params["httponly"]
-		// 	);
-		// }
-		// session_destroy();
-		// Router::redirect('/login');
+		session_start();
 		session_unset();
 		session_destroy();
 
@@ -640,7 +601,7 @@ class AdminController extends BaseController
 				case User::class:
 				{
 					$specificFields = [
-						'password' => TemplateEngine::render('components/editPasswordField', []),
+						'password' => TemplateEngine::render('components/editPasswordField', ['user' => $entity]),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
 						'entity' => $entity,
