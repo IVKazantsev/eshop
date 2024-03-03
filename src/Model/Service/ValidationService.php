@@ -69,6 +69,27 @@ class ValidationService
 		return $validatedField;
 	}
 
+	public static function validateFulltextField(?string $fulltextField): ?string
+	{
+		$fulltextField = trim($fulltextField);
+		if(!$fulltextField)
+		{
+			return null;
+		}
+		$fulltextInArray = preg_split('/\s+/', $fulltextField, -1, PREG_SPLIT_NO_EMPTY);
+		$preparedFulltextInArray = array_map(static function($word) {
+			$preparedWord = preg_replace('/\W/', '', $word);
+			if ($preparedWord)
+			{
+				return "+" . $preparedWord . "*";
+			}
+
+			return null;
+		}, $fulltextInArray);
+
+		return implode(' ', $preparedFulltextInArray);
+	}
+
 	public static function safe(?string $value): string
 	{
 		return htmlspecialchars($value, ENT_QUOTES);

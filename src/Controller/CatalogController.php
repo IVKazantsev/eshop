@@ -4,6 +4,7 @@ namespace N_ONE\App\Controller;
 
 use mysqli_sql_exception;
 use N_ONE\App\Model\Service\PaginationService;
+use N_ONE\App\Model\Service\ValidationService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Log\Logger;
@@ -20,11 +21,9 @@ class CatalogController extends BaseController
 	{
 		try
 		{
-			$searchRequest = trim($searchRequest);
-			$searchRequest = preg_replace('/\s+/', ' ', $searchRequest);
 			$filter = [
 				'tags' => $tags,
-				'title, description' => $searchRequest,
+				'title, description' => ValidationService::validateFulltextField($searchRequest),
 				'pageNumber' => $pageNumber,
 				'attributes' => $attributes,
 				'sortOrder' => $sortOrder,
