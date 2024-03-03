@@ -198,6 +198,7 @@ class OrderRepository extends Repository
 	public function getByNumber(string $number, bool $isPublic = false): ?Order
 	{
 		$connection = $this->dbConnection->getConnection();
+		$number = mysqli_real_escape_string($connection, $number);
 		if ($isPublic)
 		{
 			$isActive = "(1)";

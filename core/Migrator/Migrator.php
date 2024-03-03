@@ -77,11 +77,10 @@ class Migrator
 		$result = mysqli_query(
 			$connection,
 			"
-        SELECT *
-        FROM {$this->migrationTable}
-        ORDER BY ID DESC
-        LIMIT 1
-        "
+			SELECT *
+			FROM {$this->migrationTable}
+			ORDER BY ID DESC
+			LIMIT 1;"
 		);
 
 		if (!$result)

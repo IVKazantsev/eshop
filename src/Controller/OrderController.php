@@ -145,7 +145,7 @@ class OrderController extends BaseController
 		return $this->renderPublicView($checkOrderPage);
 	}
 
-	public function renderOrderInfoPage(?string $phoneNumber, ?int $orderNumber): string
+	public function renderOrderInfoPage(?string $phoneNumber, ?string $orderNumber): string
 	{
 		try
 		{
