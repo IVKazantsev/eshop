@@ -78,7 +78,7 @@ class ValidationService
 		}
 		$fulltextInArray = preg_split('/\s+/', $fulltextField, -1, PREG_SPLIT_NO_EMPTY);
 		$preparedFulltextInArray = array_map(static function($word) {
-			$preparedWord = preg_replace('/\W/', '', $word);
+			$preparedWord = preg_replace('/[^A-z0-9А-я]/u', '', $word);
 			if ($preparedWord)
 			{
 				return "+" . $preparedWord . "*";
