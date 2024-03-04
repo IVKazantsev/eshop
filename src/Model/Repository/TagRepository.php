@@ -214,8 +214,8 @@ class TagRepository extends Repository
 			FROM N_ONE_TAGS t 
 			JOIN N_ONE_ITEMS_TAGS it on t.ID = it.TAG_ID
 			WHERE it.ITEM_ID IN ($itemsIdsString)
-			AND t.IS_ACTIVE = 1;
-	"
+			AND t.IS_ACTIVE = 1
+			order by t.PARENT_ID;"
 		);
 
 		if (!$result)

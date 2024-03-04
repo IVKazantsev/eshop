@@ -104,7 +104,7 @@ class AdminController extends BaseController
 		}
 		$_SESSION['user_id'] = $user->getId();
 		ob_start();
-		Router::redirect('/admin');
+		Router::redirect('/admin/items');
 		ob_end_flush();
 		exit();
 	}

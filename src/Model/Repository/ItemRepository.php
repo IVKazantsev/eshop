@@ -147,7 +147,7 @@ class ItemRepository extends Repository
 		{
 			$sortQueryBlock = "ORDER BY i.PRICE {$sortOrder['direction']}";
 		}
-		elseif (is_int($sortOrder['column']))
+		elseif (is_numeric($sortOrder['column']))
 		{
 			$sortQueryBlock = "ORDER BY ia.VALUE {$sortOrder['direction']}";
 			$conditions[] = "ia.ATTRIBUTE_ID = {$sortOrder['column']}";
