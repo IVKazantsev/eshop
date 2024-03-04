@@ -10,6 +10,7 @@ $iconsPath = Configurator::option('ICONS_PATH');
 		<img  class="success-img" src="<?= $iconsPath . 'checkmark.svg' ?>" alt="image of checkmark">
 	</div>
 	<div class="success-update-title">
-		Вы успешно изменили товар
+		Вы успешно изменили сущность
 	</div>
 </div>
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">

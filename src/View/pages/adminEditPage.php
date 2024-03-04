@@ -1,78 +1,64 @@
 <?php
 
 use N_ONE\App\Model\Entity;
-use N_ONE\App\Model\Item;
+use N_ONE\App\Model\Service\ValidationService;
+use N_ONE\Core\Configurator\Configurator;
 
 /**
- * @var Entity $item
+ * @var Entity $entity
  * @var array $statuses
- * @var array $parentTags
  * @var array $additionalSections
  * @var array $specificFields
  */
-$fields = array_flip($item->getFieldNames(true));
-$scriptsPath = \N_ONE\Core\Configurator\Configurator::option('SCRIPTS_PATH');
+$fields = array_flip($entity->getFieldNames());
+foreach ($fields as $field => $value)
+{
+	if (
+		array_key_exists(
+			$field,
+			array_merge($specificFields ?? [], $additionalSections ?? [], ['id' => ''])
+		)
+	)
+	{
+		unset($fields[$field]);
+	}
+}
 
 ?>
 <div class="edit-form-container">
 	<form action="" class="edit-form" method="post" enctype="multipart/form-data">
 		<div class="form-section">
-			<p>ID сущности: <?= $item->getId() ?></p>
+			<p>ID сущности: <?= $entity->getId() ?></p>
+
 			<?php foreach ($fields as $field => $value): ?>
-
-				<?php if (in_array($field, ['tags', 'images', 'id', 'dateCreate', 'attributes', 'value'])): {
-					continue;
-				} endif ?>
-
-
-				<?php if ($field === 'parentId'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'isActive'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'description'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'status'): ?>
-					<?= $specificFields[$field] ?>
-					<?php continue;
-				endif; ?>
-				<?php if ($field === 'statusId'): ?>
-				<?= $specificFields[$field] ?>
-				<script src='/js/statusChange.js'></script>
-
-			<?php continue;
-			endif; ?>
 				<label for="<?= $field ?>">
 					<?= $field ?>:
-					<input id="<?= $field ?>" type="text" name="<?= $field ?>" value="<?= $item->getField($field) ?>">
+					<input
+						class="specific-input-<?= $entity->getPropertyType($field) ?>"
+						id="<?= $field ?>"
+						type="text" name="<?= $field ?>"
+						value="<?= ValidationService::safe($entity->getField($field)) ?>"
+					>
 				</label>
+			<?php endforeach; ?>
 
+			<?php foreach ($specificFields as $field): ?>
+				<?= $field ?>
 			<?php endforeach; ?>
 
 		</div>
-		<?php if (!empty($additionalSections))
-		{
-			foreach ($additionalSections as $section)
-			{
-				echo $section;
-			}
-		}
-		else
-		{
-			echo '';
-		}
-		?>
+		<?php if (!empty($additionalSections)): ?>
+			<?php foreach ($additionalSections as $section): ?>
+				<?= $section ?>
+			<?php endforeach; ?>
+		<?php endif; ?>
+
+
 		<div class="form-section">
-
 			<button class="submit-button" type="submit">Сохранить</button>
-
 		</div>
 	</form>
 </div>
-
-<script src="/js/checkingEmptyEntry.js"></script>
+<meta name="css" content="<?= '/styles/' . basename(__FILE__, '.php') . '.css' ?>">
+<script src="/js/checkingEmptyEntryAdmin.js"></script>
+<script src="/js/validateNumber.js"></script>

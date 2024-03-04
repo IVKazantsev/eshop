@@ -2,18 +2,33 @@
 
 namespace N_ONE\App\Model;
 
+use N_ONE\App\Model\Service\ValidationService;
+
 class User extends Entity
 {
 	public function __construct(
-		protected int|null  $id,
-		private int|null    $roleId,
-		private string|null $name,
-		private string|null $email,
-		private string|null $pass,
-		private string|null $number,
-		private string|null $address,
+		protected ?int  $id,
+		private ?int    $roleId,
+		private ?string $name,
+		private ?string $email,
+		private ?string $pass,
+		private ?string $number,
+		private ?string $address,
 	)
 	{
+	}
+
+	public static function fromFields(array $fields): static
+	{
+		return new static(
+			$fields['id'],
+			$fields['roleId'],
+			$fields['name'],
+			$fields['email'],
+			$fields['pass'],
+			$fields['number'],
+			$fields['address'],
+		);
 	}
 
 	public function getExcludedFields(): array
@@ -28,9 +43,9 @@ class User extends Entity
 		return strtolower(end($array));
 	}
 
-	public function getField(string $fieldName)
+	public function getField(string $fieldName): string
 	{
-		return $this->$fieldName;
+		return ValidationService::safe($this->$fieldName);
 	}
 
 	public function getRoleId(): int
@@ -63,7 +78,7 @@ class User extends Entity
 		$this->email = $email;
 	}
 
-	public function getPass(): string
+	public function getPass(): ?string
 	{
 		return $this->pass;
 	}
@@ -92,5 +107,4 @@ class User extends Entity
 	{
 		$this->address = $address;
 	}
-
 }

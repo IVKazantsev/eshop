@@ -2,7 +2,6 @@
 
 namespace N_ONE\Core\DbConnector;
 
-use Exception;
 use mysqli;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -10,9 +9,11 @@ use N_ONE\Core\Exceptions\DatabaseException;
 class DbConnector
 {
 	static private ?DbConnector $instance = null;
+
 	private static mysqli|false $connection;
+
 	/**
-	 * @throws Exception
+	 * @throws DatabaseException
 	 */
 	private function __construct()
 	{
@@ -24,6 +25,9 @@ class DbConnector
 	{
 	}
 
+	/**
+	 * @throws DatabaseException
+	 */
 	public static function getInstance(): DbConnector
 	{
 		if (static::$instance)
@@ -33,6 +37,7 @@ class DbConnector
 
 		return static::$instance = new self();
 	}
+
 	/**
 	 * @throws DatabaseException
 	 */

@@ -1,4 +1,5 @@
 <?php
+
 ?>
 
 <!doctype html>
@@ -7,7 +8,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<link rel="stylesheet" href="/styles/style.css">
+	<link rel="stylesheet" href="/styles/publicLayout.css">
 	<title>BITCAR|admin</title>
 </head>
 <body>
@@ -21,10 +22,10 @@
 			Password
 			<input type="password" name="password" id="login-password" placeholder="Введите пароль..." required>
 		</label>
-		<button type="submit" class = "submit-button">Войти</button>
+		<button type="submit" class="submit-button">Войти</button>
 		<div class="remember-container">
-			<label class="checkbox-label" for="remember">
-				<input type="checkbox" name="remember" id="login-password">
+			<label class="checkbox-label" for="rememberMe">
+				<input type="checkbox" name="rememberMe" id="login-password">
 				Запомнить меня
 			</label>
 		</div>

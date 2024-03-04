@@ -1,15 +1,16 @@
 <?php
 /**
- * @var Entity $item
+ * @var Tag $tag
  * @var array $parentTags
  */
 
-use N_ONE\App\Model\Entity;
+use N_ONE\App\Model\Service\ValidationService;
+use N_ONE\App\Model\Tag;
 
 ?>
 
 
-<?php if (!$item->getParentId() && !$item->getId()): ?>
+<?php if (!$tag->getParentId() && !$tag->getId()): ?>
 	<label class="checkbox-label">
 		Является категорией:
 		<input type="checkbox" id="isParent" value="1">
@@ -18,20 +19,25 @@ use N_ONE\App\Model\Entity;
 		parentId:
 		<select id="statusSelect" name="parentId">
 			<?php foreach ($parentTags as $parentTag): ?>
-				<option value="<?= $parentTag->getId() ?>"><?= $parentTag->getTitle() ?></option>
+				<option value="<?= $parentTag->getId() ?>"><?= ValidationService::safe($parentTag->getTitle()) ?></option>
 			<?php endforeach; ?>
 		</select>
 	</label>
-<?php elseif (!$item->getParentId()): ?>
-	<label hidden for="parentId">
-		<input type="hidden" name="parentId" value="">
-	</label>
+	<div class="add-images-section" hidden>
+		<p>Для загрзки логотипа категории</p>
+		<input type="file" name="image[]" accept="image/*" class="choose-file-button" >
+	</div>
+<?php elseif (!$tag->getParentId()): ?>
+	<div class="add-images-section">
+		<p>Для смены логотипа категории</p>
+		<input type="file" name="image[]" accept="image/*" class="choose-file-button" >
+	</div>
 <?php else: ?>
 	<label for="parentId">
 		parentId:
 		<select id="statusSelect" name="parentId">
 			<?php foreach ($parentTags as $parentTag): ?>
-				<option value="<?= $parentTag->getId() ?>"><?= $parentTag->getTitle() ?></option>
+				<option value="<?= $parentTag->getId() ?>"><?= ValidationService::safe($parentTag->getTitle()) ?></option>
 			<?php endforeach; ?>
 		</select>
 	</label>
@@ -41,11 +47,13 @@ use N_ONE\App\Model\Entity;
 	const checkbox = document.getElementById('isParent');
 	const parentIdLabel = document.getElementById('parentId');
 	const parentIdSelect = document.querySelector('select[name="parentId"]');
+	const addImagesSection = document.querySelector('.add-images-section');
 
 	checkbox.addEventListener('change', () => {
 		if (!checkbox.checked)
 		{
 			parentIdLabel.removeAttribute('hidden');
+			addImagesSection.setAttribute('hidden', '');
 			if (parentIdSelect)
 			{
 				parentIdSelect.setAttribute('name', 'parentId');
@@ -54,6 +62,7 @@ use N_ONE\App\Model\Entity;
 		else
 		{
 			parentIdLabel.setAttribute('hidden', '');
+			addImagesSection.removeAttribute('hidden');
 			if (parentIdSelect)
 			{
 				parentIdSelect.removeAttribute('name');

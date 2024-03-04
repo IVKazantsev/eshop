@@ -8,6 +8,7 @@
 			<arg service="orderRepository"/>
 			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
 		</class>
 	</service>
 	<service name="imageController">
@@ -19,6 +20,7 @@
 			<arg service="orderRepository"/>
 			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
 		</class>
 	</service>
 	<service name="catalogController">
@@ -30,6 +32,7 @@
 			<arg service="orderRepository"/>
 			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
 		</class>
 	</service>
 	<service name="detailController">
@@ -41,6 +44,7 @@
 			<arg service="orderRepository"/>
 			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
 		</class>
 	</service>
 	<service name="adminController">
@@ -52,6 +56,12 @@
 			<arg service="orderRepository"/>
 			<arg service="attributeRepository"/>
 			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
+		</class>
+	</service>
+	<service name="imageService">
+		<class name="\N_ONE\App\Model\Service\ImageService">
+			<arg service="imageRepository"/>
 		</class>
 	</service>
 	<service name="orderRepository">

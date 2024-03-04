@@ -10,6 +10,7 @@
 		"ext-simplexml": "*",
 		"ext-mbstring": "*",
 		"ext-gd": "*",
-		"ext-http": "*"
+		"ext-http": "*",
+		"ext-fileinfo": "*"
 	}
 }

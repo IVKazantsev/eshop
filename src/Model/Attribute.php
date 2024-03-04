@@ -5,11 +5,18 @@ namespace N_ONE\App\Model;
 class Attribute extends Entity
 {
 	public function __construct(
-		protected int|null  $id,
-		private string|null $title,
-		private float|null  $value,
+		protected ?int  $id,
+		private ?string $title,
+		private ?float  $value,
 	)
 	{
+	}
+
+	public static function fromFields(array $fields): static
+	{
+		return new static(
+			$fields['id'], $fields['title'], $fields['value'],
+		);
 	}
 
 	public function getTitle(): string

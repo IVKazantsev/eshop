@@ -2,6 +2,7 @@
 
 namespace N_ONE\App\Controller;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Repository\AttributeRepository;
 use N_ONE\App\Model\Repository\ImageRepository;
 use N_ONE\App\Model\Repository\ItemRepository;
@@ -9,21 +10,23 @@ use N_ONE\App\Model\Repository\OrderRepository;
 use N_ONE\App\Model\Repository\RepositoryFactory;
 use N_ONE\App\Model\Repository\TagRepository;
 use N_ONE\App\Model\Repository\UserRepository;
+use N_ONE\App\Model\Service\ImageService;
 use N_ONE\App\Model\Service\TagService;
 use N_ONE\Core\Exceptions\DatabaseException;
+use N_ONE\Core\Log\Logger;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 abstract class BaseController
 {
 	public function __construct(
-
-		protected TagRepository     $tagRepository,
-		protected ImageRepository   $imageRepository,
-		protected ItemRepository    $itemRepository,
-		protected UserRepository    $userRepository,
-		protected OrderRepository   $orderRepository,
+		protected TagRepository       $tagRepository,
+		protected ImageRepository     $imageRepository,
+		protected ItemRepository      $itemRepository,
+		protected UserRepository      $userRepository,
+		protected OrderRepository     $orderRepository,
 		protected AttributeRepository $attributeRepository,
-		protected RepositoryFactory $repositoryFactory
+		protected RepositoryFactory   $repositoryFactory,
+		protected ImageService        $imageService
 	)
 	{
 	}
@@ -32,17 +35,25 @@ abstract class BaseController
 	{
 		try
 		{
-			$tags = TagService::reformatTags($this->tagRepository->getList());
+			$tags = TagService::reformatTags($this->tagRepository->getAll());
 			$attributes = $this->attributeRepository->getList();
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+
 			return TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return TemplateEngine::render('layouts/publicLayout', [
 			'tags' => $tags,
-			'attributes' =>$attributes,
+			'attributes' => $attributes,
 			'content' => $content,
 			'currentSearchRequest' => $currentSearchRequest,
 		]);
@@ -57,11 +68,19 @@ abstract class BaseController
 
 		try
 		{
-			$user = $this->userRepository->getById($_SESSION['user_id']);
+			$user = $this->userRepository->getById($_SESSION['user_id'], true);
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+
 			return TemplateEngine::renderAdminError(';(', "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return TemplateEngine::render('layouts/adminLayout', [
@@ -69,5 +88,4 @@ abstract class BaseController
 			'content' => $content,
 		]);
 	}
-
 }

@@ -1,0 +1,52 @@
+@media (max-width: 750px) {
+	.order-info-table {
+		width: 90%;
+		margin: calc((100% - 90%)/2);
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+	}
+
+	thead {
+		display: grid;
+		background-color: #e8e8e8;
+		grid-row: 1 / -1;
+		padding: 10px;
+	}
+
+	tbody {
+		display: grid;
+		grid-row: 1 / -1;
+		padding: 10px;
+	}
+
+	.order-td {
+		padding: 0;
+	}
+
+	.order-info-tr {
+		display: grid;
+		padding: 0;
+		width: 100%;
+		grid-row: span 1;
+	}
+
+	.order-info-td {
+		background-color: transparent;
+		grid-row: span 1;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		text-align: center;
+		justify-content: center;
+		align-items: center;
+		margin: 20px 0;
+	}
+
+	.order-item-title {
+		margin: 0;
+	}
+
+	.order-item-info {
+		height: 120px;
+	}
+}

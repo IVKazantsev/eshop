@@ -5,139 +5,187 @@ use N_ONE\App\Model\Service\MiddleWare;
 use N_ONE\Core\Routing\Route;
 use N_ONE\Core\Routing\Router;
 
-Router::get('/', function() {
-	$di = Application::getDI();
-	$currentTag = $_GET['tag'] ?? null;
-	$currentSearchRequest = $_GET['SearchRequest'] ?? null;
-	$currentPageNumber = $_GET['page'] ?? null;
-	$currentRange = $_GET['range'] ?? null;
+$router = Router::getInstance();
+$router->get(
+	'/',
+	MiddleWare::processFilters(
+		static function(
+			$route,
+			$currentSearchRequest,
+			$finalTags,
+			$finalAttributes,
+			$sortOrder
+		) {
+			$di = Application::getDI();
+			$currentPageNumber = (int)($_GET['page'] ?? null);
 
-	return ($di->getComponent('catalogController'))->renderCatalog(
-		$currentPageNumber,
-		$currentTag,
-		$currentSearchRequest,
-		$currentRange
-	);
-});
+			return ($di->getComponent('catalogController'))->renderCatalog(
+				$currentPageNumber,
+				$currentSearchRequest,
+				$finalTags,
+				$finalAttributes,
+				$sortOrder
+			);
+		}
+	)
+);
 
-Router::get('/products/:id', function(Route $route) {
-	$carId = $route->getVariables()[0];
+$router->get('/products/:id', static function(Route $route) {
+	$carId = (int)$route->getVariables()[0];
 	$di = Application::getDI();
 
 	return ($di->getComponent('detailController'))->renderDetailPage($carId);
 });
 
-Router::get('/products/:id/order', function(Route $route) {
-	$carId = $route->getVariables()[0];
+$router->get('/products/:id/order', static function(Route $route) {
+	$carId = (int)$route->getVariables()[0];
 	$di = Application::getDI();
 
 	return ($di->getComponent('orderController'))->renderOrderPage($carId);
 });
 
-Router::post('/products/:id/order', function(Route $route) {
-	$carId = $route->getVariables()[0];
+$router->post('/processOrder', static function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('orderController'))->processOrder($carId);
+	return ($di->getComponent('orderController'))->processOrder();
 });
 
-Router::get('/successOrder/:id', function(Route $route) {
-	$orderId = $route->getVariables()[0];
+$router->post('/successOrder', static function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('orderController'))->renderSuccessOrderPage($orderId);
+	return ($di->getComponent('orderController'))->renderSuccessOrderPage();
+});
+
+$router->get('/checkOrder', static function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('orderController'))->renderCheckOrderPage();
+});
+
+$router->get('/orderInfo', static function() {
+	$di = Application::getDI();
+	$orderNumber = (string)($_GET['number'] ?? 0);
+	$phoneNumber = (string)($_GET['phone'] ?? "");
+
+	return ($di->getComponent('orderController'))->renderOrderInfoPage($phoneNumber, $orderNumber);
 });
 
 //роуты с защитой
-Router::get('/admin', MiddleWare::adminMiddleware(function() {
+$router->get('/admin', MiddleWare::adminMiddleware(static function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderDashboard();
 }));
 
-Router::get('/admin/:string', MiddleWare::adminMiddleware(function(Route $route) {
+$router->get('/admin/:entity', MiddleWare::adminMiddleware(static function(Route $route) {
 	$di = Application::getDI();
 	$entityToEdit = $route->getVariables()[0];
-	$currentPageNumber = $_GET['page'] ?? null;
+	$currentPageNumber = (int)($_GET['page'] ?? null);
+	$isActive = (int)($_GET['isActive'] ?? 1);
 
-	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit, $currentPageNumber);
+	return ($di->getComponent('adminController'))->renderEntityPage($entityToEdit, $currentPageNumber, $isActive);
 }));
 
-Router::get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
+$router->get('/admin/:string/edit/:id', MiddleWare::adminMiddleware(static function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];
-	$itemId = $route->getVariables()[1];
+	$itemId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderEditPage($entityToEdit, $itemId);
 }));
 
-Router::post('/admin/:string/edit/:id', MiddleWare::adminMiddleware(function(Route $route) {
+$router->post('/admin/:string/edit/:id', MiddleWare::adminMiddleware(static function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];
-	$itemId = $route->getVariables()[1];
+	$itemId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->updateItem($entityToEdit, $itemId);
+	return ($di->getComponent('adminController'))->updateEntity($entityToEdit, $itemId);
 }));
-Router::get('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $route) {
+
+$router->get('/admin/:string/add', MiddleWare::adminMiddleware(static function(Route $route) {
 	$entityToEdit = $route->getVariables()[0];
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderAddPage($entityToEdit);
 }));
-Router::post('/admin/:string/add', MiddleWare::adminMiddleware(function(Route $route) {
+
+$router->post('/admin/:string/add', MiddleWare::adminMiddleware(static function(Route $route) {
 	$entityToAdd = $route->getVariables()[0];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->addItem($entityToAdd);
+	return ($di->getComponent('adminController'))->addEntity($entityToAdd);
 }));
 
-Router::get('/admin/edit/success', MiddleWare::adminMiddleware(function() {
+$router->get('/admin/edit/success', MiddleWare::adminMiddleware(static function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderSuccessEditPage();
 }));
 
-Router::get('/admin/add/success', MiddleWare::adminMiddleware(function() {
+$router->get('/admin/add/success', MiddleWare::adminMiddleware(static function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderSuccessAddPage();
 }));
 
-Router::get('/admin/:entity/delete/:id', MiddleWare::adminMiddleware(function(Route $route) {
+$router->get('/admin/:entity/restore/:id', MiddleWare::adminMiddleware(static function(Route $route) {
 	$entityToDelete = $route->getVariables()[0];
-	$entityId = $route->getVariables()[1];
+	$entityId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->renderConfirmDeletePage($entityToDelete, $entityId);
+	return ($di->getComponent('adminController'))->renderConfirmPage($entityToDelete, $entityId, 'восстановить');
 }));
 
-Router::post('/admin/:entity/delete/:id', function(Route $route) {
+$router->post('/admin/:entity/restore/:id', static function(Route $route) {
 	$entityToDelete = $route->getVariables()[0];
-	$entityId = $route->getVariables()[1];
+	$entityId = (int)$route->getVariables()[1];
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->processDeletion($entityToDelete, $entityId);
+	return ($di->getComponent('adminController'))->processChangeActive($entityToDelete, $entityId, 1);
 });
 
-Router::get('/admin/delete/success', MiddleWare::adminMiddleware(function() {
+$router->get('/admin/restore/success', MiddleWare::adminMiddleware(static function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->renderSuccessDeletePage();
+	return ($di->getComponent('adminController'))->renderSuccessPage(1);
+}));
+
+$router->get('/admin/:entity/delete/:id', MiddleWare::adminMiddleware(static function(Route $route) {
+	$entityToDelete = $route->getVariables()[0];
+	$entityId = (int)$route->getVariables()[1];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderConfirmPage($entityToDelete, $entityId, 'удалить');
+}));
+
+$router->post('/admin/:entity/delete/:id', static function(Route $route) {
+	$entityToDelete = $route->getVariables()[0];
+	$entityId = (int)$route->getVariables()[1];
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->processChangeActive($entityToDelete, $entityId, 0);
+});
+
+$router->get('/admin/delete/success', MiddleWare::adminMiddleware(static function() {
+	$di = Application::getDI();
+
+	return ($di->getComponent('adminController'))->renderSuccessPage(0);
 }));
 
 //роуты доступные всем
-Router::get('/login', function() {
+$router->get('/login', static function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->renderLoginPage('login', []);
 });
 
-Router::post('/login', function() {
+$router->post('/login', static function() {
 	$di = Application::getDI();
 
-	return ($di->getComponent('adminController'))->login($_POST['email'], $_POST['password']);
+	return ($di->getComponent('adminController'))->login($_POST['email'], $_POST['password'], $_POST['rememberMe']);
 });
-Router::get('/logout', function() {
+
+$router->get('/logout', static function() {
 	$di = Application::getDI();
 
 	return ($di->getComponent('adminController'))->logout();

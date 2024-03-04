@@ -24,7 +24,6 @@ class Configurator
 			{
 				$localConfig = [];
 			}
-
 			$config = array_merge($masterConfig, $localConfig);
 		}
 

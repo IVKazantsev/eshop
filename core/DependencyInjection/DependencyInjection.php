@@ -2,12 +2,16 @@
 
 namespace N_ONE\Core\DependencyInjection;
 
+use Exception;
 use http\Exception\InvalidArgumentException;
+use N_ONE\Core\Log\Logger;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
 use ReflectionClass;
 
 class DependencyInjection
 {
 	private array $components = [];
+
 	private string $configurationPath;
 
 	public function __construct(string $configurationPath)
@@ -18,7 +22,6 @@ class DependencyInjection
 
 	private function configure(): void
 	{
-
 		if (!file_exists($this->configurationPath))
 		{
 			return;
@@ -47,17 +50,28 @@ class DependencyInjection
 				}
 			}
 
-			$this->components[$serviceName] = function () use ($className, $arguments, $isSingleton) {
+			$this->components[$serviceName] = function() use ($className, $arguments, $isSingleton) {
 				$loadedArguments = [];
-				foreach ($arguments as $argument) {
-					if ($argument['service']) {
+				foreach ($arguments as $argument)
+				{
+					if ($argument['service'])
+					{
 						$loadedArguments[] = $this->getComponent($argument['service']);
 					}
 				}
 
 				if ($isSingleton)
 				{
-					return $className::getInstance();
+					try
+					{
+						return $className::getInstance();
+					}
+					catch (Exception)
+					{
+						Logger::error("Failed to create singleton class", __METHOD__);
+
+						return TemplateEngine::renderFinalError();
+					}
 				}
 
 				return (new ReflectionClass($className))->newInstanceArgs($loadedArguments);
@@ -73,6 +87,5 @@ class DependencyInjection
 		}
 
 		throw new InvalidArgumentException("There is no service $serviceName");
-
 	}
 }

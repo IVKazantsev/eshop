@@ -3,7 +3,6 @@
 namespace N_ONE\App\Model\Service;
 
 use Exception;
-use N_ONE\Core\Exceptions\FileException;
 use N_ONE\Core\Exceptions\ValidateException;
 
 class ValidationService
@@ -44,21 +43,56 @@ class ValidationService
 	/**
 	 * @throws ValidateException
 	 */
-	public static function validateEntryField(string $field): string
+	public static function validateEntryField(array|string|null $field): array|string
 	{
+		if (is_array($field))
+		{
+			$result = [];
+			foreach ($field as $key => $value)
+			{
+				$validatedField = trim($value);
+				if ($validatedField !== "")
+				{
+					$result[$key] = $validatedField;
+				}
+			}
+
+			return $result;
+		}
 		$validatedField = trim($field);
-		if($validatedField === "")
+		if ($validatedField === "")
 		{
 			throw new ValidateException("No field should be empty");
 		}
+
 		return $validatedField;
 	}
 
-	public static function safe(string $value): string
+	public static function validateFulltextField(?string $fulltextField): ?string
+	{
+		$fulltextField = trim($fulltextField);
+		if(!$fulltextField)
+		{
+			return null;
+		}
+		$fulltextInArray = preg_split('/\s+/', $fulltextField, -1, PREG_SPLIT_NO_EMPTY);
+		$preparedFulltextInArray = array_map(static function($word) {
+			$preparedWord = preg_replace('/[^A-z0-9А-я]/u', '', $word);
+			if ($preparedWord)
+			{
+				return "+" . $preparedWord . "*";
+			}
+
+			return null;
+		}, $fulltextInArray);
+
+		return implode(' ', $preparedFulltextInArray);
+	}
+
+	public static function safe(?string $value): string
 	{
 		return htmlspecialchars($value, ENT_QUOTES);
 	}
-
 
 	/**
 	 * @throws ValidateException
@@ -66,44 +100,51 @@ class ValidationService
 	 */
 	public static function validateImage($image, int $i = 0): bool
 	{
-		$allowed_formats = ["jpg", "png", "jpeg",];
-		$allowed_mime_types = ['image/jpeg', 'image/png', 'image/jpg'];// Разрешенные форматы файлов
-		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]),PATHINFO_EXTENSION));
+		$allowed_formats = ["jpg", "png", "jpeg", "svg"];
+		$allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];// Разрешенные форматы файлов
+		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]), PATHINFO_EXTENSION));
+		$fileMimeType = mime_content_type($image["image"]["tmp_name"][$i]);
+		$fileInfo = @getimagesize($image["image"]["tmp_name"][$i]);
 
 		// Проверка наличия файла
-		if (isset($image["image"]))
+		if (!isset($image["image"]))
 		{
-			if (!getimagesize($image["image"]["tmp_name"][$i]))
-			{
-				throw new FileException("image ");
-			}
+			throw new ValidateException("incorrect image");
+		}
+
+		if (!in_array($fileMimeType, $allowedMimeTypes, true))
+		{
+			throw new ValidateException("incorrect image");
 		}
 
 		// Проверка размера файла
 		if ($image["image"]["size"][$i] > 500000)
 		{
-			throw new ValidateException("image $image");
+			throw new ValidateException("incorrect image");
 		}
 
 		if (!in_array($imageFileType, $allowed_formats))
 		{
-			throw new ValidateException("image $image");
+			throw new ValidateException("incorrect image");
 		}
 
-		$file_info = @getimagesize($image["image"]["tmp_name"][$i]);
-		if ($file_info === false)
+		if ($fileInfo === false && $imageFileType !== "svg")
 		{
 			// Файл не является изображением
-			throw new ValidateException("image $image");
-		}
-
-		// Проверяем MIME-тип изображения (допустимые MIME-типы можно дополнительно проверять)
-		if (!in_array($file_info['mime'], $allowed_mime_types, true))
-		{
-			// Недопустимый MIME-тип изображения
-			throw new ValidateException("image $image");
+			throw new ValidateException("incorrect image");
 		}
 
 		return true;
+	}
+
+	public static function validateMetaTag($html, $tagName): ?string
+	{
+		$pattern = '/<meta\s+name="' . preg_quote($tagName, '/') . '"\s+content="([^"]*)"\s*\/?>/i';
+		if (preg_match($pattern, $html, $matches))
+		{
+			return $matches[1];
+		}
+
+		return null;
 	}
 }

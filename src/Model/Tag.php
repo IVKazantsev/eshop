@@ -5,11 +5,18 @@ namespace N_ONE\App\Model;
 class Tag extends Entity
 {
 	public function __construct(
-		protected int|null  $id,
-		private string|null $title,
-		private int|null    $parentId,
+		protected ?int  $id,
+		private ?string $title,
+		private ?int    $parentId,
 	)
 	{
+	}
+
+	public static function fromFields(array $fields): static
+	{
+		return new static(
+			$fields['id'], $fields['title'], $fields['parentId'],
+		);
 	}
 
 	public function getParentId(): ?int
@@ -48,5 +55,4 @@ class Tag extends Entity
 	{
 		$this->title = $title;
 	}
-
 }

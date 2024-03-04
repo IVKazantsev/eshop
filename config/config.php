@@ -27,6 +27,9 @@ return [
 	'ORDER_HASH_ALGO' => 'crc32',
 	'SCRIPTS_PATH' => ROOT . '/js/',
 
+	'FINAL_ERROR_PAGE' => 'pages/finalErrorPage',
 	'PUBLIC_ERROR_PAGE' => 'pages/publicErrorPage',
 	'ADMIN_ERROR_PAGE' => 'pages/adminErrorPage',
+
+	'ROOT_LOG_DIR' => ROOT . '/var/log/',
 ];

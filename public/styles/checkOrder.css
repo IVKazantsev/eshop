@@ -1,0 +1,21 @@
+.check-order-container {
+	margin: 0 20px;
+}
+
+.check-order-input-container {
+	display: flex;
+	flex-direction: column;
+	margin-top: 10px;
+}
+
+
+.check-order-input {
+	padding: 17px 10px;
+	border-radius: 7px;
+	margin-top: 10px;
+}
+
+.check-order-submit {
+	border-radius: 7px;
+	margin-top: 10px;
+}

@@ -2,35 +2,37 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Order;
 use N_ONE\App\Model\Entity;
+use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
-use RuntimeException;
 
 class OrderRepository extends Repository
 {
-
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		// $currentLimit = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		// $offset = calculateCurrentOffset($currentPageNumber);
-		// $whereQueryBlock = getWhereQueryBlock($genre, $title, $connection);
+		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
+		$currentLimit = $numItemsPerPage + 1;
+		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
+		$isActive = $filter['isActive'] ?? 1;
 		$orders = [];
 
-		$whereQueryBlock = $this->getWhereQueryBlock();
+		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
 
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
-		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-		$whereQueryBlock;
-	"
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE, o.NUMBER
+			FROM N_ONE_ORDERS o
+			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+			$whereQueryBlock
+			LIMIT $currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -41,7 +43,7 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'], $row['NUMBER']
 			);
 
 			$orders[] = $order;
@@ -50,28 +52,33 @@ class OrderRepository extends Repository
 		return $orders;
 	}
 
-	private function getWhereQueryBlock(): string
+	private function getWhereQueryBlock(int $isActive): string
 	{
-		$whereQueryBlock = "WHERE o.IS_ACTIVE = 1";
-
-		return $whereQueryBlock;
+		return "WHERE o.IS_ACTIVE = $isActive";
 	}
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Order|null
+	public function getById(int $id, bool $isPublic = false): ?Order
 	{
 		$connection = $this->dbConnection->getConnection();
-
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE 
-		FROM N_ONE_ORDERS o
-		JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
-		WHERE o.ID = $id;
-	"
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE, o.NUMBER
+			FROM N_ONE_ORDERS o
+			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+			WHERE o.ID = $id and o.IS_ACTIVE in $isActive;"
 		);
 
 		if (!$result)
@@ -83,7 +90,7 @@ class OrderRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'],
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'], $row['NUMBER']
 			);
 		}
 
@@ -92,6 +99,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getStatuses(): array
 	{
@@ -99,9 +107,8 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT ID, TITLE 
-		FROM N_ONE_STATUSES s;
-	"
+			SELECT ID, TITLE 
+			FROM N_ONE_STATUSES s;"
 		);
 
 		if (!$result)
@@ -119,6 +126,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(Order|Entity $entity): int
 	{
@@ -127,17 +135,19 @@ class OrderRepository extends Repository
 		$itemId = $entity->getItemId();
 		$statusId = $entity->getStatusId();
 		$price = $entity->getPrice();
+		$orderNumber = $entity->getNumber();
 
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE) 
-		VALUES (
-			$userId,
-			$itemId,
-			$statusId,
-			$price
-		);"
+			INSERT INTO N_ONE_ORDERS (USER_ID, ITEM_ID, STATUS_ID, PRICE, NUMBER) 
+			VALUES (
+				$userId,
+				$itemId,
+				$statusId,
+				$price,
+				'$orderNumber'
+			);"
 		);
 
 		if (!$result)
@@ -150,6 +160,7 @@ class OrderRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(Order|Entity $entity): bool
 	{
@@ -163,14 +174,13 @@ class OrderRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_ORDERS 
-		SET 
-			USER_ID = $userId,
-			ITEM_ID = $itemId,
-			STATUS_ID = $statusId,
-			PRICE = $price
-		WHERE ID = $orderId;
-		"
+			UPDATE N_ONE_ORDERS 
+			SET 
+				USER_ID = $userId,
+				ITEM_ID = $itemId,
+				STATUS_ID = $statusId,
+				PRICE = $price
+			WHERE ID = $orderId;"
 		);
 
 		if (!$result)
@@ -179,5 +189,46 @@ class OrderRepository extends Repository
 		}
 
 		return true;
+	}
+
+	/**
+	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
+	 */
+	public function getByNumber(string $number, bool $isPublic = false): ?Order
+	{
+		$connection = $this->dbConnection->getConnection();
+		$number = mysqli_real_escape_string($connection, $number);
+		if ($isPublic)
+		{
+			$isActive = "(1)";
+		}
+		else
+		{
+			$isActive = "(1, 0)";
+		}
+		$result = mysqli_query(
+			$connection,
+			"
+			SELECT o.ID, o.USER_ID, o.ITEM_ID, o.STATUS_ID, o.PRICE, s.TITLE
+			FROM N_ONE_ORDERS o
+			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
+			WHERE o.NUMBER = '$number' and o.IS_ACTIVE in $isActive;"
+		);
+
+		if (!$result)
+		{
+			throw new DatabaseException(mysqli_error($connection));
+		}
+
+		$order = null;
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$order = new Order(
+				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'], $number
+			);
+		}
+
+		return $order;
 	}
 }

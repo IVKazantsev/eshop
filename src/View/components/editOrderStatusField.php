@@ -1,8 +1,10 @@
 <?php
 /**
- * // * @var string $field
+ * @var string $field
  * @var array $statuses
  */
+
+use N_ONE\App\Model\Service\ValidationService;
 
 ?>
 
@@ -11,7 +13,7 @@
 	status:
 	<select id="statusSelect" name="status">
 		<?php foreach ($statuses as $statusId => $status): ?>
-			<option value="<?= $statusId ?>"><?= $status ?></option>
+			<option value="<?= $statusId ?>"><?= ValidationService::safe($status) ?></option>
 		<?php endforeach; ?>
 	</select>
 </label>

@@ -5,6 +5,8 @@
  * @var array $itemTags
  */
 
+use N_ONE\App\Model\Service\ValidationService;
+
 ?>
 
 <div class="form-section">
@@ -13,7 +15,7 @@
 
 	<?php foreach ($childrenTags as $parentName => $childTag): ?>
 		<div class="tag-group">
-			<p><?= $parentName ?>:</p>
+			<p><?= ValidationService::safe($parentName) ?>:</p>
 
 			<?php foreach ($childTag as $tag): ?>
 				<label for="<?= $tag->getParentId() ?>">
@@ -21,8 +23,13 @@
 					{
 						echo $itemTags[$tag->getParentId()] === $tag->getId() ? 'checked' : '';
 					}
-					?> type="radio" name="tags[<?= $tag->getParentId() ?>]" value="<?= $tag->getId() ?>">
-					<?= $tag->getTitle() ?>
+					?>
+						class="specific-input-string"
+						type="radio"
+						name="tags[<?= $tag->getParentId() ?>]"
+						value="<?= $tag->getId() ?>"
+					>
+					<?=  ValidationService::safe($tag->getTitle()) ?>
 				</label>
 
 			<?php endforeach; ?>

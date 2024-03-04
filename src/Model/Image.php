@@ -7,16 +7,15 @@ class Image extends Entity
 	private string $path;
 
 	public function __construct(
-		protected int|null  $id,
-		private int|null    $itemId,
-		private bool|null   $isMain,
-		private int|null    $type,
-		private int|null    $height,
-		private int|null    $width,
-		private string|null $extension
+		protected ?int  $id,
+		private ?int    $itemId,
+		private ?bool   $isMain,
+		private ?int    $type,
+		private ?int    $height,
+		private ?int    $width,
+		private ?string $extension
 	)
 	{
-
 		$size = ($this->type === 1) ? 'fullsize' : 'preview';
 		$description = $this->isMain ? 'main' : 'base';
 		$this->path = $this->itemId
@@ -96,5 +95,10 @@ class Image extends Entity
 	public function setWidth(int $width): void
 	{
 		$this->width = $width;
+	}
+
+	public function getExcludedFields(): array
+	{
+		return [];
 	}
 }

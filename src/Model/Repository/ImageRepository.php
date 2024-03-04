@@ -2,15 +2,18 @@
 
 namespace N_ONE\App\Model\Repository;
 
+use mysqli_sql_exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Image;
 use N_ONE\Core\Exceptions\DatabaseException;
-use RuntimeException;
 
 class ImageRepository extends Repository
 {
 	/**
+	 * @param int[]|null $filter
+	 *
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function getList(array $filter = null, bool $isImageId = null): array
 	{
@@ -20,12 +23,11 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT id, item_id, height, width, is_main, type, extension
-		FROM N_ONE_IMAGES
-		WHERE $field IN (" . implode(',', $filter) . ");
-		"
+			SELECT id, item_id, height, width, is_main, type, extension
+			FROM N_ONE_IMAGES
+			WHERE $field IN (" . implode(',', $filter) . ");
+			"
 		);
-
 
 		if (!$result)
 		{
@@ -50,18 +52,18 @@ class ImageRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
-	public function getById(int $id): Image|null
+	public function getById(int $id, bool $isPublic = false): ?Image
 	{
 		$connection = $this->dbConnection->getConnection();
-
 		$result = mysqli_query(
 			$connection,
 			"
-		SELECT id, item_id, height, width, is_main, type, extension
-		FROM N_ONE_IMAGES 
-		WHERE id = $id;
-		"
+			SELECT ID, item_id, height, width, is_main, type, extension
+			FROM N_ONE_IMAGES 
+			WHERE ID = $id;
+			"
 		);
 
 		if (!$result)
@@ -88,6 +90,7 @@ class ImageRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function add(Image|Entity $entity): int
 	{
@@ -102,15 +105,15 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		INSERT INTO N_ONE_IMAGES (ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE, EXTENSION) 
-		VALUES (
-			$itemId,
-			$height,
-			$width,
-			$isMain,
-			$type,
-			'$extension'
-		);"
+			INSERT INTO N_ONE_IMAGES (ITEM_ID, HEIGHT, WIDTH, IS_MAIN, TYPE, EXTENSION) 
+			VALUES (
+				$itemId,
+				$height,
+				$width,
+				$isMain,
+				$type,
+				'$extension'
+			);"
 		);
 
 		if (!$result)
@@ -123,6 +126,7 @@ class ImageRepository extends Repository
 
 	/**
 	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
 	 */
 	public function update(Image|Entity $entity): bool
 	{
@@ -138,16 +142,16 @@ class ImageRepository extends Repository
 		$result = mysqli_query(
 			$connection,
 			"
-		UPDATE N_ONE_IMAGES 
-		SET 
-			ITEM_ID = $itemId,
-			HEIGHT = $height,
-			WIDTH = $width,
-			IS_MAIN = $isMain,
-			TYPE = $type,
-			EXTENSION = '$extension'
-		where ID = $imageId;
-		"
+			UPDATE N_ONE_IMAGES 
+			SET 
+				ITEM_ID = $itemId,
+				HEIGHT = $height,
+				WIDTH = $width,
+				IS_MAIN = $isMain,
+				TYPE = $type,
+				EXTENSION = '$extension'
+				where ID = $imageId;
+			"
 		);
 
 		if (!$result)
@@ -157,13 +161,19 @@ class ImageRepository extends Repository
 
 		return true;
 	}
+
+	/**
+	 * @throws DatabaseException
+	 * @throws mysqli_sql_exception
+	 */
 	public function permanentDeleteByIds(array $entityId): bool
 	{
 		$connection = $this->dbConnection->getConnection();
 
 		$result = mysqli_query(
 			$connection,
-			"DELETE FROM N_ONE_IMAGES WHERE ID IN (" . implode(',', $entityId) . ");"
+			"DELETE FROM N_ONE_IMAGES 
+			WHERE ID IN (" . implode(',', $entityId) . ");"
 		);
 
 		if (!$result)
@@ -173,5 +183,4 @@ class ImageRepository extends Repository
 
 		return true;
 	}
-
 }

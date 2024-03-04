@@ -6,12 +6,11 @@ use Closure;
 
 class Route
 {
-
 	private array $variables = [];
 
 	public function __construct(
-		public string   $method,
-		public string   $uri,
+		public string  $method,
+		public string  $uri,
 		public Closure $action
 	)
 	{

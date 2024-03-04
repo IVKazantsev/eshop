@@ -2,9 +2,6 @@
 
 namespace N_ONE\App\Model;
 
-use Exception;
-use RuntimeException;
-
 class Item extends Entity
 {
 	/**
@@ -13,17 +10,30 @@ class Item extends Entity
 	 * @param Attribute[] $attributes
 	 */
 	public function __construct(
-		protected int|null  $id,
-		private string|null $title,
-		private bool|null   $isActive,
-		private int|null    $price,
-		private string|null $description,
-		private int|null    $sortOrder,
-		private array|null  $tags,
-		private array|null  $attributes,
-		private array|null  $images,
+		protected ?int  $id,
+		private ?string $title,
+		private ?int    $price,
+		private ?string $description,
+		private ?int    $sortOrder,
+		private ?array  $tags,
+		private ?array  $attributes,
+		private ?array  $images,
 	)
 	{
+	}
+
+	public static function fromFields(array $fields): static
+	{
+		return new static(
+			$fields['id'],
+			$fields['title'],
+			$fields['price'],
+			$fields['description'],
+			$fields['sortOrder'],
+			$fields['tags'],
+			$fields['attributes'],
+			$fields['images']
+		);
 	}
 
 	public function getAttributes(): ?array
@@ -76,7 +86,7 @@ class Item extends Entity
 
 	public function getExcludedFields(): array
 	{
-		return ['isActive', 'tags', 'images', 'attributes'];
+		return ['tags', 'images', 'attributes'];
 	}
 
 	public function getClassname(): string
@@ -111,15 +121,15 @@ class Item extends Entity
 		$this->title = $title;
 	}
 
-	public function isActive(): bool
-	{
-		return $this->isActive;
-	}
-
-	public function setIsActive(bool $isActive): void
-	{
-		$this->isActive = $isActive;
-	}
+	// public function isActive(): bool
+	// {
+	// 	return $this->isActive;
+	// }
+	//
+	// public function setIsActive(bool $isActive): void
+	// {
+	// 	$this->isActive = $isActive;
+	// }
 
 	public function getPrice(): int
 	{
@@ -151,7 +161,7 @@ class Item extends Entity
 		$this->sortOrder = $sortOrder;
 	}
 
-	public function getTags(): array
+	public function getTags(): ?array
 	{
 		return $this->tags;
 	}

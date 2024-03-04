@@ -3,6 +3,7 @@
 namespace N_ONE\Core\Migrator;
 
 use DateTime;
+use mysqli;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -11,19 +12,26 @@ use N_ONE\Core\Exceptions\FileException;
 class Migrator
 {
 	static private ?Migrator $instance = null;
-	private DbConnector $dbConnector;
+
+	private mysqli|false $connection;
+
 	private string $migrationTable;
+
 	private string $migrationPath;
 
-	private function __construct(DbConnector $dbConnector)
+	/**
+	 * @throws DatabaseException
+	 */
+	private function __construct()
 	{
-		$this->dbConnector = $dbConnector;
+		$this->connection = DbConnector::getInstance()->getConnection();
 		$this->migrationTable = Configurator::option('MIGRATION_TABLE');
 		$this->migrationPath = Configurator::option('MIGRATION_PATH');
 	}
 
 	private function __clone()
-	{}
+	{
+	}
 
 	public static function getInstance(): Migrator
 	{
@@ -32,8 +40,7 @@ class Migrator
 			return static::$instance;
 		}
 
-		$dbConnector = DbConnector::getInstance();
-		return static::$instance = new self($dbConnector);
+		return static::$instance = new self();
 	}
 
 	/**
@@ -42,7 +49,6 @@ class Migrator
 	 */
 	public function migrate(): void
 	{
-
 		// 1. смотрим последнюю применённую миграцию, которая записана в таблице migration (если таблица пуста то делаем все миграции)
 		$lastMigration = $this->getLastMigration();
 
@@ -62,7 +68,7 @@ class Migrator
 	 */
 	private function getLastMigration()
 	{
-		$connection = $this->dbConnector->getConnection();
+		$connection = $this->connection;
 
 		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '$this->migrationTable'");
 
@@ -74,11 +80,10 @@ class Migrator
 		$result = mysqli_query(
 			$connection,
 			"
-        SELECT *
-        FROM {$this->migrationTable}
-        ORDER BY ID DESC
-        LIMIT 1
-        "
+			SELECT *
+			FROM {$this->migrationTable}
+			ORDER BY ID DESC
+			LIMIT 1;"
 		);
 
 		if (!$result)
@@ -102,6 +107,7 @@ class Migrator
 			{
 				$migrations[] = basename($file);
 			}
+
 			return $migrations;
 		}
 
@@ -132,9 +138,8 @@ class Migrator
 	 */
 	private function executeMigration($migration): void
 	{
-
 		// Получение соединения с базой данных
-		$connection = $this->dbConnector->getConnection();
+		$connection = $this->connection;
 
 		// Чтение содержимого SQL файла
 		$sql = file_get_contents(ROOT . $this->migrationPath . '/' . $migration);
@@ -169,7 +174,7 @@ class Migrator
 	 */
 	private function updateLastMigration($migration): void
 	{
-		$connection = $this->dbConnector->getConnection();
+		$connection = $this->connection;
 
 		$sql = "INSERT INTO $this->migrationTable (TITLE) VALUE ('$migration');";
 
@@ -179,7 +184,6 @@ class Migrator
 			throw new DatabaseException(mysqli_error($connection));
 		}
 	}
-
 }
 
 

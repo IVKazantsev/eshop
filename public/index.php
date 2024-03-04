@@ -10,4 +10,5 @@ require_once __DIR__ . '/../boot.php';
 // $tagRepo = $di->getComponent('tagRepository');
 //
 // var_dump(\N_ONE\App\Model\Service\TagService::reformatTags($tagRepo->getList()));
+
 N_ONE\App\Application::run();

@@ -4,6 +4,8 @@ namespace N_ONE\App\Model;
 
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
+use ReflectionUnionType;
 
 abstract class Entity
 {
@@ -32,8 +34,11 @@ abstract class Entity
 		{
 			return $result;
 		}
+		$excludedFields = $this->getExcludedFields();
 
-		return array_flip(array_diff_key(array_flip($result), array_flip($this->getExcludedFields())));
+		return array_filter($result, static function($field) use ($excludedFields) {
+			return !in_array($field, $excludedFields, true);
+		});
 	}
 
 	/**
@@ -46,10 +51,36 @@ abstract class Entity
 
 		$stubObject = $reflection->newInstanceWithoutConstructor();
 
-		foreach ($properties as $property) {
+		foreach ($properties as $property)
+		{
 			$property->setValue($stubObject, null);
 		}
 
 		return $stubObject;
+	}
+
+	/**
+	 * @throws ReflectionException
+	 */
+	public function getPropertyType(string $propertyName): ?string
+	{
+		$reflectionClass = new ReflectionClass($this);
+		$property = $reflectionClass->getProperty($propertyName);
+		$type = $property->getType();
+
+		if ($type instanceof ReflectionNamedType)
+		{
+			return $type->getName();
+		}
+
+		if ($type instanceof ReflectionUnionType)
+		{
+			// Обработка объединенных типов, например, "int|null"
+			return implode('|', array_map(static function($type) {
+				return $type->getName();
+			}, $type->getTypes()));
+		}
+
+		return null; // Тип не определен или неизвестен
 	}
 }

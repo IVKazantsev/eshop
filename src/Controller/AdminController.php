@@ -4,23 +4,22 @@ namespace N_ONE\App\Controller;
 
 use Exception;
 use InvalidArgumentException;
+use mysqli_sql_exception;
 use N_ONE\App\Model\Attribute;
-use N_ONE\App\Model\Image;
 use N_ONE\App\Model\Item;
-use N_ONE\App\Model\Entity;
-use N_ONE\App\Model\Service\ImageService;
 use N_ONE\App\Model\Service\PaginationService;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\DatabaseException;
 use N_ONE\Core\Exceptions\LoginException;
 use N_ONE\Core\Exceptions\ValidateException;
 use N_ONE\App\Model\Order;
-use N_ONE\App\Model\Repository\UserRepository;
 use N_ONE\App\Model\Tag;
 use N_ONE\App\Model\User;
+use N_ONE\Core\Log\Logger;
 use N_ONE\Core\Routing\Router;
 use N_ONE\Core\TemplateEngine\TemplateEngine;
 use N_ONE\App\Model\Service\ValidationService;
+use ReflectionException;
 
 class AdminController extends BaseController
 {
@@ -37,13 +36,15 @@ class AdminController extends BaseController
 		}
 	}
 
-	public function login(string $email, ?string $password): void
+	public function login(string $email, ?string $password, ?bool $rememberMe = false): void
 	{
 		$trimmedEmail = filter_var(trim($email), FILTER_SANITIZE_EMAIL);
 		$trimmedPassword = trim($password);
 		if (session_status() === PHP_SESSION_NONE)
 		{
 			session_start();
+			setcookie(session_name(), session_id(), time() + 1800); //Сгорание сессии через 30 минут после начала
+
 		}
 
 		try
@@ -53,8 +54,8 @@ class AdminController extends BaseController
 				$_SESSION['login_error'] = 'Please enter both email and password.';
 				throw new LoginException();
 			}
-
 			$user = $this->userRepository->getByEmail($trimmedEmail);
+
 			if (!$user)
 			{
 				throw new LoginException();
@@ -66,13 +67,26 @@ class AdminController extends BaseController
 				throw new LoginException();
 			}
 
-			if ($trimmedPassword !== $user->getPass())
+			if (!password_verify($trimmedPassword, $user->getPass()))
 			{
+
 				$_SESSION['login_error'] = 'Incorrect email or password. Please try again.';
 				throw new LoginException();
 			}
 		}
-		catch (DatabaseException|LoginException|Exception)
+		catch (DatabaseException $e)
+		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+			echo TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
+			exit();
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+			echo TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+			exit();
+		}
+		catch (LoginException)
 		{
 			if (!$_SESSION['login_error'])
 			{
@@ -81,40 +95,44 @@ class AdminController extends BaseController
 			Router::redirect('/login');
 			exit(401);
 		}
-		ob_start();
+
+		if ($rememberMe)
+		{
+			$token = bin2hex(random_bytes(32));
+			$this->userRepository->addToken($user->getId(), $token);
+			setcookie('remember_me', $token, time() + (86400), "/");
+		}
 		$_SESSION['user_id'] = $user->getId();
-		Router::redirect('/admin');
+		ob_start();
+		Router::redirect('/admin/items');
 		ob_end_flush();
 		exit();
 	}
 
-	public function renderEditPage(string $entityToEdit, string $itemId): string
+	public function renderEditPage(string $entityToEdit, int $entityId): string
 	{
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entityToEdit);
-			$item = $repository->getById($itemId);
-			if ($item === null)
+			$entity = $repository->getById($entityId);
+			if ($entity === null)
 			{
 				$content = TemplateEngine::renderAdminError(':(', 'Данный товар не найден');
 
 				return $this->renderAdminView($content);
 			}
-			switch (get_class($item))
+			switch (get_class($entity))
 			{
 				case Item::class:
 				{
 					$parentTags = $this->tagRepository->getParentTags();
 					$attributes = $this->attributeRepository->getList();
-					$itemAttributes = $item->getAttributes();
+					$itemAttributes = $entity->getAttributes();
 					$itemTags = [];
 					$childrenTags = [];
 					$specificFields = [
-						'isActive' => TemplateEngine::render('components/editIsActive', [
-							'item' => $item,
-						]),
 						'description' => TemplateEngine::render('components/editItemDescription', [
-							'item' => $item,
+							'item' => $entity,
 						]),
 					];
 					foreach ($parentTags as $parentTag)
@@ -124,10 +142,9 @@ class AdminController extends BaseController
 						);
 
 					}
-					foreach ($item->getTags() as $tag)
+					foreach ($entity->getTags() as $tag)
 					{
 						$itemTags[$tag->getParentId()] = $tag->getId();
-
 					}
 					$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
 						'childrenTags' => $childrenTags,
@@ -138,23 +155,19 @@ class AdminController extends BaseController
 						'itemAttributes' => $itemAttributes,
 					]);
 
-					$images = $this->imageRepository->getList([$itemId]);
-					$addImagesSection = TemplateEngine::render('components/addImagesSection', [
-						'itemId' => $itemId,
-					]);
+					$images = $this->imageRepository->getList([$entityId]);
 					$deleteImagesSection = TemplateEngine::render('components/deleteImagesSection', [
-						'images' => $images[$itemId] ?? [],
+						'images' => $images[$entityId] ?? [],
 					]);
 
 					$additionalSections = [
-						$tagsSection,
-						$attributesSection,
-						$addImagesSection,
-						$deleteImagesSection,
+						'tags' => $tagsSection,
+						'attributes' => $attributesSection,
+						'images' => $deleteImagesSection,
 					];
 
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
 						'specificFields' => $specificFields,
 						'additionalSections' => $additionalSections,
 					]);
@@ -162,25 +175,36 @@ class AdminController extends BaseController
 				}
 				case Tag::class:
 				{
-					$parentTags = $repository->getAllParentTags();
+					$parentTags = $this->tagRepository->getAllParentTags();
 					$specificFields = [
 						'parentId' => TemplateEngine::render('components/editTagParentId', [
-							'item' => $item,
+							'tag' => $entity,
 							'parentTags' => $parentTags,
 						]),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
+						'specificFields' => $specificFields,
+					]);
+					break;
+
+				}
+				case User::class:
+				{
+					$specificFields = [
+						'password' => TemplateEngine::render('components/editPasswordField', ['user' => $entity]),
+					];
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
 						'specificFields' => $specificFields,
 					]);
 					break;
 
 				}
 				case Attribute::class:
-				case User::class:
 				{
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
 					]);
 					break;
 
@@ -189,12 +213,18 @@ class AdminController extends BaseController
 				{
 					$statuses = $this->orderRepository->getStatuses();
 					$specificFields = [
-						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]
+						'status' => TemplateEngine::render(
+							'components/editOrderStatusField', ['statuses' => $statuses]
 						),
-						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['item' => $item]),
+						'statusId' => TemplateEngine::render(
+							'components/editOrderStatusIdField', ['order' => $entity]
+						),
+						'orderNumber' => TemplateEngine::render(
+							'components/editOrderNumberField', ['orderNumber' => $entity->getNumber()]
+						),
 					];
 					$content = TemplateEngine::render('pages/adminEditPage', [
-						'item' => $item,
+						'entity' => $entity,
 						'specificFields' => $specificFields,
 					]);
 					break;
@@ -202,14 +232,25 @@ class AdminController extends BaseController
 				}
 				default:
 				{
-					$content = TemplateEngine::render('pages/adminEditPage', []);
+					$content = TemplateEngine::render('pages/adminEditPage');
 					break;
-
 				}
 			}
 		}
-		catch (InvalidArgumentException|Exception)
+		catch (DatabaseException $e)
 		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
 
@@ -225,10 +266,7 @@ class AdminController extends BaseController
 
 	public function renderDashboard(): string
 	{
-		if (!$this->checkIfLoggedIn())
-		{
-			Router::redirect('/login');
-		}
+
 		try
 		{
 			$content = TemplateEngine::render('pages/adminDashboard');
@@ -241,21 +279,7 @@ class AdminController extends BaseController
 		return $this->renderAdminView($content);
 	}
 
-	public function checkIfLoggedIn(): bool
-	{
-		if (session_status() === PHP_SESSION_NONE)
-		{
-			session_start();
-		}
-		if (!isset($_SESSION['user_id']))
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-	public function renderEntityPage(string $entityToDisplay, ?int $pageNumber): string
+	public function renderEntityPage(string $entityToDisplay, ?int $pageNumber, int $isActive): string
 	{
 		try
 		{
@@ -263,38 +287,54 @@ class AdminController extends BaseController
 
 			$filter = [
 				'pageNumber' => $pageNumber,
+				'isActive' => $isActive,
 			];
 
-			$items = $repository->getList($filter);
-			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber);
-			$nextPageUri = PaginationService::getNextPageUri(count($items), $pageNumber);
+			$entities = $repository->getList($filter);
+			$previousPageUri = PaginationService::getPreviousPageUri($pageNumber, $_SERVER['REQUEST_URI']);
+			$nextPageUri = PaginationService::getNextPageUri(count($entities), $pageNumber, $_SERVER['REQUEST_URI']);
 
-			if (empty($items))
+			if (empty($entities))
 			{
-				$content = TemplateEngine::renderAdminError(':(', 'Сущности не найдены');
+				$className = 'N_ONE\App\Model\\' . ucfirst(
+						substr_replace($entityToDisplay, '', -1)
+					);
+				$entities['dummy'] = ($className)::createDummyObject();
 
-				return $this->renderAdminView($content);
+				return $this->renderAdminView(TemplateEngine::render('pages/adminEntitiesPage', [
+					'entities' => $entities,
+					'isActive' => $isActive,
+				]));
 			}
 
-			if ($entityToDisplay === 'items' && count($items) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
+			if (count($entities) === Configurator::option('NUM_OF_ITEMS_PER_PAGE') + 1)
 			{
-				array_pop($items);
+				array_pop($entities);
 			}
 
-			$content = TemplateEngine::render('pages/adminItemsPage', [
-				'items' => $items,
+			$content = TemplateEngine::render('pages/adminEntitiesPage', [
+				'entities' => $entities,
 				'previousPageUri' => $previousPageUri,
 				'nextPageUri' => $nextPageUri,
+				'isActive' => $isActive,
 			]);
 
 		}
 		catch (InvalidArgumentException)
 		{
-			$content = TemplateEngine::renderAdminError('404', 'Страница не найдена');
-		}
-		catch (Exception)
-		{
+			// Не получилось создать репозиторий. Логирование не нужно
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (DatabaseException $e)
+		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderAdminView($content);
@@ -304,84 +344,55 @@ class AdminController extends BaseController
 	 * @throws ValidateException
 	 * @throws DatabaseException
 	 */
-	public function updateItem(string $entityType, string $itemId): string
+	public function updateEntity(string $entityType, string $entityId): string
 	{
 		$fields = $_POST;
-
-		// foreach ($fields as $field)
-		// {
-		// 	$fields[$field] = ValidationService::validateEntryField($field);
-		// }
-		$className = 'N_ONE\App\Model\\' . ucfirst(
-				substr_replace($entityType, '', -1)
-			); //Костыль на приведение названия типа сущности из URL к названию класса
-		if ($entityType === 'tags')
-		{
-			foreach ($fields as $field => $value)
-			{
-				if ($field === 'parentId' && $value === '')
-				{
-					$fields[$field] = null;
-					continue;
-				}
-				$fields[$field] = ValidationService::validateEntryField($value);
-			}
-		}
-		if ($entityType === 'attributes')
-		{
-			$fields['value'] = null;
-			// foreach ($fields as $field => $value)
-			// {
-			// $fields[$field] = ValidationService::validateEntryField($value);
-			// }
-		}
-		if ($entityType === 'items')
-		{
-			// $tags = [];
-			if (array_key_exists('imageIds', $fields))
-			{
-				$this->deleteImages($fields['imageIds']);
-			}
-			if ($_FILES['image']['size'][0] !== 0)
-			{
-				$this->addBaseImages($_FILES, $itemId);
-			}
-
-			foreach ($fields as $field => $value)
-			{
-				if (
-					($field === 'isActive' || $field === 'sortOrder')
-					&& $value === '0'
-				) //РАЗРЕШЕНИЕ НА ИСПОЛЬЗОВАНИЕ FALSY ДЛЯ УКАЗАННЫХ ПОЛЕЙ
-				{
-					continue;
-				}
-			}
-			// $fields['tags'] = $tags;
-			$fields['images'] = [];
-		}
-		// foreach ($fields as $field => $value)
-		// {
-		// 	if (!trim($value))
-		// 	{
-		// 		return TemplateEngine::renderAdminError(404, "Missing required field: {$field}");
-		// 	}
-		// 	$fields[$field] = trim($value);
-		// }
+		$fields['id'] = $entityId;
+		//Костыль на приведение названия типа сущности из URL к названию класса
+		$className = 'N_ONE\App\Model\\' . ucfirst(substr_replace($entityType, '', -1));
 
 		try
 		{
+			foreach ($fields as $field => $value)
+			{
+				$fields[$field] = ValidationService::validateEntryField($value);
+			}
+			if (array_key_exists('imageIds', $fields) && $entityType === 'items')
+			{
+				$this->imageService->deleteImages($fields['imageIds']);
+			}
+			if ($_FILES['image']['size'][0] !== 0 && $entityType === 'items')
+			{
+				$this->imageService->addBaseImages($_FILES, $entityId);
+			}
+			if ($_FILES['image']['size'][0] !== 0 && !$fields['parentId'] && $entityType === 'tags')
+			{
+				$this->imageService->addTagLogo($_FILES, $entityId);
+			}
 			$repository = $this->repositoryFactory->createRepository($entityType);
-			$item = new $className($itemId, ...array_values($fields));
-			$repository->update($item);
+			$entity = $className::fromFields($fields);
+			$repository->update($entity);
+		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
 		catch (ValidateException $e)
 		{
 			return TemplateEngine::renderAdminError(400, $e->getMessage());
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderSuccessEditPage();
@@ -418,36 +429,58 @@ class AdminController extends BaseController
 	public function logout(): void
 	{
 		session_start();
-		$_SESSION = [];
-		if (ini_get("session.use_cookies"))
-		{
-			$params = session_get_cookie_params();
-			setcookie(
-				session_name(),
-				'',
-				time() - 42000,
-				$params["path"],
-				$params["domain"],
-				$params["secure"],
-				$params["httponly"]
-			);
-		}
+		session_unset();
 		session_destroy();
+
+		setcookie('remember_me', '', time() - 3600, '/'); // Set the cookie's expiration to a time in the past
+
 		Router::redirect('/login');
+		exit();
 	}
 
-	public function renderConfirmDeletePage(string $entities, string $entityId): string
+	public function renderConfirmPage(string $entityType, int $entityId, string $action): string
 	{
-		$entity = substr($entities, 0, -1);
-		$confirmDeletePage = TemplateEngine::render('pages/confirmDeletePage', [
-			'entity' => $entity,
-			'entityId' => $entityId,
-		]);
+		try
+		{
+			$repository = $this->repositoryFactory->createRepository($entityType);
+			$entity = $repository->getById($entityId);
+			if ($entity === null)
+			{
+				$content = TemplateEngine::renderAdminError(':(', 'Данный товар не найден');
+			}
+			else
+			{
+				$entityName = substr($entityType, 0, -1);
 
-		return $this->renderAdminView($confirmDeletePage);
+				$content = TemplateEngine::render('pages/confirmPage', [
+					'entity' => $entityName,
+					'entityId' => $entityId,
+					'action' => $action,
+				]);
+			}
+		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (DatabaseException $e)
+		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+
+			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+
+		return $this->renderAdminView($content);
 	}
 
-	public function processDeletion(string $entities, string $entityId): string
+	public function processChangeActive(string $entities, int $entityId, int $isActive): string
 	{
 		if (!$entityId)
 		{
@@ -456,293 +489,226 @@ class AdminController extends BaseController
 		try
 		{
 			$repository = $this->repositoryFactory->createRepository($entities);
-			$repository->delete($entities, $entityId);
+			$repository->changeActive($entities, $entityId, $isActive);
 		}
-		catch (DatabaseException|InvalidArgumentException)
+		catch (DatabaseException $e)
 		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+
 			return TemplateEngine::renderAdminError(":(", "Что-то пошло не так");
 		}
-
-		return $this->renderSuccessDeletePage();
-	}
-
-	public function renderSuccessDeletePage(): string
-	{
-		if ($_SERVER['REQUEST_URI'] !== "/admin/delete/success")
+		catch (mysqli_sql_exception $e)
 		{
-			Router::redirect("/admin/delete/success");
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
+		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			return TemplateEngine::renderAdminError(":(", "Что-то пошло не так");
+
 		}
 
-		$successDeletePage = TemplateEngine::render(
-			'pages/successDeletePage'
-		);
+		return $this->renderSuccessPage($isActive);
+	}
+
+	public function renderSuccessPage(int $isActive): string
+	{
+		$currentPage = ($isActive === 0) ? 'delete' : 'restore';
+		if ($_SERVER['REQUEST_URI'] !== "/admin/$currentPage/success")
+		{
+			Router::redirect("/admin/$currentPage/success");
+		}
+
+		$successDeletePage = TemplateEngine::render('pages/successPage', ['isActive' => $isActive]);
 
 		return $this->renderAdminView($successDeletePage);
 	}
 
-	/**
-	 * @throws DatabaseException
-	 */
-	public function deleteImages(array $imagesIds): bool
+	public function renderAddPage(string $entityToAdd): string
 	{
-		$imagesIds = array_map('intval', $imagesIds);
-		$images = $this->imageRepository->getList($imagesIds, true);
-		$path = ROOT . '/public' . Configurator::option('IMAGES_PATH');
-
-		$this->imageRepository->permanentDeleteByIds($imagesIds);
-
-		foreach ($imagesIds as $id)
+		try
 		{
-			unlink($path . $images[$id][0]->getPath());
-		}
+			$className = 'N_ONE\App\Model\\' . ucfirst(
+					$entityToAdd
+				);//Костыль на приведение названия типа сущности из URL к названию класса
 
-		return true;
-	}
-
-	/**
-	 * @throws ValidateException
-	 * @throws DatabaseException
-	 */
-	public function addBaseImages($files, $itemId): bool
-	{
-		$fileCount = count($files['image']['name']);
-
-		for ($i = 0; $i < $fileCount; $i++)
-		{
-			ValidationService::validateImage($files, $i);
-
-			$targetDir = ROOT
-				. '/public'
-				. Configurator::option('IMAGES_PATH')
-				. "$itemId/"; // директория для сохранения загруженных файлов
-			$targetFile = $targetDir . basename($files["image"]["name"][$i]);
-			$file_extension = pathinfo($files['image']['name'][$i], PATHINFO_EXTENSION);
-
-			ImageService::createDirIfNotExist($targetDir);
-
-			$fullSizeImageId = $this->imageRepository->add(
-				new Image(null, $itemId, false, 1, 1200, 900, $file_extension)
-			);
-			$previewImageId = $this->imageRepository->add(
-				new Image(null, $itemId, false, 2, 640, 480, $file_extension)
-			);
-
-			$finalFullSizePath = $targetDir . $fullSizeImageId . "_1200_900_fullsize_base" . ".$file_extension";
-			$finalPreviewPath = $targetDir . $previewImageId . '_640_480_preview_base' . ".$file_extension";
-			// Попытка загрузки файла на сервер
-			if (move_uploaded_file($files["image"]["tmp_name"][$i], $targetFile))
+			$entity = ($className)::createDummyObject();
+			switch (get_class($entity))
 			{
-				ImageService::resizeImage($targetFile, $finalFullSizePath, 1200, 900);
-				ImageService::resizeImage($targetFile, $finalPreviewPath, 640, 480);
-				unlink($targetFile);
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public function renderAddPage(string $entityToAdd)
-	{
-		$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
-		$className = 'N_ONE\App\Model\\' . ucfirst(
-				$entityToAdd
-			);//Костыль на приведение названия типа сущности из URL к названию класса
-
-		$item = ($className)::createDummyObject();
-		switch (get_class($item))
-		{
-			case Item::class:
-			{
-				$parentTags = $this->tagRepository->getParentTags();
-				$attributes = $this->attributeRepository->getList();
-
-				$itemTags = [];
-				$childrenTags = [];
-				$specificFields = [
-					'isActive' => TemplateEngine::render('components/editIsActive', [
-						'item' => $item,
-					]),
-					'description' => TemplateEngine::render('components/editItemDescription', [
-						'item' => $item,
-					]),
-				];
-				foreach ($parentTags as $parentTag)
+				case Item::class:
 				{
-					$childrenTags[(string)($parentTag->getTitle())] = $this->tagRepository->getByParentId(
-						$parentTag->getId()
-					);
+					$parentTags = $this->tagRepository->getParentTags();
+					$attributes = $this->attributeRepository->getList();
+
+					$itemTags = [];
+					$childrenTags = [];
+					$specificFields = [
+						'description' => TemplateEngine::render('components/editItemDescription', [
+							'item' => $entity,
+						]),
+					];
+					foreach ($parentTags as $parentTag)
+					{
+						$childrenTags[(string)($parentTag->getTitle())] = $this->tagRepository->getByParentId(
+							$parentTag->getId()
+						);
+
+					}
+					$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
+						'childrenTags' => $childrenTags,
+						'itemTags' => $itemTags,
+					]);
+					$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
+						'attributes' => $attributes,
+					]);
+
+					$deleteImagesSection = TemplateEngine::render('components/deleteImagesSection');
+
+					$additionalSections = [
+						'tags' => $tagsSection,
+						'attributes' => $attributesSection,
+						'images' => $deleteImagesSection,
+					];
+
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
+						'specificFields' => $specificFields,
+						'additionalSections' => $additionalSections,
+					]);
+					break;
+				}
+				case Tag::class:
+				{
+					$parentTags = $this->tagRepository->getAllParentTags();
+					$specificFields = [
+						'parentId' => TemplateEngine::render('components/editTagParentId', [
+							'tag' => $entity,
+							'parentTags' => $parentTags,
+						]),
+					];
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
+						'specificFields' => $specificFields,
+					]);
+					break;
 
 				}
-				// foreach ($item->getTags() as $tag)
-				// {
-				// 	$itemTags[$tag->getParentId()] = $tag->getId();
-				//
-				// }
-				$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
-					'childrenTags' => $childrenTags,
-					'itemTags' => $itemTags,
-				]);
-				$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
-					'attributes' => $attributes,
-					// 'itemAttributes' => $itemAttributes,
-				]);
+				case User::class:
+				{
+					$specificFields = [
+						'password' => TemplateEngine::render('components/editPasswordField', ['user' => $entity]),
+					];
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
+						'specificFields' => $specificFields,
+					]);
+					break;
 
-				// $images = $this->imageRepository->getList([$itemId]);
-				// $addImagesSection = TemplateEngine::render('components/addImagesSection', [
-				// 	'itemId' => $itemId,
-				// ]);
-				$deleteImagesSection = TemplateEngine::render(
-					'components/deleteImagesSection', [// 'images' => $images[$itemId] ?? [],
-													]
-				);
+				}
+				case Attribute::class:
+				{
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
+					]);
+					break;
 
-				$additionalSections = [
-					$tagsSection,
-					$attributesSection,
-					// $addImagesSection,
-					$deleteImagesSection,
-				];
+				}
+				case Order::class:
+				{
+					$statuses = $this->orderRepository->getStatuses();
+					$specificFields = [
+						'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]
+						),
+						'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['order' => $entity]),
+					];
+					$content = TemplateEngine::render('pages/adminEditPage', [
+						'entity' => $entity,
+						'specificFields' => $specificFields,
+					]);
+					break;
 
-				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
-					'specificFields' => $specificFields,
-					'additionalSections' => $additionalSections,
-				]);
-				break;
+				}
+				default:
+				{
+					$content = TemplateEngine::render('pages/adminEditPage');
+					break;
+
+				}
 			}
-			case Tag::class:
-			{
-				$parentTags = $repository->getAllParentTags();
-				$specificFields = [
-					'parentId' => TemplateEngine::render('components/editTagParentId', [
-						'item' => $item,
-						'parentTags' => $parentTags,
-					]),
-				];
-				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
-					'specificFields' => $specificFields,
-				]);
-				break;
-
-			}
-			case Attribute::class:
-			case User::class:
-			{
-				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
-				]);
-				break;
-
-			}
-			case Order::class:
-			{
-				$statuses = $this->orderRepository->getStatuses();
-				$specificFields = [
-					'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]),
-					'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['item' => $item]),
-				];
-				$content = TemplateEngine::render('pages/adminEditPage', [
-					'item' => $item,
-					'specificFields' => $specificFields,
-				]);
-				break;
-
-			}
-			default:
-			{
-				$content = TemplateEngine::render('pages/adminEditPage', []);
-				break;
-
-			}
+		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
+		}
+		catch (ReflectionException $e)
+		{
+			Logger::error("Failed to use Reflection", $e->getFile(), $e->getLine());
+			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+		catch (DatabaseException $e)
+		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderAdminView($content);
 	}
 
-	public function addItem(string $entityToAdd): string
+	public function addEntity(string $entityToAdd): string
 	{
-
 		$fields = $_POST;
-		// foreach ($fields as $field)
-		// {
-		// 	$fields[$field] = ValidationService::validateEntryField($field);
-		// }
 		$className = 'N_ONE\App\Model\\' . ucfirst(
 				$entityToAdd
 			); //Костыль на приведение названия типа сущности из URL к названию класса
 
-		if ($entityToAdd === 'tag')
+		try
 		{
 			foreach ($fields as $field => $value)
 			{
 				$fields[$field] = ValidationService::validateEntryField($value);
 			}
-			if (!array_key_exists('parentId', $fields))
-			{
-				echo 'true';
-				$fields['parentId'] = null;
-			}
-		}
-		if ($entityToAdd === 'attribute')
-		{
-			$fields['value'] = null;
-			// foreach ($fields as $field => $value)
-			// {
-			// $fields[$field] = ValidationService::validateEntryField($value);
-			// }
-		}
-		if ($entityToAdd === 'item')
-		{
-			foreach ($fields as $field => $value)
-			{
-				if (
-					($field === 'isActive' || $field === 'sortOrder')
-					&& $value === '0'
-				) //РАЗРЕШЕНИЕ НА ИСПОЛЬЗОВАНИЕ FALSY ДЛЯ УКАЗАННЫХ ПОЛЕЙ
-				{
-					continue;
-				}
-			}
-			// $fields['tags'] = $tags;
-			$fields['images'] = [];
-		}
-		// foreach ($fields as $field => $value)
-		// {
-		// 	if (!trim($value))
-		// 	{
-		// 		return TemplateEngine::renderAdminError(404, "Missing required field: {$field}");
-		// 	}
-		// 	$fields[$field] = trim($value);
-		// }
-
-		try
-		{
 			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
-			$item = new $className(null, ...array_values($fields));
+			$item = $className::fromFields($fields);
 			$itemId = $repository->add($item);
-			if ($entityToAdd === 'item')
+			if ($entityToAdd === 'item' && $_FILES['image']['size'][0] !== 0)
 			{
-				if ($_FILES['image']['size'][0] !== 0)
-				{
-					$this->addBaseImages($_FILES, $itemId);
-				}
+				$this->imageService->addBaseImages($_FILES, $itemId);
 			}
+			if ($entityToAdd === 'tag' && $_FILES['image']['size'][0] !== 0 && !$fields['parentId'])
+			{
+				$this->imageService->addTagLogo($_FILES, $itemId);
+			}
+		}
+		catch (InvalidArgumentException)
+		{
+			// Не получилось создать репозиторий. Логирование не нужно
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (ValidateException $e)
 		{
 			return TemplateEngine::renderAdminError(400, $e->getMessage());
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
+
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
+		}
+		catch (mysqli_sql_exception $e)
+		{
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
+
+			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
 		return $this->renderSuccessAddPage();
 	}
-
 }

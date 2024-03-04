@@ -6,30 +6,34 @@ namespace N_ONE\App\Model;
 
 class Order extends Entity
 {
-	private string|null $dateCreate;
-
 	public function __construct(
-		protected int|null  $id,
-		private int|null    $userId,
-		private int|null    $itemId,
-		private int|null    $statusId,
-		private string|null $status,
-		private int|null    $price,
+		protected ?int           $id,
+		private ?int             $userId,
+		private ?int             $itemId,
+		private ?int             $statusId,
+		private ?string          $status,
+		private ?int             $price,
+		private readonly ?string $orderNumber,
 	)
 	{
 	}
 
-	public function getExcludedFields(): array
+	public static function fromFields(array $fields): static
 	{
-		return ['dateCreate', 'statusId'];
+		return new static(
+			$fields['id'],
+			$fields['userId'],
+			$fields['itemId'],
+			$fields['statusId'],
+			$fields['status'],
+			$fields['price'],
+			$fields['orderNumber']
+		);
 	}
 
-	public function generateNumber(int $time): void
+	public function getExcludedFields(): array
 	{
-		$this->dateCreate = date('Y-m-d H:i:s', $time);
-
-		// $hashString = Configurator::option('ORDER_HASH_PREFIX') . $this->userId . $this->itemId . $this->dateCreate;
-		// $this->number = hash(Configurator::option('ORDER_HASH_ALGO'), $hashString);
+		return ['statusId'];
 	}
 
 	public function getClassname(): string
@@ -94,13 +98,8 @@ class Order extends Entity
 		$this->price = $price;
 	}
 
-	public function getDateCreate(): string
+	public function getNumber(): string
 	{
-		return $this->dateCreate;
-	}
-
-	public function setDateCreate(string $dateCreate): void
-	{
-		$this->dateCreate = $dateCreate;
+		return $this->orderNumber;
 	}
 }
