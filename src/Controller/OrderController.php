@@ -172,7 +172,7 @@ class OrderController extends BaseController
 				return $this->renderPublicView($content);
 			}
 
-			$item = $this->itemRepository->getById($order->getItemId(), true);
+			$item = $this->itemRepository->getById($order->getItemId());
 
 			$content = TemplateEngine::render('pages/orderInfoPage', [
 				'order' => $order,
