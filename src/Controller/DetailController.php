@@ -15,16 +15,16 @@ class DetailController extends BaseController
 		{
 			$item = $this->itemRepository->getById($itemId, true);
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderPublicError(':(', 'Что-то пошло не так');
 
 			return $this->renderPublicView($content);
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}

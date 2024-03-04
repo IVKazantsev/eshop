@@ -185,9 +185,7 @@ class ImageService
 			$extension = pathinfo($files[0], PATHINFO_EXTENSION);
 			return $path . '.' . $extension;
 		}
-		else
-		{
-			return false; // Если файлы не найдены, возвращаем false
-		}
+
+		return false; // Если файлы не найдены, возвращаем false
 	}
 }

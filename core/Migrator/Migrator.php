@@ -3,6 +3,7 @@
 namespace N_ONE\Core\Migrator;
 
 use DateTime;
+use mysqli;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Exceptions\DatabaseException;
@@ -12,15 +13,18 @@ class Migrator
 {
 	static private ?Migrator $instance = null;
 
-	private DbConnector $dbConnector;
+	private mysqli|false $connection;
 
 	private string $migrationTable;
 
 	private string $migrationPath;
 
-	private function __construct(DbConnector $dbConnector)
+	/**
+	 * @throws DatabaseException
+	 */
+	private function __construct()
 	{
-		$this->dbConnector = $dbConnector;
+		$this->connection = DbConnector::getInstance()->getConnection();
 		$this->migrationTable = Configurator::option('MIGRATION_TABLE');
 		$this->migrationPath = Configurator::option('MIGRATION_PATH');
 	}
@@ -35,9 +39,8 @@ class Migrator
 		{
 			return static::$instance;
 		}
-		$dbConnector = DbConnector::getInstance();
 
-		return static::$instance = new self($dbConnector);
+		return static::$instance = new self();
 	}
 
 	/**
@@ -65,7 +68,7 @@ class Migrator
 	 */
 	private function getLastMigration()
 	{
-		$connection = $this->dbConnector->getConnection();
+		$connection = $this->connection;
 
 		$tableExistsQuery = mysqli_query($connection, "SHOW TABLES LIKE '$this->migrationTable'");
 
@@ -136,7 +139,7 @@ class Migrator
 	private function executeMigration($migration): void
 	{
 		// Получение соединения с базой данных
-		$connection = $this->dbConnector->getConnection();
+		$connection = $this->connection;
 
 		// Чтение содержимого SQL файла
 		$sql = file_get_contents(ROOT . $this->migrationPath . '/' . $migration);
@@ -171,7 +174,7 @@ class Migrator
 	 */
 	private function updateLastMigration($migration): void
 	{
-		$connection = $this->dbConnector->getConnection();
+		$connection = $this->connection;
 
 		$sql = "INSERT INTO $this->migrationTable (TITLE) VALUE ('$migration');";
 

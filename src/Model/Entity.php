@@ -36,11 +36,9 @@ abstract class Entity
 		}
 		$excludedFields = $this->getExcludedFields();
 
-		$filteredResult = array_filter($result, function($field) use ($excludedFields) {
-			return !in_array($field, $excludedFields);
+		return array_filter($result, static function($field) use ($excludedFields) {
+			return !in_array($field, $excludedFields, true);
 		});
-
-		return $filteredResult;
 	}
 
 	/**
@@ -78,7 +76,7 @@ abstract class Entity
 		if ($type instanceof ReflectionUnionType)
 		{
 			// Обработка объединенных типов, например, "int|null"
-			return implode('|', array_map(function($type) {
+			return implode('|', array_map(static function($type) {
 				return $type->getName();
 			}, $type->getTypes()));
 		}

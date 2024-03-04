@@ -536,7 +536,7 @@ input[type="number"]::-webkit-inner-spin-button {
 	position: absolute;
 	display: block;
 	content: "";
-	border: 15px solid transparent; /*adjust size*/
+	border: 10px solid transparent; /*adjust size*/
 }
 
 /*Change four 'top' values below to rotate (top/right/bottom/left)*/
