@@ -96,4 +96,9 @@ class Image extends Entity
 	{
 		$this->width = $width;
 	}
+
+	public function getExcludedFields(): array
+	{
+		return [];
+	}
 }

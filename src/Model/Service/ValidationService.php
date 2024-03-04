@@ -3,7 +3,6 @@
 namespace N_ONE\App\Model\Service;
 
 use Exception;
-use N_ONE\Core\Exceptions\FileException;
 use N_ONE\Core\Exceptions\ValidateException;
 
 class ValidationService
@@ -102,7 +101,7 @@ class ValidationService
 	public static function validateImage($image, int $i = 0): bool
 	{
 		$allowed_formats = ["jpg", "png", "jpeg", "svg"];
-		$allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];;// Разрешенные форматы файлов
+		$allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];// Разрешенные форматы файлов
 		$imageFileType = strtolower(pathinfo(basename($image["image"]["name"][$i]), PATHINFO_EXTENSION));
 		$fileMimeType = mime_content_type($image["image"]["tmp_name"][$i]);
 		$fileInfo = @getimagesize($image["image"]["tmp_name"][$i]);
@@ -113,7 +112,7 @@ class ValidationService
 			throw new ValidateException("incorrect image");
 		}
 
-		if (!in_array($fileMimeType, $allowedMimeTypes))
+		if (!in_array($fileMimeType, $allowedMimeTypes, true))
 		{
 			throw new ValidateException("incorrect image");
 		}

@@ -74,15 +74,15 @@ class AdminController extends BaseController
 				throw new LoginException();
 			}
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 			echo TemplateEngine::renderPublicError(';(', "Что-то пошло не так");
 			exit();
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 			echo TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 			exit();
 		}
@@ -175,7 +175,7 @@ class AdminController extends BaseController
 				}
 				case Tag::class:
 				{
-					$parentTags = $repository->getAllParentTags();
+					$parentTags = $this->tagRepository->getAllParentTags();
 					$specificFields = [
 						'parentId' => TemplateEngine::render('components/editTagParentId', [
 							'tag' => $entity,
@@ -237,14 +237,14 @@ class AdminController extends BaseController
 				}
 			}
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
@@ -325,14 +325,14 @@ class AdminController extends BaseController
 			// Не получилось создать репозиторий. Логирование не нужно
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
@@ -382,15 +382,15 @@ class AdminController extends BaseController
 		{
 			return TemplateEngine::renderAdminError(400, $e->getMessage());
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
@@ -464,15 +464,15 @@ class AdminController extends BaseController
 			// Не получилось создать репозиторий. Логирование не нужно
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 
 			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
@@ -491,15 +491,15 @@ class AdminController extends BaseController
 			$repository = $this->repositoryFactory->createRepository($entities);
 			$repository->changeActive($entities, $entityId, $isActive);
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderAdminError(":(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
@@ -530,7 +530,6 @@ class AdminController extends BaseController
 	{
 		try
 		{
-			$repository = $this->repositoryFactory->createRepository($entityToAdd . 's');
 			$className = 'N_ONE\App\Model\\' . ucfirst(
 					$entityToAdd
 				);//Костыль на приведение названия типа сущности из URL к названию класса
@@ -565,9 +564,7 @@ class AdminController extends BaseController
 						'attributes' => $attributes,
 					]);
 
-					$deleteImagesSection = TemplateEngine::render(
-						'components/deleteImagesSection', []
-					);
+					$deleteImagesSection = TemplateEngine::render('components/deleteImagesSection');
 
 					$additionalSections = [
 						'tags' => $tagsSection,
@@ -646,19 +643,19 @@ class AdminController extends BaseController
 			// Не получилось создать репозиторий. Логирование не нужно
 			$content = TemplateEngine::renderAdminError(':(', 'Что-то пошло не так');
 		}
-		catch (ReflectionException)
+		catch (ReflectionException $e)
 		{
-			Logger::error("Failed to use Reflection", __METHOD__);
+			Logger::error("Failed to use Reflection", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 
@@ -699,15 +696,15 @@ class AdminController extends BaseController
 		{
 			return TemplateEngine::renderAdminError(400, $e->getMessage());
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderAdminError(";(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			return TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}

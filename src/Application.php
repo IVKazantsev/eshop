@@ -24,9 +24,9 @@ class Application
 			self::createDatabase();
 			DbConnector::getInstance();
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to create database connection", __METHOD__);
+			Logger::error("Failed to create database connection", $e->getFile(), $e->getLine());
 			echo TemplateEngine::renderFinalError();
 			exit();
 		}

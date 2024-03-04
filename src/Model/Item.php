@@ -2,9 +2,6 @@
 
 namespace N_ONE\App\Model;
 
-use Exception;
-use RuntimeException;
-
 class Item extends Entity
 {
 	/**

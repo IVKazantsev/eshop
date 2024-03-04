@@ -30,14 +30,14 @@ class OrderController extends BaseController
 				'item' => $item,
 			]);
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
 		catch (NotFoundException)
@@ -104,15 +104,15 @@ class OrderController extends BaseController
 		{
 			$content = TemplateEngine::renderPublicError(404, "Страница не найдена");
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}
@@ -183,15 +183,15 @@ class OrderController extends BaseController
 		{
 			$content = TemplateEngine::renderPublicError(400, $e->getMessage());
 		}
-		catch (DatabaseException)
+		catch (DatabaseException $e)
 		{
-			Logger::error("Failed to fetch data from repository", __METHOD__);
+			Logger::error("Failed to fetch data from repository", $e->getFile(), $e->getLine());
 
 			$content = TemplateEngine::renderPublicError(":(", "Что-то пошло не так");
 		}
-		catch (mysqli_sql_exception)
+		catch (mysqli_sql_exception $e)
 		{
-			Logger::error("Failed to run query", __METHOD__);
+			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
 
 			$content = TemplateEngine::renderPublicError(";(", "Что-то пошло не так");
 		}

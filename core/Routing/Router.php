@@ -9,22 +9,6 @@ class Router
 {
 	public static array $routes = [];
 
-	static private ?Router $instance = null;
-
-	private function __construct()
-	{
-	}
-
-	public static function getInstance(): Router
-	{
-		if (static::$instance)
-		{
-			return static::$instance;
-		}
-
-		return static::$instance = new self();
-	}
-
 	public static function get(string $uri, callable $action): void
 	{
 		self::add('GET', $uri, $action);
@@ -49,7 +33,7 @@ class Router
 		if (str_ends_with($path, '/') && strlen($path) !== 1)
 		{
 			$path = rtrim($path, "/");
-			if($getParams !== null)
+			if ($getParams !== null)
 			{
 				self::redirect($path . '?' . $getParams);
 			}
