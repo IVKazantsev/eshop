@@ -7,17 +7,33 @@ use N_ONE\Core\Exceptions\NotFoundException;
 
 class Router
 {
-	public static array $routes = [];
+	public array $routes = [];
 
-	public static function get(string $uri, callable $action): void
+	static private ?Router $instance = null;
+
+	private function __construct()
 	{
-		self::add('GET', $uri, $action);
 	}
 
-	public static function add(string $method, string $uri, callable $action): void
+	public static function getInstance(): Router
+	{
+		if (static::$instance)
+		{
+			return static::$instance;
+		}
+
+		return static::$instance = new self();
+	}
+
+	public function get(string $uri, callable $action): void
+	{
+		$this->add('GET', $uri, $action);
+	}
+
+	public function add(string $method, string $uri, callable $action): void
 	{
 		// self::$routes[] = new Route($method, $uri, $action(...));
-		self::$routes[] = new Route($method, $uri, function() use ($action) {
+		$this->routes[] = new Route($method, $uri, function() use ($action) {
 			$route = self::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 			if ($route instanceof Route)
 			{
@@ -27,13 +43,13 @@ class Router
 		});
 	}
 
-	public static function find(string $method, string $uri): ?Route
+	public function find(string $method, string $uri): ?Route
 	{
 		[$path, $getParams] = explode('?', $uri);
 		if (str_ends_with($path, '/') && strlen($path) !== 1)
 		{
 			$path = rtrim($path, "/");
-			if ($getParams !== null)
+			if($getParams !== null)
 			{
 				self::redirect($path . '?' . $getParams);
 			}
@@ -42,7 +58,7 @@ class Router
 				self::redirect($path);
 			}
 		}
-		foreach (self::$routes as $route)
+		foreach ($this->routes as $route)
 		{
 			if ($route->method !== $method)
 			{
@@ -57,9 +73,9 @@ class Router
 		return null;
 	}
 
-	public static function post(string $uri, callable $action): void
+	public function post(string $uri, callable $action): void
 	{
-		self::add('POST', $uri, $action);
+		$this->add('POST', $uri, $action);
 	}
 
 	public static function redirect($url): void

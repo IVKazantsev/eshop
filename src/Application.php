@@ -41,7 +41,8 @@ class Application
 			$migrator->migrate();
 		}
 
-		$route = Router::find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+		$router = Router::getInstance();
+		$route = $router->find($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 		if (!$route)
 		{
 			http_response_code(404);
@@ -82,7 +83,6 @@ class Application
 
 		// Создание подключения к серверу MySQL
 		$connection = new mysqli($servername, $username, $password);
-
 
 		$result = mysqli_query(
 			$connection,
