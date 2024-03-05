@@ -33,6 +33,10 @@ class Migrator
 	{
 	}
 
+	private function __wakeup()
+	{
+	}
+
 	public static function getInstance(): Migrator
 	{
 		if (static::$instance)

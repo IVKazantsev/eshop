@@ -15,6 +15,14 @@ class Router
 	{
 	}
 
+	private function __clone()
+	{
+	}
+
+	private function __wakeup()
+	{
+	}
+
 	public static function getInstance(): Router
 	{
 		if (static::$instance)

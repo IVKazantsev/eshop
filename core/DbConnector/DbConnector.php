@@ -25,6 +25,10 @@ class DbConnector
 	{
 	}
 
+	private function __wakeup()
+	{
+	}
+
 	/**
 	 * @throws DatabaseException
 	 */
