@@ -3,6 +3,7 @@
 namespace N_ONE\Core\Migrator;
 
 use DateTime;
+use Exception;
 use mysqli;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
@@ -33,8 +34,12 @@ class Migrator
 	{
 	}
 
-	private function __wakeup()
+	/**
+	 * @throws Exception
+	 */
+	public function __wakeup()
 	{
+		throw new Exception("Cannot unserialize singleton");
 	}
 
 	public static function getInstance(): Migrator

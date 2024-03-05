@@ -2,6 +2,7 @@
 
 namespace N_ONE\Core\Routing;
 
+use Exception;
 use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\Exceptions\NotFoundException;
 
@@ -19,8 +20,12 @@ class Router
 	{
 	}
 
-	private function __wakeup()
+	/**
+	 * @throws Exception
+	 */
+	public function __wakeup()
 	{
+		throw new Exception("Cannot unserialize singleton");
 	}
 
 	public static function getInstance(): Router
