@@ -52,33 +52,58 @@ class MiddleWare
 	public static function processFilters(callable $action): Closure
 	{
 		return static function(Route $route) use ($action) {
-			$tagsToFilter = $_GET['selectedTags'];
-			$tagGroups = explode(';', $tagsToFilter);
+			$tagsToFilter = ($_GET['selectedTags']) ?? null;
+			$tagGroups = null;
+			if ($tagsToFilter)
+			{
+				$tagGroups = explode(';', $tagsToFilter);
+			}
 
 			$finalTags = [];
-			foreach ($tagGroups as $tagGroup)
+			if ($tagGroups)
 			{
-				[$parentId, $childIds] = explode(':[', trim($tagGroup, '[]'));
-				foreach (explode(',', $childIds) as $childId)
+				foreach ($tagGroups as $tagGroup)
 				{
-					$finalTags[(int)$parentId][] = (int)trim($childId);
+					$tags = explode(':[', trim($tagGroup, '[]'));
+					$parentId = ($tags[0]) ?? null;
+					$childIds = ($tags[1]) ?? null;
+					foreach (explode(',', $childIds) as $childId)
+					{
+						$finalTags[(int)$parentId][] = (int)trim($childId);
+					}
 				}
 			}
 
-			$attributesToFilter = $_GET['attributes'];
-			$attributeGroups = explode(';', $attributesToFilter);
+			$attributesToFilter = ($_GET['attributes']) ?? null;
+			$attributeGroups = null;
+			if ($attributesToFilter)
+			{
+				$attributeGroups = explode(';', $attributesToFilter);
+			}
 			$finalAttributes = [];
 
-			foreach ($attributeGroups as $attributeGroup)
+			if ($attributeGroups)
 			{
-				[$parentId, $childIds] = explode('=[', trim($attributeGroup, '[]'));
-				[$from, $to] = explode('-', $childIds);
-				$finalAttributes[(int)$parentId]['from'] = (int)$from;
-				$finalAttributes[(int)$parentId]['to'] = (int)$to;
+				foreach ($attributeGroups as $attributeGroup)
+				{
+					$attributes = explode('=[', trim($attributeGroup, '[]'));
+					$parentId = ($attributes[0]) ?? null;
+					$childIds = ($attributes[1]) ?? null;
+					$range = explode('-', $childIds);
+					$from = ($range[0]) ?? null;
+					$to = ($range[1]) ?? null;
+					$finalAttributes[(int)$parentId]['from'] = (int)$from;
+					$finalAttributes[(int)$parentId]['to'] = (int)$to;
+				}
 			}
 
 			$sortField = $_GET['sortOrder'] ?? null;
-			[$attributeId, $sortDirection] = explode('-', $sortField);
+			if ($sortField)
+			{
+				$sorting = explode('-', $sortField);
+			}
+			$attributeId = $sorting[0] ?? null;
+			$sortDirection = $sorting[1] ?? null;
 			$sortOrder = ['column' => $attributeId, 'direction' => $sortDirection];
 			$currentSearchRequest = $_GET['searchRequest'] ?? null;
 			unset($finalTags[0], $finalAttributes[0]);

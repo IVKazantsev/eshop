@@ -58,11 +58,17 @@ class Router
 
 	public function find(string $method, string $uri): ?Route
 	{
-		[$path, $getParams] = explode('?', $uri);
+		$uriInArray = explode('?', $uri);
+		$path = ($uriInArray[0]) ?? null;
+		$getParams = ($uriInArray[1]) ?? null;
+		if ($path === null)
+		{
+			return null;
+		}
 		if (str_ends_with($path, '/') && strlen($path) !== 1)
 		{
 			$path = rtrim($path, "/");
-			if($getParams !== null)
+			if ($getParams !== null)
 			{
 				self::redirect($path . '?' . $getParams);
 			}

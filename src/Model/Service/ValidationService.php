@@ -70,8 +70,13 @@ class ValidationService
 
 	public static function validateFulltextField(?string $fulltextField): ?string
 	{
+		if ($fulltextField === null)
+		{
+			return null;
+		}
+
 		$fulltextField = trim($fulltextField);
-		if(!$fulltextField)
+		if (!$fulltextField)
 		{
 			return null;
 		}

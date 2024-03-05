@@ -130,7 +130,7 @@ class ItemRepository extends Repository
 			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('$itemFulltext' IN BOOLEAN MODE) DESC";
 		}
 
-		if ($sortOrder['direction'] === null)
+		if (!isset($sortOrder['direction']))
 		{
 			$sortQueryBlock = "ORDER BY i.SORT_ORDER DESC";
 		}
@@ -147,30 +147,36 @@ class ItemRepository extends Repository
 
 		$conditions[] = "i.IS_ACTIVE = $isActive";
 
-		foreach ($attributes as $key => $attribute)
+		if($attributes)
 		{
-			$attributeId = $key;
-			$from = $attribute['from'];
-			$to = $attribute['to'];
+			foreach ($attributes as $key => $attribute)
+			{
+				$attributeId = $key;
+				$from = $attribute['from'];
+				$to = $attribute['to'];
 
-			$conditions[] = "EXISTS
+				$conditions[] = "EXISTS
 				(SELECT 1 FROM N_ONE_ITEMS_ATTRIBUTES ia$attributeId
 				WHERE
 				ia$attributeId.ITEM_ID = i.ID AND
 				ia$attributeId.ATTRIBUTE_ID = $attributeId AND
 				ia$attributeId.VALUE BETWEEN $from AND $to)";
+			}
 		}
 
-		foreach ($tags as $parentId => $tagIds)
+		if($tags)
 		{
-			$tagIdsString = implode(',', $tagIds);
+			foreach ($tags as $parentId => $tagIds)
+			{
+				$tagIdsString = implode(',', $tagIds);
 
-			$conditions[] = "EXISTS 
+				$conditions[] = "EXISTS 
 				(SELECT 1 FROM N_ONE_ITEMS_TAGS it 
 				JOIN N_ONE_TAGS t on t.ID = it.TAG_ID
 				WHERE it.ITEM_ID = i.ID 
 				AND t.PARENT_ID = $parentId 
 				AND it.TAG_ID IN ($tagIdsString))";
+			}
 		}
 
 		$whereQueryBlock .= " WHERE " . implode(' AND ', $conditions);

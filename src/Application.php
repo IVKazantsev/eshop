@@ -17,6 +17,7 @@ class Application
 
 	public static function run(): void
 	{
+		// error_reporting(0);
 		Logger::setRootLogDir(Configurator::option("ROOT_LOG_DIR"));
 		try
 		{
