@@ -2,7 +2,9 @@
 
 namespace N_ONE\App\Model;
 
+use N_ONE\App\Application;
 use N_ONE\App\Model\Service\ValidationService;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
 
 class User extends Entity
 {

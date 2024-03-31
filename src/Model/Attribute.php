@@ -2,6 +2,9 @@
 
 namespace N_ONE\App\Model;
 
+use N_ONE\App\Application;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
+
 class Attribute extends Entity
 {
 	public function __construct(

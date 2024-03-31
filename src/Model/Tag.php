@@ -2,6 +2,9 @@
 
 namespace N_ONE\App\Model;
 
+use N_ONE\App\Application;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
+
 class Tag extends Entity
 {
 	public function __construct(
@@ -17,6 +20,20 @@ class Tag extends Entity
 		return new static(
 			$fields['id'], $fields['title'], $fields['parentId'],
 		);
+	}
+
+	public static function fillAddEditPage(Entity $entity)
+	{
+		$di = Application::getDI();
+		$parentTags = $di->getComponent('tagRepository')->getAllParentTags();
+		$specificFields = [
+			'parentId' => TemplateEngine::render('components/editTagParentId', [
+				'tag' => $entity,
+				'parentTags' => $parentTags,
+			]),
+		];
+
+		return ['specificFields' => $specificFields];
 	}
 
 	public function getParentId(): ?int

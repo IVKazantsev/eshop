@@ -59,6 +59,42 @@
 			<arg service="imageService"/>
 		</class>
 	</service>
+	<service name="adminLoginController">
+		<class name="N_ONE\App\Controller\AdminLoginController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
+		</class>
+	</service>
+	<service name="adminTableController">
+		<class name="N_ONE\App\Controller\AdminTableController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
+		</class>
+	</service>
+	<service name="adminAddEditController">
+		<class name="N_ONE\App\Controller\AdminAddEditController">
+			<arg service="tagRepository"/>
+			<arg service="imageRepository"/>
+			<arg service="itemRepository"/>
+			<arg service="userRepository"/>
+			<arg service="orderRepository"/>
+			<arg service="attributeRepository"/>
+			<arg service="repositoryFactory"/>
+			<arg service="imageService"/>
+		</class>
+	</service>
 	<service name="imageService">
 		<class name="\N_ONE\App\Model\Service\ImageService">
 			<arg service="imageRepository"/>

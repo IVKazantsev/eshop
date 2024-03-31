@@ -3,6 +3,8 @@
 namespace N_ONE\App\Model;
 
 use Exception;
+use N_ONE\App\Application;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
 use RuntimeException;
 
 class Item extends Entity
@@ -13,14 +15,14 @@ class Item extends Entity
 	 * @param Attribute[] $attributes
 	 */
 	public function __construct(
-		protected ?int  $id,
+		protected ?int $id,
 		private ?string $title,
-		private ?int    $price,
+		private ?int $price,
 		private ?string $description,
-		private ?int    $sortOrder,
-		private ?array  $tags,
-		private ?array  $attributes,
-		private ?array  $images,
+		private ?int $sortOrder,
+		private ?array $tags,
+		private ?array $attributes,
+		private ?array $images,
 	)
 	{
 	}
@@ -37,6 +39,63 @@ class Item extends Entity
 			$fields['attributes'],
 			$fields['images']
 		);
+	}
+
+	public static function fillAddEditPage(Entity $entity)
+	{
+		echo 'fill';
+		$di = Application::getDI();
+		$parentTags = $di->getComponent('tagRepository')->getParentTags();
+		$attributes = $di->getComponent('attributeRepository')->getList();
+
+		$itemTags = [];
+		$childrenTags = [];
+		$specificFields = [
+			'description' => TemplateEngine::render('components/editItemDescription', [
+				'item' => $entity,
+			]),
+		];
+		foreach ($parentTags as $parentTag)
+		{
+			$childrenTags[(string)($parentTag->getTitle())] = $di->getComponent('tagRepository')->getByParentId(
+				$parentTag->getId()
+			);
+		}
+		foreach ($entity->getTags() as $tag)
+		{
+			$itemTags[$tag->getParentId()] = $tag->getId();
+		}
+		$tagsSection = TemplateEngine::render('components/editPageTagsSection', [
+			'childrenTags' => $childrenTags,
+			'itemTags' => $itemTags,
+		]);
+
+		$itemAttributes = $entity->getAttributes();
+		if ($itemAttributes)
+		{
+			$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
+				'attributes' => $attributes,
+				'itemAttributes' => $itemAttributes,
+			]);
+		}
+		else
+		{
+			$attributesSection = TemplateEngine::render('components/editPageAttributesSection', [
+				'attributes' => $attributes,
+			]);
+		}
+
+		$deleteImagesSection = TemplateEngine::render(
+			'components/deleteImagesSection', []
+		);
+
+		$additionalSections = [
+			'tags' => $tagsSection,
+			'attributes' => $attributesSection,
+			'images' => $deleteImagesSection,
+		];
+
+		return ['specificFields' => $specificFields, 'additionalSection' => $additionalSections,];
 	}
 
 	public function getAttributes(): ?array

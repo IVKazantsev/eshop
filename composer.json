@@ -12,5 +12,9 @@
 		"ext-gd": "*",
 		"ext-http": "*",
 		"ext-fileinfo": "*"
+	},
+	"require-dev": {
+		"degraciamathieu/php-smelly-code-detector": "^2.1",
+		"phpmd/phpmd": "^2.15"
 	}
 }

@@ -4,6 +4,9 @@ namespace N_ONE\App\Model;
 
 // use N_ONE\Core\Configurator\Configurator;
 
+use N_ONE\App\Application;
+use N_ONE\Core\TemplateEngine\TemplateEngine;
+
 class Order extends Entity
 {
 	public function __construct(
@@ -29,6 +32,22 @@ class Order extends Entity
 			$fields['price'],
 			$fields['orderNumber']
 		);
+	}
+
+	public static function fillAddEditPage(Entity $entity)
+	{
+		$di = Application::getDI();
+		$orderNumber = $entity->getNumber();
+		$statuses = $di->getComponent('orderRepository')->getStatuses();
+		$specificFields = [
+			'status' => TemplateEngine::render('components/editOrderStatusField', ['statuses' => $statuses]),
+			'statusId' => TemplateEngine::render('components/editOrderStatusIdField', ['order' => $entity]),
+			'orderNumber' => TemplateEngine::render(
+				'components/editOrderNumberField', ['orderNumber' => $orderNumber ? $orderNumber : '']
+			),
+		];
+
+		return ['specificFields' => $specificFields];
 	}
 
 	public function getExcludedFields(): array
@@ -98,7 +117,7 @@ class Order extends Entity
 		$this->price = $price;
 	}
 
-	public function getNumber(): string
+	public function getNumber(): ?string
 	{
 		return $this->orderNumber;
 	}
