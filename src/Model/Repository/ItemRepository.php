@@ -7,7 +7,6 @@ use mysqli_result;
 use mysqli_sql_exception;
 use N_ONE\App\Model\Entity;
 use N_ONE\App\Model\Item;
-use N_ONE\Core\Configurator\Configurator;
 use N_ONE\Core\DbConnector\DbConnector;
 use N_ONE\Core\Exceptions\DatabaseException;
 
@@ -78,23 +77,22 @@ class ItemRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		$currentLimit = $numItemsPerPage + 1;
-		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
-		$isActive = $filter['isActive'] ?? 1;
-		$fulltext = $filter['title, description'] ?? null;
-		$tags = $filter['tags'] ?? null;
-		$attributes = $filter['attributes'] ?? null;
-		$sortOrder = $filter['sortOrder'] ?? null;
+		$offset = $this->calculateOffset($filter['pageNumber']);
 
-		$whereQueryBlock = $this->getConditionQueryBlock($tags, $fulltext, $attributes, $isActive, $sortOrder, $connection);
+		$whereQueryBlock = $this->getConditionQueryBlock(
+			$filter['tags'] ?? null,
+			$filter['title, description'] ?? null,
+			$filter['attributes'] ?? null,
+			$filter['isActive'] ?? 1,
+			$filter['sortOrder'] ?? null,
+			$connection);
 
 		$result = mysqli_query(
 			$connection,
 			"SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
 			FROM N_ONE_ITEMS i
 			$whereQueryBlock
-			LIMIT $currentLimit OFFSET $offset;"
+			LIMIT $this->currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -121,101 +119,19 @@ class ItemRepository extends Repository
 		mysqli  $connection
 	): string
 	{
-		$whereQueryBlock = "";
-		$conditions = [];
-		if ($fulltext !== null && $fulltext !== "")
-		{
-			$itemFulltext = mysqli_real_escape_string($connection, $fulltext);
-			$conditions[] = "MATCH (title,description) AGAINST ('$itemFulltext' IN BOOLEAN MODE)";
-			$sortQueryBlock = "ORDER BY MATCH (title,description) AGAINST ('$itemFulltext' IN BOOLEAN MODE) DESC";
-		}
 
-		if (!isset($sortOrder['direction']))
-		{
-			$sortQueryBlock = "ORDER BY i.SORT_ORDER DESC";
-		}
-		elseif ($sortOrder['column'] === 'PRICE')
-		{
-			$sortQueryBlock = "ORDER BY i.PRICE {$sortOrder['direction']}";
-		}
-		elseif (is_numeric($sortOrder['column']))
-		{
-			$sortQueryBlock = "ORDER BY ia.VALUE {$sortOrder['direction']}";
-			$conditions[] = "ia.ATTRIBUTE_ID = {$sortOrder['column']}";
-			$whereQueryBlock .= " JOIN N_ONE_ITEMS_ATTRIBUTES ia ON ia.ITEM_ID = i.ID";
-		}
+		$conditions['result'] = '';
+		$conditions['whereBlock'][] = "i.IS_ACTIVE = $isActive";
 
-		$conditions[] = "i.IS_ACTIVE = $isActive";
+		$conditions = $this->generateFullTextConditions($fulltext, $conditions, $connection);
+		$conditions = $this->generateSortConditions($sortOrder, $conditions);
+		$conditions = $this->generateAttributeConditions($attributes, $conditions);
+		$conditions = $this->generateTagConditions($tags, $conditions);
 
-		if($attributes)
-		{
-			foreach ($attributes as $key => $attribute)
-			{
-				$attributeId = $key;
-				$from = $attribute['from'];
-				$to = $attribute['to'];
-
-				$conditions[] = "EXISTS
-				(SELECT 1 FROM N_ONE_ITEMS_ATTRIBUTES ia$attributeId
-				WHERE
-				ia$attributeId.ITEM_ID = i.ID AND
-				ia$attributeId.ATTRIBUTE_ID = $attributeId AND
-				ia$attributeId.VALUE BETWEEN $from AND $to)";
-			}
-		}
-
-		if($tags)
-		{
-			foreach ($tags as $parentId => $tagIds)
-			{
-				$tagIdsString = implode(',', $tagIds);
-
-				$conditions[] = "EXISTS 
-				(SELECT 1 FROM N_ONE_ITEMS_TAGS it 
-				JOIN N_ONE_TAGS t on t.ID = it.TAG_ID
-				WHERE it.ITEM_ID = i.ID 
-				AND t.PARENT_ID = $parentId 
-				AND it.TAG_ID IN ($tagIdsString))";
-			}
-		}
-
-		$whereQueryBlock .= " WHERE " . implode(' AND ', $conditions);
-		$whereQueryBlock .= " $sortQueryBlock" ?? "";
-		return $whereQueryBlock;
+		$conditions['result'] .= " WHERE " . implode(' AND ', $conditions['whereBlock']);
+		$conditions['result'] .= (' ' . $conditions['sortBlock']) ?? "";
+		return $conditions['result'];
 	}
-
-	/**
-	 * @throws DatabaseException
-	 * @throws mysqli_sql_exception
-	 */
-	public function getByIds(array $ids): array
-	{
-		$connection = $this->dbConnection->getConnection();
-
-		$result = mysqli_query(
-			$connection,
-			"
-			SELECT i.ID, i.TITLE, i.IS_ACTIVE, i.PRICE, i.DESCRIPTION, i.SORT_ORDER
-			FROM N_ONE_ITEMS i
-			WHERE i.ID IN (" . implode(',', $ids) . ");
-			"
-		);
-
-		if (!$result)
-		{
-			throw new DatabaseException(mysqli_error($connection));
-		}
-
-		$items = $this->getItemsFromResult($result);
-
-		if (empty($items))
-		{
-			return $items;
-		}
-
-		return $this->fillItemsWithOtherEntities($items);
-	}
-
 	/**
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
@@ -435,10 +351,87 @@ class ItemRepository extends Repository
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$items[] = new Item(
-				$row['ID'], $row['TITLE'], $row['PRICE'], $row['DESCRIPTION'], $row['SORT_ORDER'], [], [], []
+				$row['ID'],
+				$row['TITLE'],
+				$row['PRICE'],
+				$row['DESCRIPTION'],
+				$row['SORT_ORDER'],
+				[],
+				[],
+				[]
 			);
 		}
 
 		return $items;
+	}
+
+	private function generateAttributeConditions(?array $attributes, array $conditions): array
+	{
+		if($attributes)
+		{
+			foreach ($attributes as $key => $attribute)
+			{
+				$attributeId = $key;
+				$from = $attribute['from'];
+				$to = $attribute['to'];
+
+				$conditions['whereBlock'][] = "EXISTS
+				(SELECT 1 FROM N_ONE_ITEMS_ATTRIBUTES ia$attributeId
+				WHERE
+				ia$attributeId.ITEM_ID = i.ID AND
+				ia$attributeId.ATTRIBUTE_ID = $attributeId AND
+				ia$attributeId.VALUE BETWEEN $from AND $to)";
+			}
+		}
+		return $conditions;
+	}
+
+	private function generateTagConditions(?array $tags, array $conditions): array
+	{
+		if($tags)
+		{
+			foreach ($tags as $parentId => $tagIds)
+			{
+				$tagIdsString = implode(',', $tagIds);
+
+				$conditions['whereBlock'][] = "EXISTS 
+				(SELECT 1 FROM N_ONE_ITEMS_TAGS it 
+				JOIN N_ONE_TAGS t on t.ID = it.TAG_ID
+				WHERE it.ITEM_ID = i.ID 
+				AND t.PARENT_ID = $parentId 
+				AND it.TAG_ID IN ($tagIdsString))";
+			}
+		}
+		return $conditions;
+	}
+
+	private function generateSortConditions(array $sortOrder, array $conditions): array
+	{
+		if (!isset($sortOrder['direction']))
+		{
+			$conditions['sortBlock'] = "ORDER BY i.SORT_ORDER DESC";
+		}
+		elseif ($sortOrder['column'] === 'PRICE')
+		{
+			$conditions['sortBlock'] = "ORDER BY i.PRICE {$sortOrder['direction']}";
+		}
+		elseif (is_numeric($sortOrder['column']))
+		{
+			$conditions['sortBlock'] = "ORDER BY ia.VALUE {$sortOrder['direction']}";
+			$conditions['whereBlock'][] = "ia.ATTRIBUTE_ID = {$sortOrder['column']}";
+			$conditions['result'] .= " JOIN N_ONE_ITEMS_ATTRIBUTES ia ON ia.ITEM_ID = i.ID";
+		}
+		return $conditions;
+	}
+
+	private function generateFullTextConditions(?string $fulltext, array $conditions, $connection): array
+	{
+		if ($fulltext !== null && $fulltext !== "")
+		{
+			$itemFulltext = mysqli_real_escape_string($connection, $fulltext);
+			$conditions['whereBlock'][] = "MATCH (title,description) AGAINST ('$itemFulltext' IN BOOLEAN MODE)";
+			$conditions['sortBlock'] = "ORDER BY MATCH (title,description) AGAINST ('$itemFulltext' IN BOOLEAN MODE) DESC";
+		}
+		return $conditions;
 	}
 }

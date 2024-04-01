@@ -50,13 +50,8 @@ class TagRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		$currentLimit = $numItemsPerPage + 1;
-		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
-		$isActive = $filter['isActive'] ?? 1;
-		$tags = [];
-
-		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
+		$offset = $this->calculateOffset($filter['pageNumber']);
+		$whereQueryBlock = $this->getWhereQueryBlock($filter['isActive'] ?? 1);
 
 		$result = mysqli_query(
 			$connection,
@@ -64,7 +59,7 @@ class TagRepository extends Repository
 			SELECT t.ID, t.TITLE, t.PARENT_ID 
 			FROM N_ONE_TAGS t
 			$whereQueryBlock
-			LIMIT $currentLimit OFFSET $offset;"
+			LIMIT $this->currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -72,10 +67,13 @@ class TagRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
+		$tags = [];
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$tags[] = new Tag(
-				$row['ID'], $row['TITLE'], ($row['PARENT_ID'] === '0') ? null : $row['PARENT_ID']
+				$row['ID'],
+				$row['TITLE'],
+				($row['PARENT_ID'] === '0') ? null : $row['PARENT_ID']
 			);
 		}
 

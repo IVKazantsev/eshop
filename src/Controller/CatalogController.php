@@ -60,7 +60,6 @@ class CatalogController extends BaseController
 		catch (mysqli_sql_exception $e)
 		{
 			Logger::error("Failed to run query", $e->getFile(), $e->getLine());
-
 			return TemplateEngine::renderFinalError();
 		}
 

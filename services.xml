@@ -11,18 +11,6 @@
 			<arg service="imageService"/>
 		</class>
 	</service>
-	<service name="imageController">
-		<class name="N_ONE\App\Controller\ImageController">
-			<arg service="tagRepository"/>
-			<arg service="imageRepository"/>
-			<arg service="itemRepository"/>
-			<arg service="userRepository"/>
-			<arg service="orderRepository"/>
-			<arg service="attributeRepository"/>
-			<arg service="repositoryFactory"/>
-			<arg service="imageService"/>
-		</class>
-	</service>
 	<service name="catalogController">
 		<class name="N_ONE\App\Controller\CatalogController">
 			<arg service="tagRepository"/>

@@ -19,13 +19,8 @@ class AttributeRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		$currentLimit = $numItemsPerPage + 1;
-		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
-		$isActive = $filter['isActive'] ?? 1;
-		$attributes = [];
-
-		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
+		$offset = $this->calculateOffset($filter['pageNumber']);
+		$whereQueryBlock = $this->getWhereQueryBlock($filter['isActive'] ?? 1);
 
 		$result = mysqli_query(
 			$connection,
@@ -33,7 +28,7 @@ class AttributeRepository extends Repository
 			SELECT a.ID, a.TITLE
 			FROM N_ONE_ATTRIBUTES a
 			$whereQueryBlock
-			LIMIT $currentLimit OFFSET $offset;"
+			LIMIT $this->currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -41,10 +36,13 @@ class AttributeRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
+		$attributes = [];
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$attributes[] = new Attribute(
-				$row['ID'], $row['TITLE'], null
+				$row['ID'],
+				$row['TITLE'],
+				null
 			);
 		}
 

@@ -17,7 +17,6 @@ class ImageRepository extends Repository
 	 */
 	public function getList(array $filter = null, bool $isImageId = null): array
 	{
-		$images = [];
 		$connection = $this->dbConnection->getConnection();
 		$field = ($isImageId === null) ? 'item_id' : 'id';
 		$result = mysqli_query(
@@ -34,6 +33,7 @@ class ImageRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
+		$images = [];
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$images[$row[$field]][] = new Image(

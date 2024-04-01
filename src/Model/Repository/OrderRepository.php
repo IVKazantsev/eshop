@@ -17,13 +17,8 @@ class OrderRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		$currentLimit = $numItemsPerPage + 1;
-		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
-		$isActive = $filter['isActive'] ?? 1;
-		$orders = [];
-
-		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
+		$offset = $this->calculateOffset($filter['pageNumber']);
+		$whereQueryBlock = $this->getWhereQueryBlock($filter['isActive'] ?? 1);
 
 		$result = mysqli_query(
 			$connection,
@@ -32,7 +27,7 @@ class OrderRepository extends Repository
 			FROM N_ONE_ORDERS o
 			JOIN N_ONE_STATUSES s on s.ID = o.STATUS_ID
 			$whereQueryBlock
-			LIMIT $currentLimit OFFSET $offset;"
+			LIMIT $this->currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -40,10 +35,17 @@ class OrderRepository extends Repository
 			throw new DatabaseException(mysqli_error($connection));
 		}
 
+		$orders = [];
 		while ($row = mysqli_fetch_assoc($result))
 		{
 			$order = new Order(
-				$row['ID'], $row['USER_ID'], $row['ITEM_ID'], $row['STATUS_ID'], $row['TITLE'], $row['PRICE'], $row['NUMBER']
+				$row['ID'],
+				$row['USER_ID'],
+				$row['ITEM_ID'],
+				$row['STATUS_ID'],
+				$row['TITLE'],
+				$row['PRICE'],
+				$row['NUMBER']
 			);
 
 			$orders[] = $order;

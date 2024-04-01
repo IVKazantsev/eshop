@@ -11,47 +11,6 @@ use N_ONE\Core\Exceptions\DatabaseException;
 
 class UserRepository extends Repository
 {
-	public function getUserFromResult(mysqli_result $result): ?User
-	{
-		$user = null;
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$user = new User(
-				$row['ID'],
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
-			);
-		}
-
-		return $user;
-	}
-
-	/**
-	 * @return User[]
-	 */
-	public function getUsersFromResult(mysqli_result $result): array
-	{
-		$users = [];
-		while ($row = mysqli_fetch_assoc($result))
-		{
-			$users[] = new User(
-				$row['ID'],
-				$row['ROLE_ID'],
-				$row['NAME'],
-				$row['EMAIL'],
-				$row['PASSWORD'],
-				$row['PHONE_NUMBER'],
-				$row['ADDRESS'],
-			);
-		}
-
-		return $users;
-	}
-
 	/**
 	 * @throws DatabaseException
 	 * @throws mysqli_sql_exception
@@ -59,11 +18,8 @@ class UserRepository extends Repository
 	public function getList(array $filter = null): array
 	{
 		$connection = $this->dbConnection->getConnection();
-		$numItemsPerPage = Configurator::option('NUM_OF_ITEMS_PER_PAGE');
-		$currentLimit = $numItemsPerPage + 1;
-		$offset = ($filter['pageNumber'] ?? 0) * $numItemsPerPage;
-		$isActive = $filter['isActive'] ?? 1;
-		$whereQueryBlock = $this->getWhereQueryBlock($isActive);
+		$offset = $this->calculateOffset($filter['pageNumber']);
+		$whereQueryBlock = $this->getWhereQueryBlock($filter['isActive'] ?? 1);
 
 		$result = mysqli_query(
 			$connection,
@@ -72,7 +28,7 @@ class UserRepository extends Repository
 			FROM N_ONE_USERS u
 			JOIN N_ONE_ROLES r on r.ID = u.ROLE_ID
 			$whereQueryBlock
-			LIMIT $currentLimit OFFSET $offset;"
+			LIMIT $this->currentLimit OFFSET $offset;"
 		);
 
 		if (!$result)
@@ -369,4 +325,46 @@ class UserRepository extends Repository
 
 		return true;
 	}
+
+	public function getUserFromResult(mysqli_result $result): ?User
+	{
+		$user = null;
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$user = new User(
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
+			);
+		}
+
+		return $user;
+	}
+
+	/**
+	 * @return User[]
+	 */
+	public function getUsersFromResult(mysqli_result $result): array
+	{
+		$users = [];
+		while ($row = mysqli_fetch_assoc($result))
+		{
+			$users[] = new User(
+				$row['ID'],
+				$row['ROLE_ID'],
+				$row['NAME'],
+				$row['EMAIL'],
+				$row['PASSWORD'],
+				$row['PHONE_NUMBER'],
+				$row['ADDRESS'],
+			);
+		}
+
+		return $users;
+	}
+
 }
